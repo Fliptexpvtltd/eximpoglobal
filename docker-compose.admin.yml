@@ -1,0 +1,25 @@
+# Admin Frontend - Separate Port Configuration
+version: '3.8'
+
+services:
+  # Admin Frontend (React + Vite) - Port 3001
+  admin-frontend:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile.dev
+    container_name: eximpo-admin-frontend
+    ports:
+      - "3001:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:5000/api
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    networks:
+      - eximpo-network
+    restart: unless-stopped
+
+networks:
+  eximpo-network:
+    external: true
+    name: eximpo_eximpo-network

@@ -1,0 +1,5 @@
+﻿.env.production
+.env.production.example
+*.zip
+*.tar.gz
+node_modules/

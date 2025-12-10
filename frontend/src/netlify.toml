@@ -1,0 +1,28 @@
+[build]
+  # Build command
+  command = "npm install && npm run build"
+  
+  # Directory with the build output
+  publish = "dist"
+  
+  # Base directory
+  base = ""
+
+[build.environment]
+  # Node version
+  NODE_VERSION = "20.11.0"
+  NPM_FLAGS = "--legacy-peer-deps"
+
+# Redirect all routes to index.html for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Exclude mobile directory from deployment
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
