@@ -1,0 +1,52 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: eximpo-backend-vps
+    ports:
+      - "5000:5000"
+    env_file:
+      - .env.production
+    networks:
+      - eximpo-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: eximpo-frontend-vps
+    ports:
+      - "3000:80"
+    environment:
+      - VITE_API_BASE_URL=http://217.217.250.49:5000
+    networks:
+      - eximpo-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  admin:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    container_name: eximpo-admin-vps
+    ports:
+      - "3001:80"
+    environment:
+      - VITE_API_BASE_URL=http://217.217.250.49:5000
+    networks:
+      - eximpo-network
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+networks:
+  eximpo-network:
+    driver: bridge
