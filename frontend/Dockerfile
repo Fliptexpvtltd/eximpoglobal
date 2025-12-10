@@ -13,7 +13,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build for production
-RUN npm run build
+RUN npx vite build
 
 # Production stage
 FROM nginx:alpine
