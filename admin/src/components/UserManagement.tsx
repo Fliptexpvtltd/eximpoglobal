@@ -31,7 +31,7 @@ export function UserManagement() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/users', {
+      const response = await fetch('/api/admin/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -50,7 +50,7 @@ export function UserManagement() {
   const handleVerifyUser = async (userId: string, verified: boolean) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/verify`, {
+      const response = await fetch(`/api/admin/users/${userId}/verify`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -80,7 +80,7 @@ export function UserManagement() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      const response = await fetch(`/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

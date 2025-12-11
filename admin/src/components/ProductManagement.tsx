@@ -38,7 +38,7 @@ export function ProductManagement() {
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (categoryFilter !== 'all') params.append('category', categoryFilter);
       
-      const response = await fetch(`http://localhost:5000/api/admin/products?${params}`, {
+      const response = await fetch(`/api/admin/products?${params}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -57,7 +57,7 @@ export function ProductManagement() {
   const handleApproveProduct = async (productId: string, approved: boolean) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/admin/products/${productId}/approve`, {
+      const response = await fetch(`/api/admin/products/${productId}/approve`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

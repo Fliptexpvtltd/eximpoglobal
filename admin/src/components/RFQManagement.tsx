@@ -34,7 +34,7 @@ export function RFQManagement() {
       const params = new URLSearchParams();
       if (statusFilter !== 'all') params.append('status', statusFilter);
       
-      const response = await fetch(`http://localhost:5000/api/admin/rfqs?${params}`, {
+      const response = await fetch(`/api/admin/rfqs?${params}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
