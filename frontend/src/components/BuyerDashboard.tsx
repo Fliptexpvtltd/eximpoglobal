@@ -92,7 +92,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
       const token = localStorage.getItem('token');
       
       // Fetch buyer analytics
-      const analyticsResponse = await fetch('http://localhost:5000/api/analytics/buyer', {
+      const analyticsResponse = await fetch('/api/analytics/buyer', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const analyticsData = await analyticsResponse.json();
@@ -101,13 +101,13 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
       }
       
       // Fetch RFQs
-      const rfqResponse = await fetch('http://localhost:5000/api/rfqs?limit=5', {
+      const rfqResponse = await fetch('/api/rfqs?limit=5', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const rfqData = await rfqResponse.json();
       
       // Fetch trending products
-      const productsResponse = await fetch('http://localhost:5000/api/products?limit=4');
+      const productsResponse = await fetch('/api/products?limit=4');
       const productsData = await productsResponse.json();
 
       if (rfqData.success && rfqData.data) {

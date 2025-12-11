@@ -22,7 +22,7 @@ export function SupplierProfile({ supplierId, onBack }: SupplierProfileProps) {
 
   const fetchSupplier = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/suppliers/${supplierId}`);
+      const response = await fetch(`/api/suppliers/${supplierId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -37,7 +37,7 @@ export function SupplierProfile({ supplierId, onBack }: SupplierProfileProps) {
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/suppliers/${supplierId}/products`);
+      const response = await fetch(`/api/suppliers/${supplierId}/products`);
       const data = await response.json();
       
       if (data.success) {

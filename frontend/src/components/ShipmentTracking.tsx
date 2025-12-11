@@ -18,7 +18,7 @@ export function ShipmentTracking({ po, onBack }: ShipmentTrackingProps) {
   const fetchShipment = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/shipments?order_id=${po.id}`, {
+      const response = await fetch(`/api/shipments?order_id=${po.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();

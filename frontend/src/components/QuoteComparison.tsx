@@ -20,7 +20,7 @@ export function QuoteComparison({ rfq, onAcceptQuote, onChat, onBack }: QuoteCom
   const fetchQuotes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/quotes/rfq/${rfq.id}`, {
+      const response = await fetch(`/api/quotes/rfq/${rfq.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -54,7 +54,7 @@ export function QuoteComparison({ rfq, onAcceptQuote, onChat, onBack }: QuoteCom
   const handleAcceptQuote = async (quote: Quote) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/quotes/${quote.id}/accept`, {
+      const response = await fetch(`/api/quotes/${quote.id}/accept`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });
