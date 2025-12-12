@@ -77,7 +77,7 @@ export function AdminDashboard({ user, onNavigate }: AdminDashboardProps) {
       setLoading(true);
       
       // Fetch admin analytics
-      const analyticsResponse = await fetch('/api/analytics/admin', {
+      const analyticsResponse = await fetch('http://localhost:5000/api/analytics/admin', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -115,7 +115,7 @@ export function AdminDashboard({ user, onNavigate }: AdminDashboardProps) {
       }
 
       // Fetch recent products
-      const productsResponse = await fetch('/api/products?limit=10', {
+      const productsResponse = await fetch('http://localhost:5000/api/products?limit=10', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

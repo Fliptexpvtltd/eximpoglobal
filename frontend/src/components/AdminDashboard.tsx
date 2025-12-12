@@ -70,7 +70,7 @@ export function AdminDashboard({ user, onNavigate }: AdminDashboardProps) {
       setLoading(true);
       
       // Fetch platform statistics
-      const statsResponse = await fetch('/api/admin/stats', {
+      const statsResponse = await fetch('http://localhost:5000/api/admin/stats', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -82,7 +82,7 @@ export function AdminDashboard({ user, onNavigate }: AdminDashboardProps) {
       }
 
       // Fetch recent users
-      const usersResponse = await fetch('/api/admin/users?limit=10', {
+      const usersResponse = await fetch('http://localhost:5000/api/admin/users?limit=10', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -94,7 +94,7 @@ export function AdminDashboard({ user, onNavigate }: AdminDashboardProps) {
       }
 
       // Fetch recent products
-      const productsResponse = await fetch('/api/admin/products?limit=10', {
+      const productsResponse = await fetch('http://localhost:5000/api/admin/products?limit=10', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }

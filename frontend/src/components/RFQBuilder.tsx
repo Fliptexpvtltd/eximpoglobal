@@ -87,7 +87,7 @@ export function RFQBuilder({ initialProduct, user, onSubmit, onCancel }: RFQBuil
         paymentTerms: 'Net 30'
       };
 
-      const response = await fetch('/api/rfqs', {
+      const response = await fetch('http://localhost:5000/api/rfqs', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,

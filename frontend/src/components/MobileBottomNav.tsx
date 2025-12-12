@@ -5,9 +5,10 @@ interface MobileBottomNavProps {
   user: UserType;
   currentView: string;
   onNavigate: (view: any) => void;
+  activeMode?: 'buyer' | 'seller';
 }
 
-export function MobileBottomNav({ user, currentView, onNavigate }: MobileBottomNavProps) {
+export function MobileBottomNav({ user, currentView, onNavigate, activeMode = 'buyer' }: MobileBottomNavProps) {
   const buyerLinks = [
     { id: 'catalog', label: 'Browse', icon: ShoppingBag },
     { id: 'dashboard', label: 'Orders', icon: Home },
@@ -24,7 +25,9 @@ export function MobileBottomNav({ user, currentView, onNavigate }: MobileBottomN
     { id: 'profile', label: 'Profile', icon: User },
   ];
 
-  const links = user.role === 'seller' ? sellerLinks : buyerLinks;
+  // For 'both' role, use activeMode to determine which links to show
+  const effectiveRole = user.role === 'both' ? activeMode : user.role;
+  const links = effectiveRole === 'seller' ? sellerLinks : buyerLinks;
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] safe-area-bottom">

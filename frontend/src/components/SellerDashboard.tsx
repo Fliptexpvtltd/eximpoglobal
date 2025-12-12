@@ -58,7 +58,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const fetchSellerAnalytics = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/analytics/seller', {
+      const response = await fetch('http://localhost:5000/api/analytics/seller', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();

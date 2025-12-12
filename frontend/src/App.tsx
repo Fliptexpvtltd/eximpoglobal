@@ -161,6 +161,7 @@ function AppContent() {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedPO, setSelectedPO] = useState<PO | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [activeMode, setActiveMode] = useState<'buyer' | 'seller'>('buyer');
 
   // Listen for pending action execution
   useEffect(() => {
@@ -299,12 +300,14 @@ function AppContent() {
                 logout();
                 setCurrentView('catalog');
               }}
+              activeMode={activeMode}
+              onModeChange={setActiveMode}
             />
           )}
           
           {/* Main Content */}
           <main className={user ? "flex-1 max-w-7xl mx-auto w-full px-4 py-6 pb-24 lg:pb-6" : "flex-1"}>
-          {currentView === 'dashboard' && user && user.role === 'buyer' && (
+          {currentView === 'dashboard' && user && (user.role === 'buyer' || (user.role === 'both' && activeMode === 'buyer')) && (
           <BuyerDashboard 
             user={user} 
             onNavigate={navigate}
@@ -313,7 +316,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'dashboard' && user && user.role === 'seller' && (
+        {currentView === 'dashboard' && user && (user.role === 'seller' || (user.role === 'both' && activeMode === 'seller')) && (
           <SellerDashboard 
             user={user} 
             onNavigate={navigate}
@@ -439,6 +442,7 @@ function AppContent() {
               user={user}
               currentView={currentView}
               onNavigate={navigate}
+              activeMode={activeMode}
             />
           )}
         </div>

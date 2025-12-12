@@ -7,9 +7,11 @@ interface NavigationProps {
   currentView: string;
   onNavigate: (view: string) => void;
   onLogout: () => void;
+  activeMode?: 'buyer' | 'seller';
+  onModeChange?: (mode: 'buyer' | 'seller') => void;
 }
 
-export function Navigation({ user, currentView, onNavigate, onLogout }: NavigationProps) {
+export function Navigation({ user, currentView, onNavigate, onLogout, activeMode = 'buyer', onModeChange }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const buyerLinks = [
     { id: 'catalog', label: 'Browse Products', icon: Search },
@@ -27,7 +29,9 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
-  const links = user.role === 'seller' ? sellerLinks : buyerLinks;
+  // For 'both' role, use activeMode to determine which links to show
+  const effectiveRole = user.role === 'both' ? activeMode : user.role;
+  const links = effectiveRole === 'seller' ? sellerLinks : buyerLinks;
 
   return (
     <>
@@ -45,6 +49,32 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
             </div>
             
             <div className="flex items-center gap-2 md:gap-4">
+              {/* Role Switcher for users with 'both' role */}
+              {user.role === 'both' && onModeChange && (
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => onModeChange('buyer')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      activeMode === 'buyer'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Buyer
+                  </button>
+                  <button
+                    onClick={() => onModeChange('seller')}
+                    className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
+                      activeMode === 'seller'
+                        ? 'bg-white text-green-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    Seller
+                  </button>
+                </div>
+              )}
+              
               {user.kycStatus === 'pending' && (
                 <div className="hidden md:block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
                   KYC Pending

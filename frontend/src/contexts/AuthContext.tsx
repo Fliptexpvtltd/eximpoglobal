@@ -32,7 +32,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch('/api/auth/login', {
+      const response = await fetch('http://localhost:5000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const response = await fetch('/api/auth/register', {
+      const response = await fetch('http://localhost:5000/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           password: pendingSignupData.password,
           fullName: pendingSignupData.fullName,
           phone: pendingSignupData.phone,
-          role: role === 'both' ? 'buyer' : role,
+          role: role,
           companyName,
           country: pendingSignupData.countryCode.replace('+', ''),
         }),

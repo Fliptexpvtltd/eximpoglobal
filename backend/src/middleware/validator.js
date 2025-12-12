@@ -29,7 +29,7 @@ export const schemas = {
   register: Joi.object({
     email: Joi.string().email().required(),
     password: Joi.string().min(6).required(),
-    role: Joi.string().valid('buyer', 'seller').required(),
+    role: Joi.string().valid('buyer', 'seller', 'both', 'ops', 'finance', 'admin').required(),
     companyName: Joi.string().required(),
     fullName: Joi.string().required(),
     phone: Joi.string().optional(),

@@ -68,7 +68,7 @@ export function PurchaseOrder({ user, quote, orderId, onSubmit, onCancel }: Purc
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/orders', {
+      const response = await fetch('http://localhost:5000/api/orders', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
