@@ -163,6 +163,11 @@ function AppContent() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeMode, setActiveMode] = useState<'buyer' | 'seller'>('buyer');
 
+  const handleModeChange = (mode: 'buyer' | 'seller') => {
+    console.log('Mode changing to:', mode);
+    setActiveMode(mode);
+  };
+
   // Listen for pending action execution
   useEffect(() => {
     const handlePendingAction = (event: any) => {
@@ -301,7 +306,7 @@ function AppContent() {
                 setCurrentView('catalog');
               }}
               activeMode={activeMode}
-              onModeChange={setActiveMode}
+              onModeChange={handleModeChange}
             />
           )}
           

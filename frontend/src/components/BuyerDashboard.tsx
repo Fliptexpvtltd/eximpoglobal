@@ -82,9 +82,15 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
   const [products, setProducts] = useState<Product[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
+    // Set greeting based on time of day
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good Morning');
+    else if (hour < 18) setGreeting('Good Afternoon');
+    else setGreeting('Good Evening');
   }, []);
 
   const fetchDashboardData = async () => {
@@ -205,9 +211,10 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl mb-2">Welcome back, {user.name}</h1>
-        <p className="text-base md:text-xl text-gray-600">Here's what's happening with your trades today</p>
+      {/* Header with Blue Theme */}
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 -mx-4 -mt-6 px-4 pt-6 pb-8 mb-6 rounded-b-2xl">
+        <h1 className="text-2xl md:text-3xl text-white mb-2">{greeting}, {user.name}! 👋</h1>
+        <p className="text-base md:text-xl text-blue-100">Find the best suppliers and manage your orders</p>
       </div>
       
       {user.kycStatus === 'pending' && (

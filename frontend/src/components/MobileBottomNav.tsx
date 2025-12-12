@@ -28,6 +28,9 @@ export function MobileBottomNav({ user, currentView, onNavigate, activeMode = 'b
   // For 'both' role, use activeMode to determine which links to show
   const effectiveRole = user.role === 'both' ? activeMode : user.role;
   const links = effectiveRole === 'seller' ? sellerLinks : buyerLinks;
+  
+  // Theme colors based on role
+  const textColor = effectiveRole === 'seller' ? 'text-emerald-600' : 'text-blue-600';
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] safe-area-bottom">
@@ -42,7 +45,7 @@ export function MobileBottomNav({ user, currentView, onNavigate, activeMode = 'b
               onClick={() => onNavigate(link.id)}
               className={`flex flex-col items-center justify-center gap-0.5 transition-colors active:bg-gray-50 ${
                 isActive
-                  ? 'text-blue-600'
+                  ? textColor
                   : 'text-gray-500'
               }`}
             >

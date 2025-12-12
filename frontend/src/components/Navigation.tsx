@@ -14,24 +14,34 @@ interface NavigationProps {
 export function Navigation({ user, currentView, onNavigate, onLogout, activeMode = 'buyer', onModeChange }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const buyerLinks = [
-    { id: 'catalog', label: 'Browse Products', icon: Search },
     { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'rfq-builder', label: 'Create RFQ', icon: FileText },
+    { id: 'catalog', label: 'Browse Products', icon: Search },
+    { id: 'rfq-builder', label: 'Request Quotes', icon: FileText },
+    { id: 'shipment-tracking', label: 'Track Orders', icon: Package },
     { id: 'chat', label: 'Messages', icon: MessageSquare },
-    { id: 'shipment-tracking', label: 'Shipments', icon: Package },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
   const sellerLinks = [
-    { id: 'catalog', label: 'My Products', icon: Package },
     { id: 'dashboard', label: 'Dashboard', icon: Home },
+    { id: 'catalog', label: 'My Products', icon: Package },
+    { id: 'incoming-rfqs', label: 'RFQ Requests', icon: FileText },
     { id: 'chat', label: 'Messages', icon: MessageSquare },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    { id: 'analytics', label: 'Performance', icon: BarChart3 },
   ];
 
   // For 'both' role, use activeMode to determine which links to show
   const effectiveRole = user.role === 'both' ? activeMode : user.role;
   const links = effectiveRole === 'seller' ? sellerLinks : buyerLinks;
+  
+  // Debug logging
+  console.log('Navigation render:', { userRole: user.role, activeMode, effectiveRole });
+  
+  // Theme colors based on role
+  const bgColor = effectiveRole === 'seller' ? 'bg-emerald-600' : 'bg-blue-600';
+  const textColor = effectiveRole === 'seller' ? 'text-emerald-600' : 'text-blue-600';
+  const hoverBgColor = effectiveRole === 'seller' ? 'hover:bg-emerald-50' : 'hover:bg-blue-50';
+  const activeBgColor = effectiveRole === 'seller' ? 'bg-emerald-50 text-emerald-700 border-emerald-600' : 'bg-blue-50 text-blue-700 border-blue-600';
 
   return (
     <>
@@ -43,7 +53,7 @@ export function Navigation({ user, currentView, onNavigate, onLogout, activeMode
                 onClick={() => onNavigate('catalog')}
                 className="flex items-center gap-2 lg:hidden"
               >
-                <Globe className="w-7 h-7 md:w-8 md:h-8 text-blue-600" />
+                <Globe className={`w-7 h-7 md:w-8 md:h-8 ${textColor}`} />
                 <span className="text-lg md:text-xl text-gray-900">EximpoGlobal</span>
               </button>
             </div>
@@ -60,17 +70,17 @@ export function Navigation({ user, currentView, onNavigate, onLogout, activeMode
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    Buyer
+                    🛒 Buyer
                   </button>
                   <button
                     onClick={() => onModeChange('seller')}
                     className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                       activeMode === 'seller'
-                        ? 'bg-white text-green-600 shadow-sm'
+                        ? 'bg-white text-emerald-600 shadow-sm'
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    Seller
+                    🏪 Seller
                   </button>
                 </div>
               )}
@@ -98,7 +108,7 @@ export function Navigation({ user, currentView, onNavigate, onLogout, activeMode
                 </div>
                 
                 <div className="relative group">
-                  <button className="w-9 h-9 bg-blue-600 text-white rounded-full flex items-center justify-center">
+                  <button className={`w-9 h-9 ${bgColor} text-white rounded-full flex items-center justify-center`}>
                     <User className="w-5 h-5" />
                   </button>
                   
@@ -152,8 +162,8 @@ export function Navigation({ user, currentView, onNavigate, onLogout, activeMode
                     }}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
                       currentView === link.id
-                        ? 'bg-blue-50 text-blue-600'
-                        : 'text-gray-600 hover:bg-gray-50'
+                        ? activeBgColor
+                        : `text-gray-600 ${hoverBgColor}`
                     }`}
                   >
                     <Icon className="w-5 h-5" />

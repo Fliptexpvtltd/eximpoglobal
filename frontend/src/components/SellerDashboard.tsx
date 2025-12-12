@@ -119,17 +119,30 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
     );
   }
 
+  const greeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    else if (hour < 18) return 'Good Afternoon';
+    else return 'Good Evening';
+  };
+
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl md:text-3xl mb-2">Welcome back, {user.name}</h1>
-          <p className="text-base md:text-xl text-gray-600">Manage your products and respond to buyer inquiries</p>
+      {/* Header with Green Theme */}
+      <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 -mx-4 -mt-6 px-4 pt-6 pb-8 mb-6 rounded-b-2xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl md:text-3xl text-white mb-2">{greeting()}, {user.name}! 🏪</h1>
+            <p className="text-base md:text-xl text-emerald-100">Grow your business and reach global buyers</p>
+          </div>
+          <button 
+            onClick={() => onNavigate('add-product')}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-white text-emerald-600 rounded-lg hover:bg-emerald-50 font-medium shadow-lg"
+          >
+            <Plus className="w-5 h-5" />
+            Add Product
+          </button>
         </div>
-        <button className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-          <Plus className="w-5 h-5" />
-          Add Product
-        </button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
