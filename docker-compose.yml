@@ -4,11 +4,10 @@ services:
   # Frontend (React + Vite)
   frontend:
     build:
-      context: .
+      context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "80:80"
-      - "443:443"
+      - "3000:80"
     environment:
       - VITE_API_BASE_URL=http://backend:5000/api
     depends_on:
@@ -19,6 +18,22 @@ services:
     restart: always
     volumes:
       - ./ssl:/etc/nginx/ssl:ro
+
+  # Admin Frontend (React + Vite)
+  admin-frontend:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    environment:
+      - VITE_API_BASE_URL=http://backend:5000/api
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - eximpo-network
+    restart: always
 
   # Backend (Node.js API)
   backend:
@@ -37,10 +52,14 @@ services:
       - EMAIL_FROM=${EMAIL_FROM:-noreply@eximpoglobal.net}
       - EMAIL_FROM_NAME=${EMAIL_FROM_NAME:-Eximpo}
       - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
     env_file:
       - .env
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     networks:
       - eximpo-network
@@ -50,6 +69,23 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+
+  # Redis (for BullMQ job queue)
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - eximpo-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
 
   # PostgreSQL Database (Contabo VPS)
   postgres:
@@ -99,5 +135,6 @@ networks:
     driver: bridge
 
 volumes:
+  redis-data:
   postgres-data:
   pgadmin-data:

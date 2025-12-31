@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { IndianRupee, Calendar, Package, Shield, FileText, CheckCircle } from 'lucide-react';
 import type { User, PO, Quote } from '../App';
 
 interface PurchaseOrderProps {
   user: User | null;
+  activeMode?: 'buyer' | 'seller';
   quote?: Quote;
   orderId?: string;
   onSubmit: (po: PO) => void;
   onCancel: () => void;
 }
 
-export function PurchaseOrder({ user, quote, orderId, onSubmit, onCancel }: PurchaseOrderProps) {
+export function PurchaseOrder({ user, activeMode = 'buyer', quote, orderId, onSubmit, onCancel }: PurchaseOrderProps) {
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
+  const themeColor = isSeller ? '#059669' : '#2563eb';
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(!!orderId);
   const [paymentMethod, setPaymentMethod] = useState<'escrow' | 'lc' | 'oa' | 'dp'>('escrow');
@@ -45,16 +50,17 @@ export function PurchaseOrder({ user, quote, orderId, onSubmit, onCancel }: Purc
     }
   };
 
-  const mockItems = quote ? [
+  // Calculate items from quote data
+  const orderItems = quote ? [
     { 
-      productName: quote.rfqId, 
-      quantity: 5000, 
+      productName: quote.supplierName || 'Product', 
+      quantity: 1, 
       unitPrice: quote.unitPrice, 
       total: quote.totalCost 
     }
   ] : [];
 
-  const totalAmount = mockItems.reduce((sum, item) => sum + item.total, 0);
+  const totalAmount = orderItems.reduce((sum, item) => sum + item.total, 0);
   const depositAmount = (totalAmount * depositPercent) / 100;
   const balanceAmount = totalAmount - depositAmount;
 
@@ -62,7 +68,7 @@ export function PurchaseOrder({ user, quote, orderId, onSubmit, onCancel }: Purc
     e.preventDefault();
     
     if (!quote) {
-      alert('No quote selected');
+      toast.error('No quote selected');
       return;
     }
 
@@ -86,13 +92,13 @@ export function PurchaseOrder({ user, quote, orderId, onSubmit, onCancel }: Purc
       const data = await response.json();
       
       if (data.success) {
-        alert('Order created successfully!');
+        toast.success('Purchase Order created successfully!');
         const po: PO = {
           id: data.data.order_number,
           buyerId: user?.id || '1',
           supplierId: quote.supplierId,
           quoteId: quote.id,
-          items: mockItems,
+          items: orderItems,
           totalAmount,
           currency: 'USD',
           depositPercent,
@@ -106,11 +112,11 @@ export function PurchaseOrder({ user, quote, orderId, onSubmit, onCancel }: Purc
         };
         onSubmit(po);
       } else {
-        alert('Failed to create order: ' + (data.message || 'Unknown error'));
+        toast.error('Failed to create order: ' + (data.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error creating order:', error);
-      alert('Failed to create order. Please try again.');
+      toast.error('Failed to create order. Please try again.');
     }
   };
 
@@ -186,7 +192,7 @@ export function PurchaseOrder({ user, quote, orderId, onSubmit, onCancel }: Purc
                 </tr>
               </thead>
               <tbody>
-                {mockItems.map((item, index) => (
+                {orderItems.map((item, index) => (
                   <tr key={index} className="border-b border-gray-100">
                     <td className="py-4 text-gray-900">{item.productName}</td>
                     <td className="py-4 text-right text-gray-900">{item.quantity.toLocaleString()}</td>

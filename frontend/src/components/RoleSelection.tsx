@@ -23,27 +23,6 @@ const roles = [
     icon: Store,
     color: 'green',
   },
-  {
-    id: 'both' as UserRole,
-    name: 'Both',
-    description: 'Import and export on the same platform',
-    icon: Truck,
-    color: 'purple',
-  },
-  {
-    id: 'ops' as UserRole,
-    name: 'Ops/Logistics Partner',
-    description: 'Manage shipments and logistics',
-    icon: Truck,
-    color: 'orange',
-  },
-  {
-    id: 'finance' as UserRole,
-    name: 'Finance/Compliance',
-    description: 'Handle payments and regulatory compliance',
-    icon: Calculator,
-    color: 'indigo',
-  },
 ];
 
 const industries = [
@@ -161,16 +140,16 @@ export function RoleSelection({ onSelectRole, onBack, isModal = false }: RoleSel
               </div>
               
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-900">
+                <div className="text-sm text-blue-900">
                   <span className="block mb-1">📋 Next Steps: KYC Verification</span>
-                  After registration, you'll be asked to provide:
+                  <div>After registration, you'll be asked to provide:</div>
                   <ul className="mt-2 ml-4 space-y-1 list-disc text-blue-800">
                     <li>Company registration documents</li>
                     <li>VAT/GST number (if applicable)</li>
                     <li>Bank verification letter</li>
                     <li>Identity verification</li>
                   </ul>
-                </p>
+                </div>
               </div>
               
               <button
@@ -209,14 +188,14 @@ export function RoleSelection({ onSelectRole, onBack, isModal = false }: RoleSel
         </button>
       )}
       
-      <div className={isModal ? '' : 'text-center mb-12'}>
+      <div className={isModal ? 'text-center mb-12' : 'text-center mb-12'}>
         <h1 className={isModal ? 'text-xl mb-2' : 'text-3xl mb-3'}>Choose Your Role</h1>
         <p className={isModal ? 'text-sm text-gray-600' : 'text-xl text-gray-600'}>
           How will you be using EximpoGlobal?
         </p>
       </div>
       
-      <div className={isModal ? 'grid grid-cols-2 gap-3 mt-4' : 'grid md:grid-cols-2 lg:grid-cols-3 gap-6'}>
+      <div className={isModal ? 'grid grid-cols-2 gap-6 mt-8 max-w-4xl mx-auto' : 'grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto'}>
         {roles.map((role) => {
           const Icon = role.icon;
           return (

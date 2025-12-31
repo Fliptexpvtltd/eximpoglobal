@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS products (
     images TEXT[],
     specifications JSONB,
     available BOOLEAN DEFAULT true,
+    approval_status VARCHAR(50) DEFAULT 'pending' CHECK (approval_status IN ('pending', 'approved', 'rejected')),
+    rejection_reason TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -131,6 +133,21 @@ CREATE TABLE IF NOT EXISTS supplier_profiles (
     logo_url TEXT,
     banner_url TEXT,
     verified BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Reviews table
+CREATE TABLE IF NOT EXISTS reviews (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    reviewer_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    supplier_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    order_id UUID REFERENCES orders(id) ON DELETE SET NULL,
+    rating DECIMAL(2, 1) NOT NULL CHECK (rating >= 0 AND rating <= 5),
+    comment TEXT,
+    verified_purchase BOOLEAN DEFAULT false,
+    helpful_votes INTEGER DEFAULT 0,
+    seller_response TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

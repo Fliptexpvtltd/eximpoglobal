@@ -33,7 +33,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - VITE_API_BASE_URL=http://localhost:5000/api
+      - VITE_API_BASE_URL=http://backend:5000/api
     volumes:
       - ./frontend:/app
       - /app/node_modules
@@ -63,6 +63,23 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    restart: unless-stopped
+
+  # Admin Frontend (React + Vite) - Development Mode
+  admin-frontend:
+    build:
+      context: ./admin
+      dockerfile: Dockerfile.dev
+    container_name: eximpo-admin-frontend
+    ports:
+      - "3001:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:5000/api
+    volumes:
+      - ./admin:/app
+      - /app/node_modules
+    networks:
+      - eximpo-network
     restart: unless-stopped
 
   # pgAdmin (Optional - Database Management UI)

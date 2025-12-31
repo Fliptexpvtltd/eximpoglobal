@@ -17,7 +17,7 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
     { id: 'catalog', label: 'Browse Products', icon: Search },
     { id: 'rfq-builder', label: 'Create RFQ', icon: FileText },
     { id: 'chat', label: 'Messages', icon: MessageSquare, badge: 3 },
-    { id: 'shipment-tracking', label: 'Shipments', icon: Package },
+    { id: 'shipments', label: 'Shipments', icon: Package },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
@@ -34,19 +34,23 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
     { id: 'help', label: 'Help & Support', icon: HelpCircle },
   ];
 
-  const links = user.role === 'seller' ? sellerLinks : buyerLinks;
+  const isSeller = user.role === 'seller';
+  const links = isSeller ? sellerLinks : buyerLinks;
 
   return (
     <aside className={`
-      ${sidebarOpen ? 'w-64' : 'w-20'}
+      ${sidebarOpen ? 'w-64' : 'w-16'}
       bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen
       hidden lg:flex flex-shrink-0 sticky top-0
     `}>
       {/* Logo and Toggle */}
-      <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
+      <div className={`h-16 border-b border-gray-200 flex items-center ${sidebarOpen ? 'justify-between px-4' : 'justify-center'}`}>
         {sidebarOpen && (
           <div className="flex items-center gap-2">
-            <Globe className="w-8 h-8 text-blue-600" />
+            <Globe 
+              className="w-8 h-8"
+              style={{ color: isSeller ? '#059669' : '#2563eb' }}
+            />
             <span className="font-bold text-gray-900">EximpoGlobal</span>
           </div>
         )}
@@ -68,14 +72,15 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
               key={link.id}
               onClick={() => onNavigate(link.id)}
               className={`
-                w-full flex items-center gap-3 px-4 py-3 transition group relative
+                w-full flex items-center gap-3 py-3 transition group relative
+                ${sidebarOpen ? 'px-4' : 'justify-center'}
                 ${isActive 
-                  ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600' 
+                  ? (isSeller ? 'bg-emerald-50 text-emerald-700 border-r-4 border-emerald-600' : 'bg-blue-50 text-blue-600 border-r-4 border-blue-600')
                   : 'text-gray-700 hover:bg-gray-50'
                 }
               `}
             >
-              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? 'text-blue-600' : 'text-gray-500'}`} />
+              <Icon className={`w-5 h-5 flex-shrink-0 ${isActive ? (isSeller ? 'text-emerald-600' : 'text-blue-600') : 'text-gray-500'}`} />
               {sidebarOpen && (
                 <>
                   <span className="font-medium">{link.label}</span>
@@ -86,13 +91,6 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
                   )}
                   {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
                 </>
-              )}
-              
-              {/* Tooltip for collapsed sidebar */}
-              {!sidebarOpen && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-50">
-                  {link.label}
-                </div>
               )}
             </button>
           );
@@ -110,7 +108,8 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
               key={link.id}
               onClick={() => onNavigate(link.id)}
               className={`
-                w-full flex items-center gap-3 px-4 py-3 transition group relative
+                w-full flex items-center gap-3 py-3 transition group relative
+                ${sidebarOpen ? 'px-4' : 'justify-center'}
                 ${isActive 
                   ? 'bg-blue-50 text-blue-600 border-r-4 border-blue-600' 
                   : 'text-gray-700 hover:bg-gray-50'
@@ -123,13 +122,6 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
                   <span className="font-medium">{link.label}</span>
                   {isActive && <ChevronRight className="w-4 h-4 ml-auto" />}
                 </>
-              )}
-              
-              {/* Tooltip for collapsed sidebar */}
-              {!sidebarOpen && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded opacity-0 group-hover:opacity-100 transition pointer-events-none whitespace-nowrap z-50">
-                  {link.label}
-                </div>
               )}
             </button>
           );

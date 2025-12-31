@@ -1,15 +1,21 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { ArrowLeft, Check, X, AlertCircle, MessageSquare, IndianRupee, Calendar, Truck, Shield } from 'lucide-react';
 import type { RFQ, Quote } from '../App';
 
 interface QuoteComparisonProps {
   rfq: RFQ;
+  user?: any;
+  activeMode?: 'buyer' | 'seller';
   onAcceptQuote: (quote: Quote) => void;
   onChat: () => void;
   onBack: () => void;
 }
 
-export function QuoteComparison({ rfq, onAcceptQuote, onChat, onBack }: QuoteComparisonProps) {
+export function QuoteComparison({ rfq, user, activeMode = 'buyer', onAcceptQuote, onChat, onBack }: QuoteComparisonProps) {
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
+  const themeColor = isSeller ? '#059669' : '#2563eb';
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -61,14 +67,14 @@ export function QuoteComparison({ rfq, onAcceptQuote, onChat, onBack }: QuoteCom
       const data = await response.json();
       
       if (data.success) {
-        alert('Quote accepted successfully!');
-        onAcceptQuote(quote);
+        toast.success('Quote accepted successfully!');
+        onAccept(quote.id);
       } else {
-        alert('Failed to accept quote: ' + (data.message || 'Unknown error'));
+        toast.error('Failed to accept quote: ' + (data.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error accepting quote:', error);
-      alert('Failed to accept quote. Please try again.');
+      toast.error('Failed to accept quote. Please try again.');
     }
   };
 

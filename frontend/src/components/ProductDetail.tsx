@@ -7,9 +7,12 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface ProductDetailProps {
   product: Product;
+  user?: any;
+  activeMode?: 'buyer' | 'seller';
   onCreateRFQ: (product: Product) => void;
   onOrderSample: (product: Product) => void;
   onViewSupplier: (supplierId: string) => void;
+  onContactSupplier: (supplierId: string) => void;
   onBack: () => void;
 }
 
@@ -35,8 +38,13 @@ const specifications = [
   { label: 'Customization', value: 'Logo printing, embroidery available' },
 ];
 
-export function ProductDetail({ product, onCreateRFQ, onOrderSample, onViewSupplier, onBack }: ProductDetailProps) {
-  const { user } = useAuth();
+export function ProductDetail({ product, user: propUser, activeMode = 'buyer', onCreateRFQ, onOrderSample, onViewSupplier, onContactSupplier, onBack }: ProductDetailProps) {
+  const { user: authUser } = useAuth();
+  const user = propUser || authUser;
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
+  const themeColor = isSeller ? '#059669' : '#2563eb';
+  
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'shipping'>('description');
 
   return (
@@ -135,7 +143,10 @@ export function ProductDetail({ product, onCreateRFQ, onOrderSample, onViewSuppl
                   <FileText className="w-5 h-5" />
                   Request Quote
                 </button>
-                <button className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2">
+                <button 
+                  onClick={() => onContactSupplier(product.supplierId)}
+                  className="px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2"
+                >
                   <MessageSquare className="w-5 h-5" />
                   <span className="hidden sm:inline">Contact</span>
                 </button>

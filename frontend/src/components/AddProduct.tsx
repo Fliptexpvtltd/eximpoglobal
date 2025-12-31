@@ -1,0 +1,642 @@
+import { useState } from 'react';
+import { toast } from 'sonner';
+import { ArrowLeft, Upload, Plus, X, Save, AlertCircle } from 'lucide-react';
+import type { User } from '../App';
+
+interface AddProductProps {
+  user: User;
+  activeMode: 'buyer' | 'seller';
+  onBack: () => void;
+  onSuccess?: () => void;
+}
+
+export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductProps) {
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    category: 'Electronics',
+    hsCode: '',
+    description: '',
+    price: '',
+    currency: 'USD',
+    moq: '',
+    unit: 'pieces',
+    leadTime: '',
+    origin: 'China',
+    specifications: '',
+    features: '',
+    certifications: [] as string[],
+    customization: false,
+    sampleAvailable: true,
+    samplePrice: '',
+    packagingDetails: '',
+    shippingWeight: '',
+    dimensions: { length: '', width: '', height: '' },
+  });
+
+  const [newCertification, setNewCertification] = useState('');
+  const [images, setImages] = useState<string[]>([]);
+
+  const categories = [
+    'Electronics',
+    'Textiles & Apparel',
+    'Machinery & Equipment',
+    'Home & Garden',
+    'Automotive',
+    'Food & Beverage',
+    'Chemicals',
+    'Construction Materials',
+    'Medical & Healthcare',
+    'Toys & Sports',
+  ];
+
+  const currencies = ['USD', 'EUR', 'GBP', 'CNY', 'INR', 'JPY'];
+  const units = ['pieces', 'sets', 'kg', 'tons', 'meters', 'liters'];
+  const countries = ['China', 'India', 'Vietnam', 'Thailand', 'Turkey', 'USA', 'Germany', 'Italy'];
+
+  const handleAddCertification = () => {
+    if (newCertification.trim() && !formData.certifications.includes(newCertification)) {
+      setFormData({
+        ...formData,
+        certifications: [...formData.certifications, newCertification.trim()],
+      });
+      setNewCertification('');
+    }
+  };
+
+  const handleRemoveCertification = (cert: string) => {
+    setFormData({
+      ...formData,
+      certifications: formData.certifications.filter((c) => c !== cert),
+    });
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please upload image files only');
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size must be less than 5MB');
+        return;
+      }
+
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImages([...images, reader.result as string]);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    // Validate required fields
+    if (!formData.name || !formData.category) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      
+      if (!token) {
+        toast.error('Authentication required. Please login again.');
+        return;
+      }
+
+      // Prepare product data for API
+      const productData = {
+        name: formData.name,
+        category: formData.category,
+        description: formData.description || null,
+        price: formData.price ? parseFloat(formData.price) : null,
+        moq: formData.moq ? parseInt(formData.moq) : null,
+        unit: formData.unit,
+        incoterms: ['FOB', 'CIF', 'EXW'], // Default incoterms
+        certifications: formData.certifications,
+        images: images,
+        specifications: {
+          hsCode: formData.hsCode,
+          leadTime: formData.leadTime,
+          originCountry: formData.origin,
+          features: formData.features,
+          specifications: formData.specifications,
+          customization: formData.customization,
+          sampleAvailable: formData.sampleAvailable,
+          samplePrice: formData.samplePrice ? parseFloat(formData.samplePrice) : null,
+          packaging: formData.packagingDetails,
+          shippingWeight: formData.shippingWeight,
+          dimensions: formData.dimensions,
+        },
+      };
+
+      const response = await fetch('http://localhost:5000/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(productData),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Product submitted successfully! Pending admin approval.');
+        setTimeout(() => {
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            onBack();
+          }
+        }, 2000);
+      } else {
+        console.error('Server error:', data);
+        if (response.status === 403) {
+          toast.error('Access forbidden. You must be logged in as a Seller to add products.');
+        } else {
+          toast.error(data.message || 'Failed to create product');
+        }
+      }
+    } catch (error) {
+      console.error('Error creating product:', error);
+      toast.error('Failed to create product. Please try again.');
+    }
+  };
+
+  const isSeller = activeMode === 'seller';
+  const themeColor = isSeller ? '#059669' : '#2563eb';
+
+  return (
+    <div className="space-y-6">
+      {/* Success Message */}
+      {showSuccess && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-start gap-3">
+          <div className="w-5 h-5 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-white text-xs">✓</span>
+          </div>
+          <div>
+            <p className="text-green-900 font-medium">Product submitted successfully!</p>
+            <p className="text-green-700 text-sm mt-1">Your product is pending admin approval. It will appear in the catalog once approved.</p>
+          </div>
+        </div>
+      )}
+
+      {/* Header */}
+      <div className="p-6 rounded-xl text-white" style={{ background: `linear-gradient(to right, ${themeColor}, ${isSeller ? '#047857' : '#1e40af'})` }}>
+        <button
+          onClick={onBack}
+          className="flex items-center gap-2 text-white hover:opacity-80 transition-opacity mb-4"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          Back to Catalog
+        </button>
+        <h1 className="text-2xl md:text-3xl mb-2">Add New Product</h1>
+        <p className="text-base md:text-xl opacity-90">List a new product in your catalog</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Basic Information */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Basic Information</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                placeholder="e.g., Premium Wireless Earbuds"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Category <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {categories.map((cat) => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  HS Code
+                </label>
+                <input
+                  type="text"
+                  value={formData.hsCode}
+                  onChange={(e) => setFormData({ ...formData, hsCode: e.target.value })}
+                  placeholder="e.g., 8518.30.20"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Product Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                required
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={4}
+                placeholder="Provide a detailed description of your product..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Key Features
+              </label>
+              <textarea
+                value={formData.features}
+                onChange={(e) => setFormData({ ...formData, features: e.target.value })}
+                rows={3}
+                placeholder="List key features (one per line)"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Technical Specifications
+              </label>
+              <textarea
+                value={formData.specifications}
+                onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
+                rows={3}
+                placeholder="Enter technical specifications..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Pricing & Order Details */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Pricing & Order Details</h2>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Unit Price <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  required
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Currency <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={formData.currency}
+                  onChange={(e) => setFormData({ ...formData, currency: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {currencies.map((curr) => (
+                    <option key={curr} value={curr}>{curr}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Minimum Order Quantity (MOQ) <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={formData.moq}
+                  onChange={(e) => setFormData({ ...formData, moq: e.target.value })}
+                  placeholder="100"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Unit <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={formData.unit}
+                  onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {units.map((unit) => (
+                    <option key={unit} value={unit}>{unit}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Lead Time <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.leadTime}
+                  onChange={(e) => setFormData({ ...formData, leadTime: e.target.value })}
+                  placeholder="e.g., 15-30 days"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Country of Origin <span className="text-red-500">*</span>
+                </label>
+                <select
+                  required
+                  value={formData.origin}
+                  onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  {countries.map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Product Images */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Product Images</h2>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            {images.map((image, index) => (
+              <div key={index} className="relative aspect-square border border-gray-200 rounded-lg overflow-hidden group">
+                <img src={image} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+                {index === 0 && (
+                  <div className="absolute bottom-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">
+                    Main
+                  </div>
+                )}
+              </div>
+            ))}
+            <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer">
+              <Upload className="w-8 h-8 text-gray-400" />
+              <span className="text-sm text-gray-600">Upload</span>
+              <input
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
+              />
+            </label>
+          </div>
+          
+          <p className="text-sm text-gray-500">
+            Upload at least 3 images. First image will be the main product image. Recommended size: 800x800px
+          </p>
+        </div>
+
+        {/* Certifications */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Certifications & Standards</h2>
+          
+          <div className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={newCertification}
+              onChange={(e) => setNewCertification(e.target.value)}
+              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddCertification())}
+              placeholder="e.g., CE, ISO 9001, FDA"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            />
+            <button
+              type="button"
+              onClick={handleAddCertification}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {formData.certifications.map((cert) => (
+              <span
+                key={cert}
+                className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full"
+              >
+                {cert}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveCertification(cert)}
+                  className="hover:text-blue-900"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </span>
+            ))}
+            {formData.certifications.length === 0 && (
+              <p className="text-sm text-gray-500">No certifications added yet</p>
+            )}
+          </div>
+        </div>
+
+        {/* Additional Options */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Additional Options</h2>
+          
+          <div className="space-y-4">
+            <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div>
+                <p className="font-medium text-gray-900">Customization Available</p>
+                <p className="text-sm text-gray-500">Accept custom orders with specific requirements</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.customization}
+                  onChange={(e) => setFormData({ ...formData, customization: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between py-3 border-b border-gray-200">
+              <div>
+                <p className="font-medium text-gray-900">Sample Available</p>
+                <p className="text-sm text-gray-500">Offer product samples to potential buyers</p>
+              </div>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.sampleAvailable}
+                  onChange={(e) => setFormData({ ...formData, sampleAvailable: e.target.checked })}
+                  className="sr-only peer"
+                />
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            {formData.sampleAvailable && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Sample Price ({formData.currency})
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.samplePrice}
+                  onChange={(e) => setFormData({ ...formData, samplePrice: e.target.value })}
+                  placeholder="0.00"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Shipping Details */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping Details</h2>
+          
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Packaging Details
+              </label>
+              <textarea
+                value={formData.packagingDetails}
+                onChange={(e) => setFormData({ ...formData, packagingDetails: e.target.value })}
+                rows={2}
+                placeholder="Describe how the product will be packaged..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Shipping Weight (kg)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                value={formData.shippingWeight}
+                onChange={(e) => setFormData({ ...formData, shippingWeight: e.target.value })}
+                placeholder="0.00"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Package Dimensions (cm)
+              </label>
+              <div className="grid grid-cols-3 gap-4">
+                <input
+                  type="number"
+                  value={formData.dimensions.length}
+                  onChange={(e) => setFormData({ ...formData, dimensions: { ...formData.dimensions, length: e.target.value } })}
+                  placeholder="Length"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <input
+                  type="number"
+                  value={formData.dimensions.width}
+                  onChange={(e) => setFormData({ ...formData, dimensions: { ...formData.dimensions, width: e.target.value } })}
+                  placeholder="Width"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <input
+                  type="number"
+                  value={formData.dimensions.height}
+                  onChange={(e) => setFormData({ ...formData, dimensions: { ...formData.dimensions, height: e.target.value } })}
+                  placeholder="Height"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Important Note */}
+        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex gap-3">
+          <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-medium text-yellow-900 mb-1">Review Before Publishing</p>
+            <p className="text-sm text-yellow-700">
+              Please ensure all information is accurate and complete. Once published, your product will be visible to all buyers on the platform.
+            </p>
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-3">
+          <button
+            type="button"
+            onClick={onBack}
+            className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
+          >
+            <Save className="w-4 h-4" />
+            Publish Product
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+}

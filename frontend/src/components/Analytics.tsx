@@ -1,62 +1,75 @@
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
 import { TrendingUp, TrendingDown, IndianRupee, Package, Truck, Star, Download } from 'lucide-react';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import type { User } from '../App';
 
 interface AnalyticsProps {
   user: User;
+  activeMode?: 'buyer' | 'seller';
 }
 
-const spendByCategory = [
-  { name: 'Electronics', value: 45000, orders: 12 },
-  { name: 'Textiles', value: 32000, orders: 8 },
-  { name: 'Machinery', value: 28000, orders: 5 },
-  { name: 'Home Goods', value: 19000, orders: 6 },
-];
+export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-const monthlySpend = [
-  { month: 'Jun', spend: 98000, orders: 24 },
-  { month: 'Jul', spend: 112000, orders: 28 },
-  { month: 'Aug', spend: 95000, orders: 22 },
-  { month: 'Sep', spend: 128000, orders: 31 },
-  { month: 'Oct', spend: 142000, orders: 35 },
-  { month: 'Nov', spend: 124000, orders: 29 },
-];
+  useEffect(() => {
+    fetchAnalytics();
+  }, [isSeller]);
 
-const supplierPerformance = [
-  { name: 'Shanghai Textile Co.', rating: 4.8, orders: 15, onTime: 96 },
-  { name: 'Shenzhen Electronics', rating: 4.9, orders: 12, onTime: 98 },
-  { name: 'Guangzhou Machinery', rating: 4.7, orders: 8, onTime: 94 },
-  { name: 'Beijing Solar Tech', rating: 4.9, orders: 6, onTime: 100 },
-  { name: 'Foshan Ceramics', rating: 4.6, orders: 5, onTime: 92 },
-];
+  const fetchAnalytics = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const endpoint = isSeller ? '/api/analytics/seller' : '/api/analytics/buyer';
+      const response = await fetch(`http://localhost:5000${endpoint}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        setAnalytics(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching analytics:', error);
+      toast.error('Failed to load analytics data');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-const countryDistribution = [
-  { name: 'China', value: 85, color: '#3B82F6' },
-  { name: 'Vietnam', value: 8, color: '#10B981' },
-  { name: 'India', value: 4, color: '#F59E0B' },
-  { name: 'Other', value: 3, color: '#6B7280' },
-];
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading analytics...</p>
+        </div>
+      </div>
+    );
+  }
 
-const deliveryMetrics = [
-  { metric: 'On-Time Delivery', value: '94%', change: '+2%', trend: 'up' },
-  { metric: 'Avg Lead Time', value: '28 days', change: '-3 days', trend: 'up' },
-  { metric: 'Quality Issues', value: '2.1%', change: '-0.5%', trend: 'up' },
-  { metric: 'Avg Order Value', value: '₹4,200', change: '+12%', trend: 'up' },
-];
-
-export function Analytics({ user }: AnalyticsProps) {
-  const totalSpend = monthlySpend.reduce((sum, m) => sum + m.spend, 0);
-  const avgMonthlySpend = totalSpend / monthlySpend.length;
-  const currentMonth = monthlySpend[monthlySpend.length - 1].spend;
-  const previousMonth = monthlySpend[monthlySpend.length - 2].spend;
-  const monthChange = ((currentMonth - previousMonth) / previousMonth * 100).toFixed(1);
+  // Use real analytics data or show placeholder
+  const overview = analytics?.overview || {};
+  const monthlyData = analytics?.monthly_trends || [];
+  const categoryData = analytics?.category_breakdown || [];
+  const topSuppliers = analytics?.top_suppliers || [];
+  
+  const totalSpend = isSeller ? overview.total_revenue : overview.total_spent;
+  const totalOrders = overview.total_orders || 0;
+  const activeItems = isSeller ? overview.active_products : overview.active_orders;
+  const conversionRate = isSeller ? overview.quote_conversion_rate : overview.rfq_acceptance_rate;
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div 
+        className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-xl text-white"
+        style={{ background: `linear-gradient(to right, ${isSeller ? '#059669' : '#2563eb'}, ${isSeller ? '#047857' : '#1e40af'})` }}
+      >
         <div>
-          <h1 className="text-2xl md:text-3xl mb-2">Analytics & Insights</h1>
-          <p className="text-base md:text-xl text-gray-600">Track your trade performance and metrics</p>
+          <h1 className="text-2xl md:text-3xl mb-2">{isSeller ? '📊 Sales Analytics' : '📈 Analytics & Insights'}</h1>
+          <p className="text-base md:text-xl opacity-90">{isSeller ? 'Track your business performance and revenue' : 'Track your trade performance and metrics'}</p>
         </div>
         
         <button className="flex items-center gap-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 w-full sm:w-auto justify-center">
@@ -71,19 +84,9 @@ export function Analytics({ user }: AnalyticsProps) {
             <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center">
               <IndianRupee className="w-6 h-6 text-blue-600" />
             </div>
-            <div className={`flex items-center gap-1 text-sm ${
-              parseFloat(monthChange) >= 0 ? 'text-green-600' : 'text-red-600'
-            }`}>
-              {parseFloat(monthChange) >= 0 ? (
-                <TrendingUp className="w-4 h-4" />
-              ) : (
-                <TrendingDown className="w-4 h-4" />
-              )}
-              {Math.abs(parseFloat(monthChange))}%
-            </div>
           </div>
-          <div className="text-3xl mb-1">₹{(currentMonth / 1000).toFixed(0)}K</div>
-          <div className="text-sm text-gray-600">This Month's Spend</div>
+          <div className="text-3xl mb-1">${totalSpend ? (totalSpend / 1000).toFixed(1) : 0}K</div>
+          <div className="text-sm text-gray-600">{isSeller ? 'Total Revenue' : 'Total Spend'}</div>
         </div>
         
         <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -92,8 +95,8 @@ export function Analytics({ user }: AnalyticsProps) {
               <Package className="w-6 h-6 text-green-600" />
             </div>
           </div>
-          <div className="text-3xl mb-1">{monthlySpend[monthlySpend.length - 1].orders}</div>
-          <div className="text-sm text-gray-600">Active Orders</div>
+          <div className="text-3xl mb-1">{totalOrders || 0}</div>
+          <div className="text-sm text-gray-600">Total Orders</div>
         </div>
         
         <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -102,8 +105,8 @@ export function Analytics({ user }: AnalyticsProps) {
               <Truck className="w-6 h-6 text-purple-600" />
             </div>
           </div>
-          <div className="text-3xl mb-1">94%</div>
-          <div className="text-sm text-gray-600">On-Time Delivery</div>
+          <div className="text-3xl mb-1">{activeItems || 0}</div>
+          <div className="text-sm text-gray-600">{isSeller ? 'Active Products' : 'Active Orders'}</div>
         </div>
         
         <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -112,24 +115,24 @@ export function Analytics({ user }: AnalyticsProps) {
               <Star className="w-6 h-6 text-yellow-600" />
             </div>
           </div>
-          <div className="text-3xl mb-1">4.8</div>
-          <div className="text-sm text-gray-600">Avg Supplier Rating</div>
+          <div className="text-3xl mb-1">{conversionRate || 0}%</div>
+          <div className="text-sm text-gray-600">{isSeller ? 'Quote Conversion' : 'Acceptance Rate'}</div>
         </div>
       </div>
       
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-xl mb-6">Monthly Spend Trend</h2>
+          <h2 className="text-xl mb-6">{isSeller ? 'Revenue Trend' : 'Monthly Spend Trend'}</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={monthlySpend}>
+            <LineChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="month" stroke="#6b7280" />
-              <YAxis stroke="#6b7280" tickFormatter={(value) => `₹${value / 1000}K`} />
+              <YAxis stroke="#6b7280" tickFormatter={(value) => `$${value / 1000}K`} />
               <Tooltip 
-                formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Spend']}
+                formatter={(value: number) => [`$${value.toLocaleString()}`, isSeller ? 'Revenue' : 'Spend']}
                 contentStyle={{ borderRadius: '8px', border: '1px solid #e5e7eb' }}
               />
-              <Line type="monotone" dataKey="spend" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', r: 4 }} />
+              <Line type="monotone" dataKey="amount" stroke="#3b82f6" strokeWidth={2} dot={{ fill: '#3b82f6', r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

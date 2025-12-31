@@ -4,10 +4,15 @@ import type { PO, Shipment } from '../App';
 
 interface ShipmentTrackingProps {
   po: PO;
+  user?: any;
+  activeMode?: 'buyer' | 'seller';
   onBack: () => void;
 }
 
-export function ShipmentTracking({ po, onBack }: ShipmentTrackingProps) {
+export function ShipmentTracking({ po, user, activeMode = 'buyer', onBack }: ShipmentTrackingProps) {
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
+  const themeColor = isSeller ? '#059669' : '#2563eb';
   const [shipment, setShipment] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 

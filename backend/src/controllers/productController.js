@@ -9,7 +9,7 @@ export const getAllProducts = async (req, res) => {
       SELECT p.*, u.company_name as supplier_name, u.country as supplier_country
       FROM products p
       JOIN users u ON p.supplier_id = u.id
-      WHERE p.available = true
+      WHERE p.available = true AND p.approval_status = 'approved'
     `;
     const params = [];
     let paramCount = 0;
@@ -33,7 +33,7 @@ export const getAllProducts = async (req, res) => {
 
     // Get total count
     const countResult = await query(
-      'SELECT COUNT(*) FROM products WHERE available = true' + 
+      'SELECT COUNT(*) FROM products WHERE available = true AND approval_status = \'approved\'' + 
       (category ? ' AND category = $1' : ''),
       category ? [category] : []
     );
@@ -95,15 +95,15 @@ export const createProduct = async (req, res) => {
     const { name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications } = req.body;
 
     const result = await query(
-      `INSERT INTO products (supplier_id, name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+      `INSERT INTO products (supplier_id, name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications, approval_status)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending')
        RETURNING *`,
       [req.user.id, name, category, subcategory || null, description || null, price || null, moq || null, unit || null, incoterms || [], certifications || [], images || [], JSON.stringify(specifications || {})]
     );
 
     res.status(201).json({
       success: true,
-      message: 'Product created successfully',
+      message: 'Product created successfully and submitted for approval',
       data: result.rows[0]
     });
   } catch (error) {
@@ -210,6 +210,137 @@ export const deleteProduct = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete product',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+export const approveProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status, rejectionReason } = req.body; // 'approved' or 'rejected'
+
+    if (!['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid approval status'
+      });
+    }
+
+    // Get product with seller info before updating
+    const productResult = await query(
+      `SELECT p.*, u.email as seller_email, u.company_name as seller_company
+       FROM products p
+       JOIN users u ON p.supplier_id = u.id
+       WHERE p.id = $1`,
+      [id]
+    );
+
+    if (productResult.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    const product = productResult.rows[0];
+
+    // Update approval status and rejection reason
+    const result = await query(
+      `UPDATE products 
+       SET approval_status = $1, rejection_reason = $2, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $3
+       RETURNING *`,
+      [status, status === 'rejected' ? rejectionReason : null, id]
+    );
+
+    // Send email notification to seller
+    const { sendEmail } = await import('../services/emailService.js');
+    const emailTemplate = status === 'approved' ? 'productApproved' : 'productRejected';
+    
+    await sendEmail(product.seller_email, emailTemplate, {
+      productName: product.name,
+      category: product.category,
+      price: product.price,
+      moq: product.moq,
+      unit: product.unit,
+      sellerCompany: product.seller_company,
+      rejectionReason: status === 'rejected' ? rejectionReason : ''
+    });
+
+    res.json({
+      success: true,
+      message: `Product ${status} successfully`,
+      data: result.rows[0]
+    });
+  } catch (error) {
+    console.error('Approve product error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update product approval status',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+export const getPendingProducts = async (req, res) => {
+  try {
+    const result = await query(
+      `SELECT p.*, u.company_name as supplier_name, u.country as supplier_country, u.email as supplier_email
+       FROM products p
+       JOIN users u ON p.supplier_id = u.id
+       WHERE p.approval_status = 'pending'
+       ORDER BY p.created_at DESC`
+    );
+
+    res.json({
+      success: true,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Get pending products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch pending products',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+// Get seller's own products (seller only)
+export const getMyProducts = async (req, res) => {
+  try {
+    console.log('getMyProducts called - User ID:', req.user?.id);
+    const sellerId = req.user.id;
+    const { status } = req.query; // Filter by approval_status if provided
+
+    let queryText = `
+      SELECT p.*
+      FROM products p
+      WHERE p.supplier_id = $1
+    `;
+    const params = [sellerId];
+    console.log('Querying products for seller:', sellerId);
+
+    if (status && ['pending', 'approved', 'rejected'].includes(status)) {
+      queryText += ` AND p.approval_status = $2`;
+      params.push(status);
+    }
+
+    queryText += ` ORDER BY p.created_at DESC`;
+
+    const result = await query(queryText, params);
+    console.log('Found products:', result.rows.length);
+
+    res.json({
+      success: true,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Get my products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch your products',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

@@ -9,10 +9,14 @@ interface CatalogProps {
   onViewProduct: (product: Product) => void;
   onViewSupplier: (supplierId: string) => void;
   onNavigate?: (view: string) => void;
+  user?: any;
+  activeMode?: 'buyer' | 'seller';
 }
 
-export function Catalog({ onViewProduct, onViewSupplier, onNavigate }: CatalogProps) {
+export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activeMode = 'buyer' }: CatalogProps) {
   const { requireAuth } = useAuth();
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,7 +63,6 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate }: CatalogPr
     }
   };
 
-  const { user } = useAuth();
   const categories = ['All Categories', ...Array.from(new Set(products.map(p => p.category)))];
 
   // Calculate active filter count
@@ -109,12 +112,14 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate }: CatalogPr
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
                 <button 
+                  type="button"
                   onClick={() => requireAuth({ type: 'browse-catalog' })}
                   className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors"
                 >
                   Start Buying
                 </button>
                 <button 
+                  type="button"
                   onClick={() => requireAuth({ type: 'browse-catalog' })}
                   className="bg-blue-700 text-white px-8 py-3 rounded-lg hover:bg-blue-800 transition-colors border border-blue-500"
                 >
@@ -128,9 +133,24 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate }: CatalogPr
       
       <div className={user ? "space-y-6" : "max-w-7xl mx-auto px-4 py-6 space-y-6"}>
         {user && (
-          <div>
-            <h1 className="text-2xl md:text-3xl mb-2">Browse Products</h1>
-            <p className="text-base md:text-xl text-gray-600">Discover verified suppliers from around the world</p>
+          <div className="mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl md:text-3xl mb-2 font-bold text-gray-900">
+                  {isSeller ? '🏪 My Products' : '🛒 Browse Products'}
+                </h1>
+                <p className="text-base md:text-xl text-gray-600">
+                  {isSeller ? 'Manage your product listings and inventory' : 'Discover verified suppliers from around the world'}
+                </p>
+              </div>
+              {isSeller && (
+                <button 
+                  className="px-6 py-3 bg-emerald-600 text-white rounded-lg font-medium hover:bg-emerald-700 transition-colors"
+                >
+                  + Add Product
+                </button>
+              )}
+            </div>
           </div>
         )}
         
@@ -149,7 +169,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate }: CatalogPr
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search products, HS codes, or suppliers..."
-            className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 ${isSeller ? 'focus:ring-emerald-500' : 'focus:ring-blue-500'} focus:border-transparent`}
           />
         </div>
         
@@ -161,7 +181,10 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate }: CatalogPr
             <Filter className="w-5 h-5" />
             <span className="md:inline">Filters</span>
             {activeFilterCount > 0 && (
-              <span className="absolute -top-2 -right-2 w-6 h-6 bg-blue-600 text-white rounded-full text-xs flex items-center justify-center">
+              <span 
+                className="absolute -top-2 -right-2 w-6 h-6 text-white rounded-full text-xs flex items-center justify-center"
+                style={{ backgroundColor: isSeller ? '#059669' : '#2563eb' }}
+              >
                 {activeFilterCount}
               </span>
             )}
@@ -170,7 +193,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate }: CatalogPr
           <select
             value={currency}
             onChange={(e) => setCurrency(e.target.value)}
-            className="flex-1 md:flex-none px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className={`flex-1 md:flex-none px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 ${isSeller ? 'focus:ring-emerald-500' : 'focus:ring-blue-500'} focus:border-transparent`}
           >
             <option value="INR">₹ INR</option>
             <option value="USD">$ USD</option>

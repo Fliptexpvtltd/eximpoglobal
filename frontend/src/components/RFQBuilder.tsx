@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { Plus, X, Upload, Calendar } from 'lucide-react';
 import type { User, Product, RFQ } from '../App';
 
 interface RFQBuilderProps {
   initialProduct: Product | null;
   user: User | null;
+  activeMode?: 'buyer' | 'seller';
   onSubmit: (rfq: RFQ) => void;
   onCancel: () => void;
 }
@@ -23,7 +25,11 @@ interface LineItem {
   targetPrice?: number;
 }
 
-export function RFQBuilder({ initialProduct, user, onSubmit, onCancel }: RFQBuilderProps) {
+export function RFQBuilder({ initialProduct, user, activeMode = 'buyer', onSubmit, onCancel }: RFQBuilderProps) {
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
+  const themeColor = isSeller ? '#059669' : '#2563eb';
+  
   const [lineItems, setLineItems] = useState<LineItem[]>([
     initialProduct 
       ? { 
@@ -99,7 +105,7 @@ export function RFQBuilder({ initialProduct, user, onSubmit, onCancel }: RFQBuil
       const data = await response.json();
       
       if (data.success) {
-        alert('RFQ created successfully!');
+        toast.success('RFQ created successfully!');
         const rfq: RFQ = {
           id: data.data.id,
           buyerId: user?.id || '1',
@@ -117,11 +123,11 @@ export function RFQBuilder({ initialProduct, user, onSubmit, onCancel }: RFQBuil
         };
         onSubmit(rfq);
       } else {
-        alert('Failed to create RFQ: ' + (data.message || 'Unknown error'));
+        toast.error('Failed to create RFQ: ' + (data.message || 'Unknown error'));
       }
     } catch (error) {
       console.error('Error creating RFQ:', error);
-      alert('Failed to create RFQ. Please try again.');
+      toast.error('Failed to create RFQ. Please try again.');
     }
   };
 

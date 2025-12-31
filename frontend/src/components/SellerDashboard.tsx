@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { IndianRupee, Package, Eye, MessageSquare, TrendingUp, Star, Plus } from 'lucide-react';
+import { IndianRupee, Package, Eye, MessageSquare, TrendingUp, Star, Plus, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import type { User } from '../App';
 
 interface SellerDashboardProps {
@@ -7,52 +7,36 @@ interface SellerDashboardProps {
   onNavigate: (view: any) => void;
 }
 
-const recentRFQs = [
-  {
-    id: 'rfq-1',
-    product: 'LED Display Modules',
-    buyer: 'TechCorp GmbH',
-    quantity: 1000,
-    incoterm: 'CIF',
-    destination: 'Hamburg',
-    deadline: '2025-11-10',
-    status: 'new',
-  },
-  {
-    id: 'rfq-2',
-    product: 'Organic Cotton T-Shirts',
-    buyer: 'Fashion Retail Inc.',
-    quantity: 5000,
-    incoterm: 'FOB',
-    destination: 'Los Angeles',
-    deadline: '2025-11-15',
-    status: 'quoted',
-  },
-  {
-    id: 'rfq-3',
-    product: 'Industrial Pumps',
-    buyer: 'Manufacturing Co.',
-    quantity: 50,
-    incoterm: 'EXW',
-    destination: 'Rotterdam',
-    deadline: '2025-11-12',
-    status: 'new',
-  },
-];
-
-const topProducts = [
-  { name: 'LED Display Modules', views: 342, quotes: 18, orders: 8 },
-  { name: 'Organic Cotton T-Shirts', views: 298, quotes: 15, orders: 12 },
-  { name: 'Industrial Pumps', views: 187, quotes: 9, orders: 5 },
-  { name: 'Ceramic Tiles', views: 156, quotes: 7, orders: 4 },
-];
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  moq: number;
+  approval_status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+}
 
 export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const [analytics, setAnalytics] = useState<any>(null);
+  const [myProducts, setMyProducts] = useState<Product[]>([]);
+  const [rfqs, setRfqs] = useState<any[]>([]);
+  const [quotes, setQuotes] = useState<any[]>([]);
+  const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [productsLoading, setProductsLoading] = useState(true);
+  
+  const handleEditProduct = (productId: string) => {
+    // Navigate to edit product page
+    onNavigate({ view: 'edit-product', productId });
+  };
 
   useEffect(() => {
     fetchSellerAnalytics();
+    fetchMyProducts();
+    fetchSellerRFQs();
+    fetchMyQuotes();
+    fetchSellerOrders();
   }, []);
 
   const fetchSellerAnalytics = async () => {
@@ -72,6 +56,75 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
     }
   };
 
+  const fetchMyProducts = async () => {
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/products/my/products', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setMyProducts(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching my products:', error);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
+  const fetchSellerRFQs = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/rfqs?limit=5', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setRfqs(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching RFQs:', error);
+    }
+  };
+
+  const fetchMyQuotes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/quotes', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setQuotes(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching quotes:', error);
+    }
+  };
+
+  const fetchSellerOrders = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/orders', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setOrders(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching orders:', error);
+    }
+  };
+
+  const productStats = {
+    approved: myProducts.filter(p => p.approval_status === 'approved').length,
+    pending: myProducts.filter(p => p.approval_status === 'pending').length,
+    rejected: myProducts.filter(p => p.approval_status === 'rejected').length,
+    total: myProducts.length
+  };
+
   const stats = analytics ? [
     { 
       label: 'Total Revenue', 
@@ -82,8 +135,8 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
     },
     { 
       label: 'Active Products', 
-      value: analytics.overview.active_products.toString(), 
-      change: `${analytics.overview.total_products} total`, 
+      value: productStats.approved.toString(), 
+      change: `${productStats.pending} pending, ${productStats.rejected} rejected`, 
       icon: Package, 
       color: 'blue' 
     },
@@ -103,7 +156,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
     },
   ] : [
     { label: 'Total Revenue', value: '$0', change: 'Loading...', icon: IndianRupee, color: 'green' },
-    { label: 'Active Products', value: '0', change: 'Loading...', icon: Package, color: 'blue' },
+    { label: 'Active Products', value: productStats.approved.toString(), change: `${productStats.pending} pending`, icon: Package, color: 'blue' },
     { label: 'Quote Conversion', value: '0%', change: 'Loading...', icon: TrendingUp, color: 'purple' },
     { label: 'Active Orders', value: '0', change: 'Loading...', icon: Star, color: 'yellow' },
   ];
@@ -128,34 +181,43 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
 
   return (
     <div className="space-y-6">
-      {/* Header with Green Theme */}
-      <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 -mx-4 -mt-6 px-4 pt-6 pb-8 mb-6 rounded-b-2xl">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl text-white mb-2">{greeting()}, {user.name}! 🏪</h1>
-            <p className="text-base md:text-xl text-emerald-100">Grow your business and reach global buyers</p>
-          </div>
-          <button 
-            onClick={() => onNavigate('add-product')}
-            className="w-full sm:w-auto flex items-center justify-center gap-2 px-4 py-3 bg-white text-emerald-600 rounded-lg hover:bg-emerald-50 font-medium shadow-lg"
-          >
-            <Plus className="w-5 h-5" />
-            Add Product
-          </button>
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-2xl md:text-3xl text-gray-900 mb-2 font-bold">{greeting()}, {user.name}</h1>
+          <p className="text-base md:text-xl text-gray-600">Grow your business and reach global buyers</p>
         </div>
+        <button 
+          onClick={() => onNavigate('add-product')}
+          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors"
+        >
+          <Plus className="w-5 h-5" />
+          Add Product
+        </button>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat) => {
           const Icon = stat.icon;
+          const colorMap: { [key: string]: { bg: string; text: string } } = {
+            green: { bg: '#d1fae5', text: '#059669' },
+            blue: { bg: '#dbeafe', text: '#2563eb' },
+            purple: { bg: '#e9d5ff', text: '#9333ea' },
+            yellow: { bg: '#fef3c7', text: '#f59e0b' },
+          };
+          const colors = colorMap[stat.color] || colorMap.green;
+          
           return (
             <div key={stat.label} className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <div className={`w-12 h-12 rounded-xl bg-${stat.color}-100 flex items-center justify-center`}>
-                  <Icon className={`w-6 h-6 text-${stat.color}-600`} />
+                <div 
+                  className="w-12 h-12 rounded-xl flex items-center justify-center"
+                  style={{ backgroundColor: colors.bg }}
+                >
+                  <Icon className="w-6 h-6" style={{ color: colors.text }} />
                 </div>
               </div>
-              <div className="text-3xl mb-1">{stat.value}</div>
+              <div className="text-3xl font-bold text-gray-900 mb-1">{stat.value}</div>
               <div className="text-sm text-gray-600 mb-1">{stat.label}</div>
               <div className="text-xs text-gray-500">{stat.change}</div>
             </div>
@@ -163,120 +225,350 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
         })}
       </div>
       
+      {/* My Products Section */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-gray-900">My Products</h2>
+          <button 
+            onClick={() => onNavigate('add-product')}
+            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+            Add Product
+          </button>
+        </div>
+
+        {productsLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        ) : myProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No products yet</h3>
+            <p className="text-gray-600 mb-4">Start by adding your first product to reach global buyers</p>
+            <button 
+              onClick={() => onNavigate('add-product')}
+              className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors"
+            >
+              Add Your First Product
+            </button>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="border-b border-gray-200">
+                <tr>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Product</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Category</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Price</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">MOQ</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Status</th>
+                  <th className="text-left py-3 px-4 text-sm font-semibold text-gray-700">Created</th>
+                  <th className="text-right py-3 px-4 text-sm font-semibold text-gray-700">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {myProducts.slice(0, 5).map((product) => (
+                  <tr key={product.id} className="hover:bg-gray-50">
+                    <td className="py-4 px-4">
+                      <div className="font-medium text-gray-900">{product.name}</div>
+                    </td>
+                    <td className="py-4 px-4">
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
+                        {product.category}
+                      </span>
+                    </td>
+                    <td className="py-4 px-4 text-gray-900">
+                      ${product.price ? parseFloat(product.price).toFixed(2) : 'N/A'}
+                    </td>
+                    <td className="py-4 px-4 text-gray-600">
+                      {product.moq || 'N/A'}
+                    </td>
+                    <td className="py-4 px-4">
+                      {product.approval_status === 'approved' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                          Approved
+                        </span>
+                      )}
+                      {product.approval_status === 'pending' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                          <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></span>
+                          Pending
+                        </span>
+                      )}
+                      {product.approval_status === 'rejected' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                          <span className="w-1.5 h-1.5 bg-red-500 rounded-full"></span>
+                          Rejected
+                        </span>
+                      )}
+                    </td>
+                    <td className="py-4 px-4 text-sm text-gray-600">
+                      {new Date(product.created_at).toLocaleDateString()}
+                    </td>
+                    <td className="py-4 px-4 text-sm text-right">
+                      {(product.approval_status === 'pending' || product.approval_status === 'rejected') && (
+                        <button
+                          onClick={() => handleEditProduct(product.id)}
+                          className="text-blue-600 hover:text-blue-700 font-medium"
+                        >
+                          Edit
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {myProducts.length > 5 && (
+              <div className="mt-4 text-center">
+                <button 
+                  onClick={() => onNavigate('catalog')}
+                  className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                >
+                  View All {myProducts.length} Products →
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl">Incoming RFQs</h2>
-            <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm">
-              2 New
-            </span>
+            <h2 className="text-xl font-semibold text-gray-900">Incoming RFQs</h2>
+            {rfqs.length > 0 && (
+              <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">
+                {rfqs.length} Total
+              </span>
+            )}
           </div>
           
           <div className="space-y-4">
-            {recentRFQs.map((rfq) => (
-              <div key={rfq.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
-                <div className="flex items-start justify-between mb-2">
-                  <div className="flex-1">
-                    <div className="mb-1">{rfq.product}</div>
-                    <div className="text-sm text-gray-600">{rfq.buyer}</div>
-                  </div>
-                  {rfq.status === 'new' && (
-                    <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs">
-                      New
-                    </span>
-                  )}
-                  {rfq.status === 'quoted' && (
-                    <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                      Quoted
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
-                  <span>Qty: {rfq.quantity}</span>
-                  <span>•</span>
-                  <span>{rfq.incoterm}</span>
-                  <span>•</span>
-                  <span>{rfq.destination}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500">Due: {rfq.deadline}</span>
-                  {rfq.status === 'new' ? (
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
-                      Send Quote
-                    </button>
-                  ) : (
-                    <button className="text-sm text-blue-600 hover:text-blue-700">
-                      View Quote
-                    </button>
-                  )}
-                </div>
+            {rfqs.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <Package className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                <p>No RFQs available</p>
               </div>
-            ))}
+            ) : (
+              rfqs.slice(0, 5).map((rfq) => (
+                <div key={rfq.id} className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1">
+                      <div className="font-semibold text-gray-900 mb-1">{rfq.title || 'RFQ Request'}</div>
+                      <div className="text-sm text-gray-600">{rfq.buyer_company || 'Unknown Buyer'}</div>
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs ${
+                      rfq.status === 'open' ? 'bg-blue-100 text-blue-800' :
+                      rfq.status === 'accepted' ? 'bg-green-100 text-green-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {rfq.status || 'pending'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-4 text-sm text-gray-600 mb-3">
+                    {rfq.line_items && rfq.line_items[0] && (
+                      <span>Qty: {rfq.line_items[0].quantity}</span>
+                    )}
+                    <span>•</span>
+                    <span>{rfq.incoterms || 'FOB'}</span>
+                    <span>•</span>
+                    <span>{rfq.delivery_location || 'Contact buyer'}</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500">
+                      Due: {rfq.delivery_date ? new Date(rfq.delivery_date).toLocaleDateString() : 'Not specified'}
+                    </span>
+                    <button 
+                      onClick={() => onNavigate({ view: 'submit-quote', rfqId: rfq.id })}
+                      className="text-sm text-emerald-600 hover:text-emerald-700 font-medium"
+                    >
+                      Submit Quote →
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
+          
+          {rfqs.length > 0 && (
+            <div className="mt-4 text-center">
+              <button 
+                onClick={() => onNavigate('all-rfqs')}
+                className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              >
+                View All RFQs →
+              </button>
+            </div>
+          )}
         </div>
         
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl">Top Products</h2>
+            <h2 className="text-xl font-semibold text-gray-900">My Top Products</h2>
             <button 
               onClick={() => onNavigate('catalog')}
-              className="text-sm text-blue-600 hover:text-blue-700"
+              className="text-sm text-emerald-600 hover:text-emerald-700"
             >
               View All
             </button>
           </div>
           
-          <div className="space-y-4">
-            {topProducts.map((product, index) => (
-              <div key={product.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-                  {index + 1}
-                </div>
-                <div className="flex-1">
-                  <div className="mb-1">{product.name}</div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span>{product.views} views</span>
-                    <span>•</span>
-                    <span>{product.quotes} quotes</span>
-                    <span>•</span>
-                    <span>{product.orders} orders</span>
+          {myProducts.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <Package className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+              <p>No products yet. Add your first product to get started.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {myProducts.slice(0, 5).map((product, index) => (
+                <div key={product.id} className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center text-emerald-600 font-semibold">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-900 mb-1">{product.name}</div>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <span className="capitalize">{product.category}</span>
+                      <span>•</span>
+                      <span className={`px-2 py-0.5 rounded-full text-xs ${
+                        product.approval_status === 'approved' ? 'bg-green-100 text-green-700' :
+                        product.approval_status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                        'bg-red-100 text-red-700'
+                      }`}>
+                        {product.approval_status}
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
       
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-6 text-white">
-          <MessageSquare className="w-12 h-12 mb-4 opacity-80" />
-          <h3 className="text-xl mb-2">5 Unread Messages</h3>
-          <p className="text-blue-100 mb-4">Respond to buyer inquiries quickly to improve your rating</p>
+      {/* Shipment Management Section */}
+      {orders.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Order Shipments</h2>
+          
+          <div className="space-y-4">
+            {orders
+              .filter(order => ['confirmed', 'processing'].includes(order.status))
+              .map(order => (
+                <div key={order.id} className="border border-gray-200 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Order #{order.order_number}</h3>
+                      <p className="text-sm text-gray-600">{order.buyer_company || 'N/A'}</p>
+                    </div>
+                    <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
+                      {order.status}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-600">
+                      <span className="font-medium text-gray-900">Total: </span>
+                      ${Number(order.total_amount || 0).toLocaleString()}
+                    </div>
+                    <button
+                      onClick={() => onNavigate('create-shipment', order.id)}
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                    >
+                      Create Shipment
+                    </button>
+                  </div>
+                </div>
+              ))}
+            
+            {orders
+              .filter(order => order.status === 'shipped')
+              .map(order => (
+                <div key={order.id} className="border border-gray-200 rounded-lg p-4 bg-emerald-50">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Order #{order.order_number}</h3>
+                      <p className="text-sm text-gray-600">{order.buyer_company || 'N/A'}</p>
+                    </div>
+                    <span className="px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full text-sm">
+                      {order.status}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <div className="text-sm text-gray-600">
+                      Shipment in transit
+                    </div>
+                    <button
+                      onClick={() => onNavigate('update-tracking', order.id)}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      Update Tracking
+                    </button>
+                  </div>
+                </div>
+              ))}
+          </div>
+          
+          {orders.filter(o => ['confirmed', 'processing', 'shipped'].includes(o.status)).length === 0 && (
+            <p className="text-center text-gray-500 py-8">No orders requiring shipment action at this time</p>
+          )}
+        </div>
+      )}
+      
+      <div className="grid lg:grid-cols-4 gap-6">
+        <div 
+          className="border-2 rounded-xl p-6"
+          style={{
+            background: 'linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%)',
+            borderColor: '#a7f3d0'
+          }}
+        >
+          <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#059669' }}>
+            <Plus className="w-6 h-6 text-white" />
+          </div>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Add New Product</h3>
+          <p className="text-gray-600 mb-4">List a new product to reach more buyers</p>
+          <button 
+            onClick={() => onNavigate('add-product')}
+            className="w-full px-4 py-2 text-white rounded-lg transition-colors"
+            style={{ backgroundColor: '#059669' }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#047857'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#059669'}
+          >
+            Get Started
+          </button>
+        </div>
+        
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">5 Unread Messages</h3>
+          <p className="text-gray-600 mb-4">Respond to buyer inquiries quickly to improve your rating</p>
           <button 
             onClick={() => onNavigate('chat')}
-            className="px-4 py-2 bg-white text-blue-600 rounded-lg hover:bg-blue-50"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             View Messages
           </button>
         </div>
         
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-6 text-white">
-          <Package className="w-12 h-12 mb-4 opacity-80" />
-          <h3 className="text-xl mb-2">12 Orders in Production</h3>
-          <p className="text-green-100 mb-4">Update milestones to keep buyers informed</p>
-          <button className="px-4 py-2 bg-white text-green-600 rounded-lg hover:bg-green-50">
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">12 Orders in Production</h3>
+          <p className="text-gray-600 mb-4">Update milestones to keep buyers informed</p>
+          <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
             Update Status
           </button>
         </div>
         
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-6 text-white">
-          <TrendingUp className="w-12 h-12 mb-4 opacity-80" />
-          <h3 className="text-xl mb-2">Performance Insights</h3>
-          <p className="text-purple-100 mb-4">View detailed analytics and optimize your listings</p>
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">Performance Insights</h3>
+          <p className="text-gray-600 mb-4">View detailed analytics and optimize your listings</p>
           <button 
             onClick={() => onNavigate('analytics')}
-            className="px-4 py-2 bg-white text-purple-600 rounded-lg hover:bg-purple-50"
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
           >
             View Analytics
           </button>

@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { Globe, LogIn, Menu, X } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
 
 interface PublicNavigationProps {
   onNavigate?: (view: string) => void;
 }
 
 export function PublicNavigation({ onNavigate }: PublicNavigationProps) {
-  const { requireAuth } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleNavigation = (view: string) => {
@@ -33,14 +31,14 @@ export function PublicNavigation({ onNavigate }: PublicNavigationProps) {
           {/* Right - Auth Buttons (Desktop) */}
           <div className="hidden md:flex items-center gap-3">
             <button
-              onClick={() => requireAuth({ type: 'browse-catalog' })}
+              onClick={() => handleNavigation('auth')}
               className="text-gray-700 hover:text-blue-600 transition-colors flex items-center gap-2"
             >
               <LogIn className="w-4 h-4" />
               Sign In
             </button>
             <button
-              onClick={() => requireAuth({ type: 'browse-catalog' })}
+              onClick={() => handleNavigation('auth')}
               className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
             >
               Get Started
@@ -80,20 +78,14 @@ export function PublicNavigation({ onNavigate }: PublicNavigationProps) {
               </button>
               <div className="border-t border-gray-200 mt-2 pt-2 flex flex-col gap-2">
                 <button
-                  onClick={() => {
-                    requireAuth({ type: 'browse-catalog' });
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => handleNavigation('auth')}
                   className="px-4 py-3 text-gray-700 hover:bg-gray-50 rounded-lg transition-colors flex items-center gap-2"
                 >
                   <LogIn className="w-4 h-4" />
                   Sign In
                 </button>
                 <button
-                  onClick={() => {
-                    requireAuth({ type: 'browse-catalog' });
-                    setMobileMenuOpen(false);
-                  }}
+                  onClick={() => handleNavigation('auth')}
                   className="bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 transition-colors"
                 >
                   Get Started

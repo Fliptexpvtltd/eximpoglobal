@@ -5,11 +5,16 @@ import { AdminLayout } from './components/AdminLayout';
 import { AdminDashboard } from './components/AdminDashboard';
 import { UserManagement } from './components/UserManagement';
 import { ProductManagement } from './components/ProductManagement';
+import { ProductDetail } from './components/ProductDetail';
 import { RFQManagement } from './components/RFQManagement';
+import { OrderManagement } from './components/OrderManagement';
+import { AnalyticsPage } from './components/AnalyticsPage';
+import { SettingsPage } from './components/SettingsPage';
 
 function AppContent() {
   const { user, isLoading } = useAuth();
   const [currentView, setCurrentView] = useState('dashboard');
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -36,8 +41,15 @@ function AppContent() {
         <UserManagement />
       )}
       
-      {currentView === 'products' && (
-        <ProductManagement />
+      {currentView === 'products' && !selectedProductId && (
+        <ProductManagement onViewProduct={(productId) => setSelectedProductId(productId)} />
+      )}
+      
+      {currentView === 'products' && selectedProductId && (
+        <ProductDetail 
+          productId={selectedProductId} 
+          onBack={() => setSelectedProductId(null)} 
+        />
       )}
       
       {currentView === 'rfqs' && (
@@ -45,24 +57,15 @@ function AppContent() {
       )}
       
       {currentView === 'orders' && (
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900">Order Management</h2>
-          <p className="text-gray-600 mt-2">Coming soon...</p>
-        </div>
+        <OrderManagement />
       )}
       
       {currentView === 'analytics' && (
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900">Analytics</h2>
-          <p className="text-gray-600 mt-2">Coming soon...</p>
-        </div>
+        <AnalyticsPage />
       )}
       
       {currentView === 'settings' && (
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900">Settings</h2>
-          <p className="text-gray-600 mt-2">Coming soon...</p>
-        </div>
+        <SettingsPage />
       )}
     </AdminLayout>
   );

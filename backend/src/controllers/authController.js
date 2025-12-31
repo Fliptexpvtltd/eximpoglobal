@@ -35,7 +35,7 @@ export const register = async (req, res) => {
     // Generate token
     const token = jwt.sign(
       { 
-        id: user.id, 
+        userId: user.id,
         email: user.email, 
         role: user.role 
       },
@@ -102,7 +102,7 @@ export const login = async (req, res) => {
     // Generate token
     const token = jwt.sign(
       { 
-        id: user.id, 
+        userId: user.id,
         email: user.email, 
         role: user.role 
       },
@@ -139,13 +139,19 @@ export const login = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
+    console.log('📋 getProfile called - User from token:', req.user);
+    
+    // Token has userId property, not id
+    const userId = req.user.userId || req.user.id;
+    
     const result = await query(
       `SELECT id, email, role, company_name, full_name, phone, country, verified, created_at
        FROM users WHERE id = $1`,
-      [req.user.id]
+      [userId]
     );
 
     if (result.rows.length === 0) {
+      console.log('❌ User not found in database:', userId);
       return res.status(404).json({
         success: false,
         message: 'User not found'
@@ -153,6 +159,7 @@ export const getProfile = async (req, res) => {
     }
 
     const user = result.rows[0];
+    console.log('✅ Profile fetched successfully for:', user.email);
 
     res.json({
       success: true,
@@ -169,7 +176,7 @@ export const getProfile = async (req, res) => {
       }
     });
   } catch (error) {
-    console.error('Get profile error:', error);
+    console.error('❌ Get profile error:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch profile',

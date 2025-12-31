@@ -6,11 +6,17 @@ import { useAuth } from '../contexts/AuthContext';
 
 interface SupplierProfileProps {
   supplierId: string;
+  user?: any;
+  activeMode?: 'buyer' | 'seller';
   onBack: () => void;
 }
 
-export function SupplierProfile({ supplierId, onBack }: SupplierProfileProps) {
-  const { user } = useAuth();
+export function SupplierProfile({ supplierId, user: propUser, activeMode = 'buyer', onBack }: SupplierProfileProps) {
+  const { user: authUser } = useAuth();
+  const user = propUser || authUser;
+  const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
+  const isSeller = effectiveRole === 'seller';
+  const themeColor = isSeller ? '#059669' : '#2563eb';
   const [supplier, setSupplier] = useState<any>(null);
   const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

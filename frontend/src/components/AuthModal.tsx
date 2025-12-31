@@ -8,14 +8,16 @@ export function AuthModal() {
 
   return (
     <Dialog open={isAuthModalOpen} onOpenChange={(open) => !open && closeAuthModal()}>
-      <DialogContent className="sm:max-w-[500px] max-h-[85vh] overflow-y-auto">
+      <DialogContent 
+        className="min-w-[320px] max-w-[92vw] sm:max-w-[600px] max-h-[92vh] overflow-hidden p-5 sm:p-8"
+      >
         <DialogHeader>
-          <DialogTitle>
-            {authStep === 'login' ? 'Sign in to continue' : 'Complete your profile'}
+          <DialogTitle className="text-base sm:text-lg">
+            {authStep === 'login' ? 'Welcome to Eximpo' : 'Complete your profile'}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="overflow-y-auto max-h-[calc(85vh-80px)]">
+        <div className="overflow-y-auto max-h-[calc(92vh-80px)] pr-0.5">
           {authStep === 'login' ? (
             <Login 
               onLogin={login}

@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
+import { Toaster, toast } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthModal } from './components/AuthModal';
 import { Login } from './components/Login';
 import { RoleSelection } from './components/RoleSelection';
 import { BuyerDashboard } from './components/BuyerDashboard';
 import { SellerDashboard } from './components/SellerDashboard';
-import { AdminDashboard } from './components/AdminDashboard';
 import { Catalog } from './components/Catalog';
 import { ProductDetail } from './components/ProductDetail';
 import { SupplierProfile } from './components/SupplierProfile';
@@ -24,8 +24,19 @@ import { HowItWorks } from './components/HowItWorks';
 import { About } from './components/About';
 import { MyRFQs } from './components/MyRFQs';
 import { Footer } from './components/Footer';
+import { Shipments } from './components/Shipments';
+import { Settings } from './components/Settings';
+import { Help } from './components/Help';
+import { AddProduct } from './components/AddProduct';
+import { EditProduct } from './components/EditProduct';
+import { VerificationPage } from './components/VerificationPage';
+import { CreateShipment } from './components/CreateShipment';
+import { UpdateShipmentTracking } from './components/UpdateShipmentTracking';
+import { ForgotPassword } from './components/ForgotPassword';
+import { VerifyOTP } from './components/VerifyOTP';
+import { ResetPassword } from './components/ResetPassword';
 
-export type UserRole = 'buyer' | 'seller' | 'both' | 'ops' | 'finance' | 'admin';
+export type UserRole = 'buyer' | 'seller' | 'ops' | 'finance' | 'admin';
 
 export interface User {
   id: string;
@@ -139,34 +150,86 @@ type View =
   | 'catalog' 
   | 'product-detail' 
   | 'supplier-profile'
-  | 'dashboard' 
+  | 'dashboard'
+  | 'auth'
   | 'rfq-builder'
   | 'my-rfqs'
   | 'quote-comparison'
   | 'chat'
   | 'purchase-order'
+  | 'shipments'
   | 'shipment-tracking'
+  | 'create-shipment'
+  | 'update-tracking'
   | 'profile'
   | 'analytics'
+  | 'settings'
+  | 'help'
+  | 'add-product'
+  | 'edit-product'
+  | 'verification'
   | 'mobile-preview'
   | 'how-it-works'
+  | 'forgot-password'
+  | 'verify-otp'
+  | 'reset-password'
   | 'about';
 
 function AppContent() {
-  const { user, requireAuth, logout } = useAuth();
-  const [currentView, setCurrentView] = useState<View>('catalog');
+  const { user, isLoading, requireAuth, logout, login, signup, selectRole, googleAuth, authStep } = useAuth();
+  const [currentView, setCurrentView] = useState<View>(() => {
+    const saved = localStorage.getItem('currentView');
+    return (saved as View) || 'catalog';
+  });
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetOTP, setResetOTP] = useState('');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
   const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
   const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null);
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedPO, setSelectedPO] = useState<PO | null>(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
+  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [activeMode, setActiveMode] = useState<'buyer' | 'seller'>('buyer');
 
-  const handleModeChange = (mode: 'buyer' | 'seller') => {
-    console.log('Mode changing to:', mode);
-    setActiveMode(mode);
-  };
+  // Scroll to top when view changes
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentView]);
+
+  // Save currentView to localStorage whenever it changes (only for public views)
+  useEffect(() => {
+    const publicViews: View[] = ['catalog', 'how-it-works', 'about', 'mobile-preview'];
+    
+    if (publicViews.includes(currentView)) {
+      localStorage.setItem('currentView', currentView);
+    } else if (user) {
+      // Only save protected views if user is authenticated
+      localStorage.setItem('currentView', currentView);
+    }
+  }, [currentView, user]);
+
+  // Redirect from auth page to dashboard after successful login
+  useEffect(() => {
+    if (currentView === 'auth' && user && !isLoading) {
+      console.log('✅ User logged in, redirecting to dashboard');
+      setCurrentView('dashboard');
+    }
+  }, [user, currentView, isLoading]);
+
+  // Check if user is on a protected view without authentication (after loading completes)
+  useEffect(() => {
+    if (isLoading) return; // Don't redirect while still loading
+    
+    const protectedViews: View[] = ['dashboard', 'rfq-builder', 'my-rfqs', 'quote-comparison', 'chat', 'purchase-order', 'shipments', 'shipment-tracking', 'analytics', 'profile', 'settings', 'help'];
+    
+    // If on protected view and no user (and done loading), redirect to catalog
+    if (protectedViews.includes(currentView) && !user) {
+      console.log('🔒 Protected view without auth, redirecting to catalog');
+      setCurrentView('catalog');
+    }
+  }, [user, currentView, isLoading]);
 
   // Listen for pending action execution
   useEffect(() => {
@@ -216,6 +279,16 @@ function AppContent() {
     return () => window.removeEventListener('execute-pending-action', handlePendingAction);
   }, []);
 
+  // Listen for navigate to auth event
+  useEffect(() => {
+    const handleNavigateToAuth = () => {
+      setCurrentView('auth');
+    };
+
+    window.addEventListener('navigate-to-auth', handleNavigateToAuth);
+    return () => window.removeEventListener('navigate-to-auth', handleNavigateToAuth);
+  }, []);
+
   const handleViewProduct = (product: Product) => {
     setSelectedProduct(product);
     setCurrentView('product-detail');
@@ -224,6 +297,11 @@ function AppContent() {
   const handleViewSupplier = (supplierId: string) => {
     setSelectedSupplier(supplierId);
     setCurrentView('supplier-profile');
+  };
+
+  const handleContactSupplier = (supplierId: string) => {
+    setSelectedSupplier(supplierId);
+    setCurrentView('chat');
   };
 
   const handleCreateRFQ = (product: Product) => {
@@ -260,9 +338,32 @@ function AppContent() {
     setCurrentView('shipment-tracking');
   };
 
-  const navigate = (view: View) => {
+  const navigate = (view: View | { view: View; productId?: string; orderId?: string }) => {
+    // Handle object parameter for views that need additional data
+    if (typeof view === 'object') {
+      const { view: viewName, productId, orderId } = view;
+      
+      if (productId) {
+        setSelectedProductId(productId);
+      }
+      
+      if (orderId) {
+        setSelectedOrderId(orderId);
+      }
+      
+      const protectedViews: View[] = ['dashboard', 'rfq-builder', 'quote-comparison', 'chat', 'purchase-order', 'shipment-tracking', 'analytics', 'profile', 'edit-product', 'create-shipment', 'update-tracking'];
+      
+      if (protectedViews.includes(viewName) && !user) {
+        requireAuth({ type: 'view-dashboard' });
+        return;
+      }
+      
+      setCurrentView(viewName);
+      return;
+    }
+    
     // Require auth for protected views
-    const protectedViews: View[] = ['dashboard', 'rfq-builder', 'quote-comparison', 'chat', 'purchase-order', 'shipment-tracking', 'analytics', 'profile'];
+    const protectedViews: View[] = ['dashboard', 'rfq-builder', 'quote-comparison', 'chat', 'purchase-order', 'shipment-tracking', 'analytics', 'profile', 'edit-product', 'create-shipment', 'update-tracking'];
     
     if (protectedViews.includes(view) && !user) {
       requireAuth({ type: 'view-dashboard' });
@@ -277,10 +378,100 @@ function AppContent() {
     return <MobilePreview />;
   }
 
+  // Show loading spinner while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
-      <AuthModal />
+      {currentView === 'forgot-password' && (
+        <ForgotPassword 
+          onBack={() => setCurrentView('auth')} 
+          onSuccess={(email) => {
+            setResetEmail(email);
+            setCurrentView('verify-otp');
+          }}
+        />
+      )}
+
+      {currentView === 'verify-otp' && (
+        <VerifyOTP
+          email={resetEmail}
+          onSuccess={(otp) => {
+            setResetOTP(otp);
+            setCurrentView('reset-password');
+          }}
+          onBack={() => {
+            setResetEmail('');
+            setCurrentView('forgot-password');
+          }}
+          onResend={async () => {
+            try {
+              await fetch('http://localhost:5000/api/auth/forgot-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: resetEmail }),
+              });
+            } catch (error) {
+              console.error('Failed to resend OTP');
+            }
+          }}
+        />
+      )}
+
+      {currentView === 'reset-password' && (
+        <ResetPassword 
+          email={resetEmail}
+          otp={resetOTP}
+          onSuccess={() => {
+            setResetEmail('');
+            setResetOTP('');
+            setCurrentView('auth');
+          }}
+          onBack={() => setCurrentView('verify-otp')}
+        />
+      )}
+
+      {currentView === 'auth' && (
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="w-full max-w-full sm:max-w-[600px] sm:bg-white sm:rounded-2xl sm:shadow-xl px-6 py-8 sm:p-8 relative">
+            <button
+              onClick={() => navigate('catalog')}
+              className="absolute top-4 right-4 p-2 hover:bg-gray-100 rounded-lg transition-colors z-10"
+              aria-label="Close"
+            >
+              <svg className="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            {authStep === 'login' ? (
+              <Login 
+                onLogin={login}
+                onSignup={signup}
+                onGoogleAuth={googleAuth}
+                onForgotPassword={() => setCurrentView('forgot-password')}
+                isModal={false}
+              />
+            ) : (
+              <RoleSelection 
+                onSelectRole={selectRole}
+                onBack={() => {}}
+                isModal={false}
+              />
+            )}
+          </div>
+        </div>
+      )}
       
+      {currentView !== 'auth' && (
       <div className="min-h-screen bg-gray-50 flex">
         {/* Sidebar - only show when logged in */}
         {user && (
@@ -305,14 +496,12 @@ function AppContent() {
                 logout();
                 setCurrentView('catalog');
               }}
-              activeMode={activeMode}
-              onModeChange={handleModeChange}
             />
           )}
           
           {/* Main Content */}
           <main className={user ? "flex-1 max-w-7xl mx-auto w-full px-4 py-6 pb-24 lg:pb-6" : "flex-1"}>
-          {currentView === 'dashboard' && user && (user.role === 'buyer' || (user.role === 'both' && activeMode === 'buyer')) && (
+          {currentView === 'dashboard' && user && user.role === 'buyer' && (
           <BuyerDashboard 
             user={user} 
             onNavigate={navigate}
@@ -321,15 +510,8 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'dashboard' && user && (user.role === 'seller' || (user.role === 'both' && activeMode === 'seller')) && (
+        {currentView === 'dashboard' && user && user.role === 'seller' && (
           <SellerDashboard 
-            user={user} 
-            onNavigate={navigate}
-          />
-        )}
-        
-        {currentView === 'dashboard' && user && user.role === 'admin' && (
-          <AdminDashboard 
             user={user} 
             onNavigate={navigate}
           />
@@ -337,6 +519,7 @@ function AppContent() {
         
         {currentView === 'catalog' && (
           <Catalog 
+            user={user}
             onViewProduct={handleViewProduct}
             onViewSupplier={handleViewSupplier}
             onNavigate={navigate}
@@ -346,19 +529,22 @@ function AppContent() {
         {currentView === 'product-detail' && selectedProduct && (
           <ProductDetail
             product={selectedProduct}
+            user={user}
             onCreateRFQ={handleCreateRFQ}
             onOrderSample={handleOrderSample}
             onViewSupplier={handleViewSupplier}
+            onContactSupplier={handleContactSupplier}
             onBack={() => setCurrentView('catalog')}
           />
         )}        {currentView === 'supplier-profile' && selectedSupplier && (
           <SupplierProfile 
             supplierId={selectedSupplier}
+            user={user}
             onBack={() => setCurrentView('catalog')}
           />
         )}
         
-        {currentView === 'rfq-builder' && (
+        {currentView === 'rfq-builder' && user && user.role === 'buyer' && (
           <RFQBuilder 
             initialProduct={selectedProduct}
             user={user}
@@ -370,30 +556,35 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'my-rfqs' && (
+        {currentView === 'my-rfqs' && user && user.role === 'buyer' && (
           <MyRFQs
             onBack={() => setCurrentView('dashboard')}
             onViewQuotes={handleViewQuotes}
           />
         )}
         
-        {currentView === 'quote-comparison' && selectedRFQ && (
+        {currentView === 'quote-comparison' && selectedRFQ && user && user.role === 'buyer' && (
           <QuoteComparison 
             rfq={selectedRFQ}
+            user={user}
             onAcceptQuote={handleCreatePO}
             onChat={() => setCurrentView('chat')}
             onBack={() => setCurrentView('dashboard')}
           />
         )}
         
-        {currentView === 'chat' && (
+        {currentView === 'chat' && user && (
           <ChatInterface 
             user={user}
-            onBack={() => setCurrentView('dashboard')}
+            partnerId={selectedSupplier || undefined}
+            onBack={() => {
+              setSelectedSupplier(null);
+              setCurrentView('catalog');
+            }}
           />
         )}
         
-        {currentView === 'purchase-order' && (
+        {currentView === 'purchase-order' && user && user.role === 'buyer' && (
           <PurchaseOrder 
             user={user}
             quote={selectedQuote || undefined}
@@ -405,10 +596,42 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'shipment-tracking' && selectedPO && (
+        {currentView === 'shipment-tracking' && selectedPO && user && user.role === 'buyer' && (
           <ShipmentTracking 
             po={selectedPO}
+            user={user}
             onBack={() => setCurrentView('dashboard')}
+          />
+        )}
+        
+        {currentView === 'create-shipment' && selectedOrderId && user && user.role === 'seller' && (
+          <CreateShipment 
+            orderId={selectedOrderId}
+            orderNumber={`ORD-${selectedOrderId}`}
+            onSuccess={() => {
+              setCurrentView('dashboard');
+              setSelectedOrderId(null);
+            }}
+            onCancel={() => {
+              setCurrentView('dashboard');
+              setSelectedOrderId(null);
+            }}
+          />
+        )}
+        
+        {currentView === 'update-tracking' && selectedOrderId && user && user.role === 'seller' && (
+          <UpdateShipmentTracking 
+            shipmentId={selectedOrderId}
+            orderNumber={`ORD-${selectedOrderId}`}
+            currentStatus="in_transit"
+            onSuccess={() => {
+              setCurrentView('dashboard');
+              setSelectedOrderId(null);
+            }}
+            onCancel={() => {
+              setCurrentView('dashboard');
+              setSelectedOrderId(null);
+            }}
           />
         )}
         
@@ -425,6 +648,59 @@ function AppContent() {
               logout();
               setCurrentView('catalog');
             }}
+          />
+        )}
+        
+        {currentView === 'shipments' && user && user.role === 'buyer' && (
+          <Shipments 
+            user={user}
+            onViewDetails={(shipmentId) => {
+              // TODO: Fetch PO by shipment ID
+              // For now, use selectedPO if available
+              if (selectedPO) {
+                setCurrentView('shipment-tracking');
+              }
+            }}
+          />
+        )}
+        
+        {currentView === 'settings' && user && (
+          <Settings 
+            user={user}
+          />
+        )}
+        
+        {currentView === 'help' && user && (
+          <Help 
+            user={user}
+          />
+        )}
+        
+        {currentView === 'add-product' && user && user.role === 'seller' && (
+          <AddProduct 
+            user={user}
+            onBack={() => setCurrentView('catalog')}
+            onSuccess={() => setCurrentView('catalog')}
+          />
+        )}
+        
+        {currentView === 'edit-product' && user && selectedProductId && user.role === 'seller' && (
+          <EditProduct 
+            productId={selectedProductId}
+            user={user}
+            onBack={() => setCurrentView('dashboard')}
+            onSuccess={() => {
+              setSelectedProductId(null);
+              setCurrentView('dashboard');
+            }}
+          />
+        )}
+        
+        {currentView === 'verification' && user && (
+          <VerificationPage 
+            user={user}
+            onBack={() => setCurrentView('dashboard')}
+            onComplete={() => setCurrentView('dashboard')}
           />
         )}
         
@@ -447,11 +723,11 @@ function AppContent() {
               user={user}
               currentView={currentView}
               onNavigate={navigate}
-              activeMode={activeMode}
             />
           )}
         </div>
       </div>
+      )}
     </>
   );
 }
@@ -459,6 +735,7 @@ function AppContent() {
 export default function App() {
   return (
     <AuthProvider>
+      <Toaster position="top-right" richColors />
       <AppContent />
     </AuthProvider>
   );

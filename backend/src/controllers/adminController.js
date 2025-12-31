@@ -149,12 +149,12 @@ export const verifyUser = async (req, res) => {
 // Get all products (admin only)
 export const getAllProductsAdmin = async (req, res) => {
   try {
+    console.log('getAllProductsAdmin called with query:', req.query);
     const { page = 1, limit = 10, category, status } = req.query;
     const offset = (page - 1) * limit;
 
     let queryText = `
-      SELECT p.*, u.company_name as supplier_name, 
-             CASE WHEN p.available = true THEN 'approved' ELSE 'pending' END as status
+      SELECT p.*, u.company_name as supplier_name
       FROM products p
       JOIN users u ON p.supplier_id = u.id
       WHERE 1=1
@@ -168,16 +168,17 @@ export const getAllProductsAdmin = async (req, res) => {
       params.push(category);
     }
 
-    if (status === 'pending') {
-      queryText += ` AND p.available = false`;
-    } else if (status === 'approved') {
-      queryText += ` AND p.available = true`;
+    if (status && status !== 'all') {
+      paramCount++;
+      queryText += ` AND p.approval_status = $${paramCount}`;
+      params.push(status);
     }
 
     queryText += ` ORDER BY p.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
 
     const result = await query(queryText, params);
+    console.log('Admin found products:', result.rows.length);
 
     res.json({
       success: true,
@@ -197,13 +198,21 @@ export const getAllProductsAdmin = async (req, res) => {
 export const approveProduct = async (req, res) => {
   try {
     const { id } = req.params;
+    const { status } = req.body; // 'approved' or 'rejected'
+
+    if (!status || !['approved', 'rejected'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid status. Must be "approved" or "rejected"'
+      });
+    }
 
     const result = await query(
       `UPDATE products 
-       SET available = true 
-       WHERE id = $1 
+       SET approval_status = $1 
+       WHERE id = $2 
        RETURNING *`,
-      [id]
+      [status, id]
     );
 
     if (result.rows.length === 0) {
@@ -224,19 +233,21 @@ export const approveProduct = async (req, res) => {
     if (sellerResult.rows.length > 0) {
       const seller = sellerResult.rows[0];
       
-      // Send approval email to seller
-      sendEmail(seller.email, 'productApproved', {
+      // Send approval/rejection email to seller
+      const emailType = status === 'approved' ? 'productApproved' : 'productRejected';
+      sendEmail(seller.email, emailType, {
         companyName: seller.company_name,
         productName: product.name,
         category: product.category,
         price: product.price,
-        moq: product.moq
-      }).catch(err => console.error('Failed to send product approval email:', err));
+        moq: product.moq,
+        status: status
+      }).catch(err => console.error(`Failed to send product ${status} email:`, err));
     }
 
     res.json({
       success: true,
-      message: 'Product approved successfully',
+      message: `Product ${status} successfully`,
       data: product
     });
   } catch (error) {

@@ -7,6 +7,15 @@ import rateLimit from 'express-rate-limit';
 // Load environment variables
 dotenv.config();
 
+// Import email worker to start processing jobs
+import './workers/emailWorker.js';
+
+// Import Bull Board for queue monitoring
+import { createBullBoard } from '@bull-board/api';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js';
+import { ExpressAdapter } from '@bull-board/express';
+import { emailQueue } from './queues/emailQueue.js';
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -19,10 +28,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Rate limiting
+// Rate limiting - very lenient for development
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 1000 // limit each IP to 1000 requests per minute (very high for dev)
 });
 app.use('/api/', limiter);
 
@@ -36,6 +45,17 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Bull Board setup for queue monitoring
+const serverAdapter = new ExpressAdapter();
+serverAdapter.setBasePath('/admin/queues');
+
+createBullBoard({
+  queues: [new BullMQAdapter(emailQueue)],
+  serverAdapter: serverAdapter,
+});
+
+app.use('/admin/queues', serverAdapter.getRouter());
+
 // Import routes
 import authRoutes from './routes/auth.js';
 import productRoutes from './routes/products.js';
@@ -47,6 +67,9 @@ import shipmentRoutes from './routes/shipments.js';
 import supplierRoutes from './routes/suppliers.js';
 import analyticsRoutes from './routes/analytics.js';
 import uploadRoutes from './routes/uploads.js';
+import messageRoutes from './routes/messageRoutes.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // API routes
 app.use('/api/auth', authRoutes);
@@ -59,6 +82,9 @@ app.use('/api/shipments', shipmentRoutes);
 app.use('/api/suppliers', supplierRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/uploads', uploadRoutes);
+app.use('/api/messages', messageRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/users', userRoutes);
 
 // API info endpoint
 app.get('/api', (req, res) => {
@@ -75,7 +101,9 @@ app.get('/api', (req, res) => {
       shipments: '/api/shipments/*',
       suppliers: '/api/suppliers/*',
       analytics: '/api/analytics/*',
-      uploads: '/api/uploads/*'
+      uploads: '/api/uploads/*',
+      messages: '/api/messages/*',
+      reviews: '/api/reviews/*'
     }
   });
 });
@@ -100,7 +128,9 @@ app.use((req, res) => {
 
 // Start server
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`📧 Email worker started and listening for jobs`);
+  console.log(`📊 Queue dashboard: http://localhost:${PORT}/admin/queues`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`API docs: http://localhost:${PORT}/api`);

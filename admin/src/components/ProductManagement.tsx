@@ -10,15 +10,19 @@ interface Product {
   id: string;
   name: string;
   category: string;
-  unit_price: string;
-  minimum_order_quantity: number;
-  available: boolean;
-  seller_id: string;
-  seller_company: string;
+  price: string;
+  moq: number;
+  approval_status: 'pending' | 'approved' | 'rejected';
+  supplier_id: string;
+  supplier_name: string;
   created_at: string;
 }
 
-export function ProductManagement() {
+interface ProductManagementProps {
+  onViewProduct: (productId: string) => void;
+}
+
+export function ProductManagement({ onViewProduct }: ProductManagementProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,7 +58,7 @@ export function ProductManagement() {
     }
   };
 
-  const handleApproveProduct = async (productId: string, approved: boolean) => {
+  const handleApproveProduct = async (productId: string, status: 'approved' | 'rejected') => {
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/admin/products/${productId}/approve`, {
@@ -63,13 +67,13 @@ export function ProductManagement() {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ approved })
+        body: JSON.stringify({ status })
       });
       
       const data = await response.json();
       
       if (data.success) {
-        showAlert('success', `Product ${approved ? 'approved' : 'rejected'} successfully`);
+        showAlert('success', `Product ${status} successfully`);
         fetchProducts();
       } else {
         showAlert('error', data.message || 'Failed to update product');
@@ -93,8 +97,9 @@ export function ProductManagement() {
 
   const stats = {
     total: products.length,
-    approved: products.filter(p => p.available).length,
-    pending: products.filter(p => !p.available).length,
+    approved: products.filter(p => p.approval_status === 'approved').length,
+    pending: products.filter(p => p.approval_status === 'pending').length,
+    rejected: products.filter(p => p.approval_status === 'rejected').length,
     categories: new Set(products.map(p => p.category)).size
   };
 
@@ -136,7 +141,7 @@ export function ProductManagement() {
       )}
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -167,6 +172,17 @@ export function ProductManagement() {
                 <p className="text-2xl font-bold">{stats.pending}</p>
               </div>
               <AlertTriangle className="h-8 w-8 text-yellow-600" />
+            </div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-600">Rejected</p>
+                <p className="text-2xl font-bold">{stats.rejected}</p>
+              </div>
+              <XCircle className="h-8 w-8 text-red-600" />
             </div>
           </CardContent>
         </Card>
@@ -206,6 +222,7 @@ export function ProductManagement() {
                 <option value="all">All Status</option>
                 <option value="approved">Approved</option>
                 <option value="pending">Pending</option>
+                <option value="rejected">Rejected</option>
               </select>
               <select
                 value={categoryFilter}
@@ -245,7 +262,14 @@ export function ProductManagement() {
               ) : (
                 filteredProducts.map((product) => (
                   <TableRow key={product.id}>
-                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="font-medium">
+                      <button
+                        onClick={() => onViewProduct(product.id)}
+                        className="text-blue-600 hover:text-blue-800 hover:underline text-left"
+                      >
+                        {product.name}
+                      </button>
+                    </TableCell>
                     <TableCell>
                       <Badge variant="secondary">{product.category}</Badge>
                     </TableCell>
@@ -253,15 +277,22 @@ export function ProductManagement() {
                     <TableCell>${product.price ? parseFloat(product.price).toFixed(2) : 'N/A'}</TableCell>
                     <TableCell>{product.moq || 'N/A'}</TableCell>
                     <TableCell>
-                      {product.available ? (
+                      {product.approval_status === 'approved' && (
                         <Badge variant="outline" className="text-green-600 border-green-600">
                           <CheckCircle className="h-3 w-3 mr-1" />
                           Approved
                         </Badge>
-                      ) : (
+                      )}
+                      {product.approval_status === 'pending' && (
                         <Badge variant="outline" className="text-yellow-600 border-yellow-600">
                           <AlertTriangle className="h-3 w-3 mr-1" />
                           Pending
+                        </Badge>
+                      )}
+                      {product.approval_status === 'rejected' && (
+                        <Badge variant="outline" className="text-red-600 border-red-600">
+                          <XCircle className="h-3 w-3 mr-1" />
+                          Rejected
                         </Badge>
                       )}
                     </TableCell>
@@ -270,12 +301,21 @@ export function ProductManagement() {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        {!product.available ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => onViewProduct(product.id)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
+                        {product.approval_status === 'pending' && (
                           <>
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleApproveProduct(product.id, true)}
+                              onClick={() => handleApproveProduct(product.id, 'approved')}
                               className="text-green-600 border-green-600 hover:bg-green-50"
                             >
                               <CheckCircle className="h-4 w-4 mr-1" />
@@ -284,20 +324,31 @@ export function ProductManagement() {
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => handleApproveProduct(product.id, false)}
+                              onClick={() => handleApproveProduct(product.id, 'rejected')}
                               className="text-red-600 border-red-600 hover:bg-red-50"
                             >
                               <XCircle className="h-4 w-4 mr-1" />
                               Reject
                             </Button>
                           </>
-                        ) : (
+                        )}
+                        {product.approval_status === 'approved' && (
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => handleApproveProduct(product.id, false)}
+                            onClick={() => handleApproveProduct(product.id, 'rejected')}
                           >
                             Revoke
+                          </Button>
+                        )}
+                        {product.approval_status === 'rejected' && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleApproveProduct(product.id, 'approved')}
+                            className="text-green-600 border-green-600 hover:bg-green-50"
+                          >
+                            Approve
                           </Button>
                         )}
                       </div>

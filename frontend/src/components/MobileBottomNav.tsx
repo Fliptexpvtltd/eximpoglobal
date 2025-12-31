@@ -30,7 +30,8 @@ export function MobileBottomNav({ user, currentView, onNavigate, activeMode = 'b
   const links = effectiveRole === 'seller' ? sellerLinks : buyerLinks;
   
   // Theme colors based on role
-  const textColor = effectiveRole === 'seller' ? 'text-emerald-600' : 'text-blue-600';
+  const isSeller = effectiveRole === 'seller';
+  const activeColor = isSeller ? '#059669' : '#2563eb'; // emerald-600 : blue-600
 
   return (
     <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.1)] safe-area-bottom">
@@ -43,11 +44,8 @@ export function MobileBottomNav({ user, currentView, onNavigate, activeMode = 'b
             <button
               key={link.id}
               onClick={() => onNavigate(link.id)}
-              className={`flex flex-col items-center justify-center gap-0.5 transition-colors active:bg-gray-50 ${
-                isActive
-                  ? textColor
-                  : 'text-gray-500'
-              }`}
+              className="flex flex-col items-center justify-center gap-0.5 transition-colors active:bg-gray-50"
+              style={{ color: isActive ? activeColor : '#6b7280' }}
             >
               <Icon className={`w-6 h-6 ${isActive ? 'stroke-[2.5]' : 'stroke-2'}`} />
               <span className={`text-[10px] ${isActive ? 'font-medium' : ''}`}>{link.label}</span>
