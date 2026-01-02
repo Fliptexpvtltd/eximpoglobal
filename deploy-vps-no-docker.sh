@@ -13,9 +13,11 @@ echo -e "${GREEN}========================================${NC}"
 echo ""
 
 # Configuration
-DEPLOY_DIR="/var/www/eximpo"
+DEPLOY_DIR="/var/www/app"
+RELEASE_NAME="$(date +%Y-%m-%d-%H%M%S)"
+RELEASE_DIR="$DEPLOY_DIR/releases/$RELEASE_NAME"
 GITHUB_REPO="https://github.com/Fliptexpvtltd/eximpoglobal.git"
-APP_USER="eximpo"
+APP_USER="root"  # Current setup uses root
 
 # Function to check if command exists
 command_exists() {
@@ -75,14 +77,11 @@ else
     echo -e "${GREEN}✓ Nginx already installed${NC}"
 fi
 
-# Step 6: Create app user
-echo -e "${YELLOW}Step 6: Creating application user...${NC}"
-if ! id "$APP_USER" &>/dev/null; then
-    useradd -m -s /bin/bash $APP_USER
-    echo -e "${GREEN}✓ User $APP_USER created${NC}"
-else
-    echo -e "${GREEN}✓ User $APP_USER already exists${NC}"
-fi
+# Step 6: Create deployment directories
+echo -e "${YELLOW}Step 6: Creating deployment directories...${NC}"
+mkdir -p $DEPLOY_DIR/releases
+mkdir -p $DEPLOY_DIR/shared
+echo -e "${GREEN}✓ Directories created${NC}"
 
 # Step 7: Setup database
 echo -e "${YELLOW}Step 7: Setting up database...${NC}"
@@ -97,40 +96,35 @@ echo -e "${GREEN}✓ Database configured${NC}"
 
 # Step 8: Clone/Update repository
 echo -e "${YELLOW}Step 8: Deploying application code...${NC}"
-if [ -d "$DEPLOY_DIR" ]; then
-    echo -e "${BLUE}Updating existing repository...${NC}"
-    cd $DEPLOY_DIR
-    git pull origin main
-else
-    echo -e "${BLUE}Cloning repository...${NC}"
-    mkdir -p $DEPLOY_DIR
-    git clone $GITHUB_REPO $DEPLOY_DIR
-    cd $DEPLOY_DIR
-fi
+echo -e "${BLUE}Creating new release: $RELEASE_NAME${NC}"
+git clone $GITHUB_REPO $RELEASE_DIR
+cd $RELEASE_DIR
 
-# Set ownership
-chown -R $APP_USER:$APP_USER $DEPLOY_DIR
+# Create symlink to new release
+rm -f $DEPLOY_DIR/current
+ln -sf $RELEASE_DIR $DEPLOY_DIR/current
+echo -e "${GREEN}✓ Code deployed to $RELEASE_DIR${NC}"
 
 # Step 9: Install dependencies
 echo -e "${YELLOW}Step 9: Installing dependencies...${NC}"
 
 echo -e "${BLUE}Installing backend dependencies...${NC}"
-cd $DEPLOY_DIR/backend
-sudo -u $APP_USER npm install --production
+cd $RELEASE_DIR/backend
+npm install --production
 
 echo -e "${BLUE}Installing frontend dependencies...${NC}"
-cd $DEPLOY_DIR/frontend
-sudo -u $APP_USER npm install
+cd $RELEASE_DIR/frontend
+npm install
 
 echo -e "${BLUE}Installing admin dependencies...${NC}"
-cd $DEPLOY_DIR/admin
-sudo -u $APP_USER npm install
+cd $RELEASE_DIR/admin
+npm install
 
 # Step 10: Setup environment files
 echo -e "${YELLOW}Step 10: Creating environment files...${NC}"
 
 # Backend .env
-cat > $DEPLOY_DIR/backend/.env << 'EOF'
+cat > $RELEASE_DIR/backend/.env << 'EOF'
 DATABASE_URL=postgresql://eximpo_user:Eximpo2024@SecureDB!9x7z@localhost:5432/eximpo
 NODE_ENV=production
 PORT=5000
@@ -151,13 +145,11 @@ CONTABO_S3_REGION=eu-central-1
 CONTABO_S3_BUCKET=eximpo-storage
 EOF
 
-chown $APP_USER:$APP_USER $DEPLOY_DIR/backend/.env
-
 echo -e "${GREEN}✓ Environment files created${NC}"
 
 # Step 11: Initialize database schema
 echo -e "${YELLOW}Step 11: Initializing database...${NC}"
-cd $DEPLOY_DIR/backend
+cd $RELEASE_DIR/backend
 sudo -u postgres psql -d eximpo -f init.sql 2>/dev/null || echo "Schema already exists"
 echo -e "${GREEN}✓ Database initialized${NC}"
 
@@ -165,35 +157,35 @@ echo -e "${GREEN}✓ Database initialized${NC}"
 echo -e "${YELLOW}Step 12: Building frontend applications...${NC}"
 
 echo -e "${BLUE}Building frontend...${NC}"
-cd $DEPLOY_DIR/frontend
-sudo -u $APP_USER npm run build
+cd $RELEASE_DIR/frontend
+npm run build
 
 echo -e "${BLUE}Building admin panel...${NC}"
-cd $DEPLOY_DIR/admin
-sudo -u $APP_USER npm run build
+cd $RELEASE_DIR/admin
+npm run build
 
 echo -e "${GREEN}✓ Builds completed${NC}"
 
 # Step 13: Stop existing PM2 processes
 echo -e "${YELLOW}Step 13: Stopping old processes...${NC}"
-sudo -u $APP_USER pm2 delete all 2>/dev/null || true
+pm2 delete all 2>/dev/null || true
 
 # Step 14: Start services with PM2
 echo -e "${YELLOW}Step 14: Starting services with PM2...${NC}"
 
-cd $DEPLOY_DIR/backend
-sudo -u $APP_USER pm2 start src/server.js --name "eximpo-backend" --time
-sudo -u $APP_USER pm2 start src/workers/emailWorker.js --name "eximpo-email-worker" --time
+cd $DEPLOY_DIR/current/backend
+pm2 start src/server.js --name "eximpo-backend" --time
+pm2 start src/workers/emailWorker.js --name "eximpo-email-worker" --time
 
-cd $DEPLOY_DIR/frontend
-sudo -u $APP_USER pm2 serve dist 3000 --name "eximpo-frontend" --spa
+cd $DEPLOY_DIR/current/frontend
+pm2 serve dist 3000 --name "eximpo-frontend" --spa
 
-cd $DEPLOY_DIR/admin
-sudo -u $APP_USER pm2 serve dist 3001 --name "eximpo-admin" --spa
+cd $DEPLOY_DIR/current/admin
+pm2 serve dist 3001 --name "eximpo-admin" --spa
 
 # Save PM2 process list
-sudo -u $APP_USER pm2 save
-sudo -u $APP_USER pm2 startup | tail -n 1 | bash
+pm2 save
+pm2 startup | tail -n 1 | bash
 
 echo -e "${GREEN}✓ Services started${NC}"
 
@@ -302,12 +294,17 @@ echo -e "${GREEN}  Deployment Complete!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
 echo -e "${BLUE}Services Status:${NC}"
-sudo -u $APP_USER pm2 list
+pm2 list
 echo ""
 echo -e "${BLUE}Access URLs:${NC}"
 echo -e "  Frontend: ${GREEN}http://app.eximpoglobal.net${NC}"
 echo -e "  Admin:    ${GREEN}http://admin.eximpoglobal.net${NC}"
 echo -e "  Backend:  ${GREEN}http://localhost:5000${NC}"
+echo ""
+echo -e "${BLUE}Deployment Info:${NC}"
+echo -e "  Release:  ${GREEN}$RELEASE_NAME${NC}"
+echo -e "  Location: ${GREEN}$RELEASE_DIR${NC}"
+echo -e "  Current:  ${GREEN}$(readlink $DEPLOY_DIR/current)${NC}"
 echo ""
 echo -e "${BLUE}Useful Commands:${NC}"
 echo -e "  View logs:       ${YELLOW}pm2 logs${NC}"
@@ -315,9 +312,10 @@ echo -e "  Restart all:     ${YELLOW}pm2 restart all${NC}"
 echo -e "  Stop all:        ${YELLOW}pm2 stop all${NC}"
 echo -e "  Service status:  ${YELLOW}pm2 status${NC}"
 echo -e "  Nginx logs:      ${YELLOW}tail -f /var/log/nginx/error.log${NC}"
+echo -e "  Rollback:        ${YELLOW}ln -sf /var/www/app/releases/PREVIOUS_RELEASE /var/www/app/current && pm2 restart all${NC}"
 echo ""
 echo -e "${YELLOW}Next Steps:${NC}"
 echo -e "  1. Configure SSL: ${BLUE}certbot --nginx -d app.eximpoglobal.net -d admin.eximpoglobal.net${NC}"
-echo -e "  2. Create admin: ${BLUE}cd $DEPLOY_DIR/backend && node create-admin.js${NC}"
+echo -e "  2. Create admin: ${BLUE}cd $DEPLOY_DIR/current/backend && node create-admin.js${NC}"
 echo -e "  3. Seed data: ${BLUE}node seed-products.js${NC}"
 echo ""
