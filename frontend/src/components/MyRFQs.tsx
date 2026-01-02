@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { ArrowLeft, FileText, Clock, CheckCircle, XCircle, Package, Eye } from 'lucide-react';
 import type { RFQ } from '../App';
 
