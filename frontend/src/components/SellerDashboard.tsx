@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { IndianRupee, Package, Eye, MessageSquare, TrendingUp, Star, Plus, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import type { User } from '../App';
 
@@ -42,7 +45,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const fetchSellerAnalytics = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/analytics/seller', {
+      const response = await fetch(`${API_BASE_URL}/analytics/seller`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -59,7 +62,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const fetchMyProducts = async () => {
     try {
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/products/my/products', {
+      const response = await fetch(`${API_BASE_URL}/products/my/products`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -76,7 +79,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const fetchSellerRFQs = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/rfqs?limit=5', {
+      const response = await fetch(`${API_BASE_URL}/rfqs?limit=5`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -91,7 +94,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const fetchMyQuotes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/quotes', {
+      const response = await fetch(`${API_BASE_URL}/quotes`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -106,7 +109,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const fetchSellerOrders = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/orders', {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -577,3 +580,4 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
     </div>
   );
 }
+

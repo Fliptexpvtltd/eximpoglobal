@@ -5,6 +5,9 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PublicNavigation } from './PublicNavigation';
 import { useAuth } from '../contexts/AuthContext';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface CatalogProps {
   onViewProduct: (product: Product) => void;
   onViewSupplier: (supplierId: string) => void;
@@ -31,7 +34,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:5000/api/products');
+      const response = await fetch(`${API_BASE_URL}/products`);
       const data = await response.json();
       
       if (data.success) {

@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { toast } from 'sonner';
 import { AlertCircle, CheckCircle, Clock, IndianRupee, Package, TrendingUp, MessageSquare, FileText, ShieldCheck } from 'lucide-react';
 import type { User, Product, RFQ } from '../App';
@@ -35,7 +38,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
       const token = localStorage.getItem('token');
       
       // Fetch buyer analytics
-      const analyticsResponse = await fetch('http://localhost:5000/api/analytics/buyer', {
+      const analyticsResponse = await fetch(`${API_BASE_URL}/analytics/buyer`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const analyticsData = await analyticsResponse.json();
@@ -44,13 +47,13 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
       }
       
       // Fetch buyer's RFQs
-      const rfqResponse = await fetch('http://localhost:5000/api/rfqs', {
+      const rfqResponse = await fetch(`${API_BASE_URL}/rfqs`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const rfqData = await rfqResponse.json();
       
       // Fetch trending products
-      const productsResponse = await fetch('http://localhost:5000/api/products?limit=4&approval_status=approved');
+      const productsResponse = await fetch('${API_BASE_URL}/products?limit=4&approval_status=approved');
       const productsData = await productsResponse.json();
 
       if (rfqData.success && rfqData.data) {
@@ -380,3 +383,4 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
     </div>
   );
 }
+

@@ -19,7 +19,7 @@ export function MyRFQs({ onBack, onViewQuotes }: MyRFQsProps) {
   const fetchRFQs = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/rfqs', {
+      const response = await fetch(`${API_BASE_URL}/rfqs`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -231,3 +231,5 @@ export function MyRFQs({ onBack, onViewQuotes }: MyRFQsProps) {
     </div>
   );
 }
+
+

@@ -144,7 +144,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
         },
       };
 
-      const response = await fetch('http://localhost:5000/api/products', {
+      const response = await fetch(`${API_BASE_URL}/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -640,3 +640,5 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
     </div>
   );
 }
+
+

@@ -2,6 +2,9 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 import { toast } from 'sonner';
 import { User, UserRole } from '../App';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface PendingAction {
   type: 'create-rfq' | 'order-sample' | 'view-quotes' | 'create-po' | 'chat' | 'view-dashboard' | 'view-orders' | 'browse-catalog';
   data?: any;
@@ -45,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const response = await fetch('http://localhost:5000/api/auth/profile', {
+        const response = await fetch(`${API_BASE_URL}/auth/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -88,7 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string, rememberMe: boolean = true) => {
     console.log('🔑 Login function called:', { email, rememberMe });
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -153,8 +156,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const isGoogleUser = !!googleTempToken;
 
       const endpoint = isGoogleUser 
-        ? 'http://localhost:5000/api/auth/google/complete-registration'
-        : 'http://localhost:5000/api/auth/register';
+        ? `${API_BASE_URL}/auth/google/complete-registration`
+        : `${API_BASE_URL}/auth/register`;
 
       const body = isGoogleUser 
         ? {
@@ -226,7 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const googleAuth = async (credential: string) => {
     try {
-      const response = await fetch('http://localhost:5000/api/auth/google/signin', {
+      const response = await fetch(`${API_BASE_URL}/auth/google/signin`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -18,7 +18,7 @@ export function ForgotPassword({ onBack, onSuccess }: ForgotPasswordProps) {
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -94,3 +94,5 @@ export function ForgotPassword({ onBack, onSuccess }: ForgotPasswordProps) {
     </div>
   );
 }
+
+

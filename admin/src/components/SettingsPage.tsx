@@ -42,7 +42,7 @@ export function SettingsPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/settings', {
+      const response = await fetch('/api/admin/settings', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -61,7 +61,7 @@ export function SettingsPage() {
     try {
       setSaving(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/settings', {
+      const response = await fetch('/api/admin/settings', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,

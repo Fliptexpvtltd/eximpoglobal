@@ -38,7 +38,7 @@ export function CreateShipment({ orderId, orderNumber, onBack, onSuccess }: Crea
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch('http://localhost:5000/api/shipments', {
+      const response = await fetch(`${API_BASE_URL}/shipments`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -204,3 +204,5 @@ export function CreateShipment({ orderId, orderNumber, onBack, onSuccess }: Crea
     </div>
   );
 }
+
+

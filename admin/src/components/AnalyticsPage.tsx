@@ -32,7 +32,7 @@ export function AnalyticsPage() {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/admin/analytics', {
+      const response = await fetch('/api/admin/analytics', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();

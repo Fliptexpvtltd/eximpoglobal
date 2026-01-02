@@ -67,7 +67,7 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
     try {
       setLoading(true);
       const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -197,7 +197,7 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
         },
       };
 
-      const response = await fetch(`http://localhost:5000/api/products/${productId}`, {
+      const response = await fetch(`${API_BASE_URL}/products/${productId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -465,3 +465,5 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
     </div>
   );
 }
+
+

@@ -1,4 +1,7 @@
 import { useState } from 'react';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { toast } from 'sonner';
 import { Plus, X, Upload, Calendar } from 'lucide-react';
 import type { User, Product, RFQ } from '../App';
@@ -93,7 +96,7 @@ export function RFQBuilder({ initialProduct, user, activeMode = 'buyer', onSubmi
         paymentTerms: 'Net 30'
       };
 
-      const response = await fetch('http://localhost:5000/api/rfqs', {
+      const response = await fetch(`${API_BASE_URL}/rfqs`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -432,3 +435,4 @@ export function RFQBuilder({ initialProduct, user, activeMode = 'buyer', onSubmi
     </div>
   );
 }
+

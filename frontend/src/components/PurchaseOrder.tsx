@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { toast } from 'sonner';
 import { IndianRupee, Calendar, Package, Shield, FileText, CheckCircle } from 'lucide-react';
 import type { User, PO, Quote } from '../App';
@@ -74,7 +77,7 @@ export function PurchaseOrder({ user, activeMode = 'buyer', quote, orderId, onSu
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/orders', {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -481,3 +484,4 @@ export function PurchaseOrder({ user, activeMode = 'buyer', quote, orderId, onSu
     </div>
   );
 }
+

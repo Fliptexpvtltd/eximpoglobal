@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { query } from '../config/database.js';
+import { sendEmail } from '../services/emailService.js';
 
 export const register = async (req, res) => {
   try {
@@ -31,6 +32,20 @@ export const register = async (req, res) => {
     );
 
     const user = result.rows[0];
+
+    // Send welcome email
+    try {
+      await sendEmail(user.email, 'welcome', {
+        email: user.email,
+        companyName: user.company_name,
+        fullName: user.full_name,
+        role: user.role
+      });
+      console.log(`✅ Welcome email queued for ${user.email}`);
+    } catch (emailError) {
+      console.error('⚠️ Failed to send welcome email:', emailError);
+      // Don't fail registration if email fails
+    }
 
     // Generate token
     const token = jwt.sign(

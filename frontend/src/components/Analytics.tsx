@@ -23,7 +23,7 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
     try {
       const token = localStorage.getItem('token');
       const endpoint = isSeller ? '/api/analytics/seller' : '/api/analytics/buyer';
-      const response = await fetch(`http://localhost:5000${endpoint}`, {
+      const response = await fetch(endpoint, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -55,6 +55,19 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
   const monthlyData = analytics?.monthly_trends || [];
   const categoryData = analytics?.category_breakdown || [];
   const topSuppliers = analytics?.top_suppliers || [];
+  const countryDistribution = analytics?.country_distribution || [
+    { name: 'India', value: 45, color: '#3b82f6' },
+    { name: 'China', value: 30, color: '#10b981' },
+    { name: 'USA', value: 15, color: '#f59e0b' },
+    { name: 'Others', value: 10, color: '#6b7280' }
+  ];
+  const supplierPerformance = analytics?.supplier_performance || topSuppliers || [];
+  const deliveryMetrics = analytics?.delivery_metrics || [
+    { metric: 'On-Time Delivery', value: '94%', trend: 'up', change: '+2%' },
+    { metric: 'Quality Score', value: '4.8/5', trend: 'up', change: '+0.2' },
+    { metric: 'Lead Time', value: '12 days', trend: 'down', change: '-1 day' },
+    { metric: 'Defect Rate', value: '1.2%', trend: 'down', change: '-0.3%' }
+  ];
   
   const totalSpend = isSeller ? overview.total_revenue : overview.total_spent;
   const totalOrders = overview.total_orders || 0;
@@ -140,7 +153,7 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-xl mb-6">Spend by Category</h2>
           <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={spendByCategory}>
+            <BarChart data={categoryData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
               <XAxis dataKey="name" stroke="#6b7280" />
               <YAxis stroke="#6b7280" tickFormatter={(value) => `₹${value / 1000}K`} />

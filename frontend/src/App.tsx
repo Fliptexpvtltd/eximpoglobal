@@ -28,6 +28,9 @@ import { Shipments } from './components/Shipments';
 import { Settings } from './components/Settings';
 import { Help } from './components/Help';
 import { AddProduct } from './components/AddProduct';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { EditProduct } from './components/EditProduct';
 import { VerificationPage } from './components/VerificationPage';
 import { CreateShipment } from './components/CreateShipment';
@@ -415,7 +418,7 @@ function AppContent() {
           }}
           onResend={async () => {
             try {
-              await fetch('http://localhost:5000/api/auth/forgot-password', {
+              await fetch(`${API_BASE_URL}/auth/forgot-password`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: resetEmail }),

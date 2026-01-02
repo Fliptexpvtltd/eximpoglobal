@@ -22,7 +22,7 @@ export function Shipments({ user, activeMode, onViewDetails }: ShipmentsProps) {
   const fetchShipments = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/shipments', {
+      const response = await fetch(`${API_BASE_URL}/shipments`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -226,3 +226,5 @@ export function Shipments({ user, activeMode, onViewDetails }: ShipmentsProps) {
     </div>
   );
 }
+
+

@@ -45,7 +45,7 @@ export function UpdateShipmentTracking({
       setLoading(true);
       const token = localStorage.getItem('token');
       
-      const response = await fetch(`http://localhost:5000/api/shipments/${shipmentId}/tracking`, {
+      const response = await fetch(`${API_BASE_URL}/shipments/${shipmentId}/tracking`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -162,3 +162,5 @@ export function UpdateShipmentTracking({
     </div>
   );
 }
+
+

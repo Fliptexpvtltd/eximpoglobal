@@ -5,13 +5,27 @@ import SibApiV3Sdk from 'sib-api-v3-sdk';
 // Import email templates
 import { emailTemplates } from '../services/emailTemplates.js';
 
-// Redis connection configuration
-const redisConnection = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  maxRetriesPerRequest: null,
-  enableReadyCheck: false,
-});
+// Check if Redis is enabled
+const REDIS_ENABLED = process.env.REDIS_ENABLED !== 'false';
+
+// Redis connection configuration (only if enabled)
+let redisConnection = null;
+let emailWorker = null;
+
+if (REDIS_ENABLED) {
+  try {
+    redisConnection = new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      maxRetriesPerRequest: null,
+      enableReadyCheck: false,
+    });
+
+    console.log('📧 Email worker: Redis connection initialized');
+  } catch (error) {
+    console.warn('⚠️ Email worker: Redis connection failed, worker disabled:', error.message);
+  }
+}
 
 // Configure Brevo API
 const defaultClient = SibApiV3Sdk.ApiClient.instance;
@@ -26,7 +40,7 @@ const processEmailJob = async (job) => {
   try {
     // Check if Brevo API key is configured
     if (!process.env.BREVO_API_KEY) {
-      console.log('⚠️ BREVO_API_KEY not configured. Email would be sent to:', to);
+      console.log('BREVO_API_KEY not configured. Email would be sent to:', to);
       console.log('Template:', templateName);
       console.log('Data:', data);
       return { success: true, message: 'Email logging (no API key)' };
@@ -75,50 +89,61 @@ const processEmailJob = async (job) => {
   }
 };
 
-// Create email worker
-export const emailWorker = new Worker('email-queue', processEmailJob, {
-  connection: redisConnection,
-  concurrency: 5, // Process up to 5 emails concurrently
-  limiter: {
-    max: 50, // Max 50 jobs
-    duration: 60000, // per 60 seconds (to respect Brevo rate limits)
-  },
-});
+// Create email worker only if Redis is enabled
+if (REDIS_ENABLED && redisConnection) {
+  emailWorker = new Worker('email-queue', processEmailJob, {
+    connection: redisConnection,
+    concurrency: 5, // Process up to 5 emails concurrently
+    limiter: {
+      max: 50, // Max 50 jobs
+      duration: 60000, // per 60 seconds (to respect Brevo rate limits)
+    },
+  });
 
-// Worker event listeners
-emailWorker.on('ready', () => {
-  console.log('✅ Email worker is ready and listening for jobs');
-});
+  // Worker event listeners
+  emailWorker.on('ready', () => {
+    console.log('✅ Email worker is ready and listening for jobs');
+  });
 
-emailWorker.on('active', (job) => {
-  console.log(`🔄 Worker processing job ${job.id}: ${job.data.templateName}`);
-});
+  emailWorker.on('active', (job) => {
+    console.log(`🔄 Worker processing job ${job.id}: ${job.data.templateName}`);
+  });
 
-emailWorker.on('completed', (job, result) => {
-  console.log(`✅ Worker completed job ${job.id}:`, result.subject);
-});
+  emailWorker.on('completed', (job, result) => {
+    console.log(`✅ Worker completed job ${job.id}:`, result.subject);
+  });
 
-emailWorker.on('failed', (job, error) => {
-  console.error(`❌ Worker failed job ${job?.id}:`, error.message);
-  if (job) {
-    console.error(`   Attempt ${job.attemptsMade}/${job.opts.attempts}`);
-    console.error(`   Template: ${job.data.templateName}, Recipient: ${job.data.to}`);
-  }
-});
+  emailWorker.on('failed', (job, error) => {
+    console.error(`❌ Worker failed job ${job?.id}:`, error.message);
+    if (job) {
+      console.error(`   Attempt ${job.attemptsMade}/${job.opts.attempts}`);
+      console.error(`   Template: ${job.data.templateName}, Recipient: ${job.data.to}`);
+    }
+  });
 
-emailWorker.on('error', (error) => {
-  console.error('❌ Email worker error:', error);
-});
+  emailWorker.on('error', (error) => {
+    console.error('❌ Email worker error:', error);
+  });
 
-emailWorker.on('stalled', (jobId) => {
-  console.warn(`⚠️ Job ${jobId} stalled and will be reprocessed`);
-});
+  emailWorker.on('stalled', (jobId) => {
+    console.warn(`⚠️ Job ${jobId} stalled and will be reprocessed`);
+  });
+} else {
+  console.log('📧 Email worker disabled (Redis not available)');
+}
 
 // Graceful shutdown
 export const closeWorker = async () => {
+  if (!emailWorker) {
+    console.log('📧 No email worker to close (Redis disabled)');
+    return;
+  }
+  
   console.log('🔌 Closing email worker...');
   await emailWorker.close();
-  await redisConnection.quit();
+  if (redisConnection) {
+    await redisConnection.quit();
+  }
   console.log('✅ Email worker closed');
 };
 
@@ -135,4 +160,5 @@ process.on('SIGTERM', async () => {
   process.exit(0);
 });
 
+export { emailWorker };
 export default emailWorker;

@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { toast } from 'sonner';
 import { Globe, ShieldCheck, Truck, TrendingUp, Smartphone } from 'lucide-react';
 
@@ -110,7 +113,7 @@ export function Login({ onLogin, onSignup, onGoogleAuth, onMobilePreview, onForg
 
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/auth/check-email', {
+      const response = await fetch(`${API_BASE_URL}/auth/check-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -616,3 +619,4 @@ export function Login({ onLogin, onSignup, onGoogleAuth, onMobilePreview, onForg
     </div>
   );
 }
+

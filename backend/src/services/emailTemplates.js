@@ -1,5 +1,84 @@
 // Email templates with modern UI
 export const emailTemplates = {
+  welcome: (data) => ({
+    subject: '🎉 Welcome to Eximpo Global - Your Account is Ready!',
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="UTF-8"></head>
+      <body style="margin: 0; padding: 20px; background: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 650px; margin: 0 auto; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); padding: 40px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🎊 Welcome to Eximpo Global!</h1>
+          </div>
+          <div style="padding: 40px 30px;">
+            <p style="font-size: 16px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+              Dear <strong>${data.fullName || data.companyName}</strong>,
+            </p>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Thank you for joining Eximpo Global! 🎉 Your account has been successfully created. You can now start exploring our platform and connect with ${data.role === 'buyer' ? 'verified suppliers' : 'potential buyers'} worldwide.
+            </p>
+            
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2563eb;">
+              <h3 style="margin: 0 0 15px 0; color: #1e40af; font-size: 18px;">📋 Account Details</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Email:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.email}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Company:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.companyName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Account Type:</td>
+                  <td style="padding: 8px 0; color: #2563eb; font-weight: 600; font-size: 14px; text-transform: capitalize;">${data.role}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #16a34a;">
+              <h3 style="margin: 0 0 15px 0; color: #15803d; font-size: 18px;">🚀 Next Steps</h3>
+              <ul style="list-style: none; padding-left: 0; margin: 10px 0;">
+                ${data.role === 'buyer' ? `
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ Browse our extensive product catalog</li>
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ Create your first RFQ to get quotes</li>
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ Connect with verified suppliers</li>
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ Track your orders in real-time</li>
+                ` : `
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ List your first product</li>
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ Respond to buyer RFQs</li>
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ Manage your inventory</li>
+                  <li style="padding: 8px 0; color: #15803d; font-size: 14px;">✅ Grow your business globally</li>
+                `}
+              </ul>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/login" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">Start Exploring</a>
+            </div>
+
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                <strong>💡 Pro Tip:</strong> Complete your profile and verify your business to unlock all platform features and gain buyer/seller trust!
+              </p>
+            </div>
+          </div>
+          <div style="background: #f8fafc; padding: 30px 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 14px; margin: 10px 0;">
+              Need help? Contact our support team at <a href="mailto:support@eximpoglobal.net" style="color: #2563eb;">support@eximpoglobal.net</a>
+            </p>
+            <p style="color: #64748b; font-size: 14px; margin: 10px 0;">
+              <strong style="color: #334155;">Eximpo Global</strong><br>
+              Connecting Buyers and Suppliers Worldwide
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }),
+
   rfqCreated: (data) => ({
     subject: `🎯 RFQ Created Successfully - ${data.rfqNumber}`,
     html: `

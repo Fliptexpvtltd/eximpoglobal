@@ -26,7 +26,7 @@ export function VerifyOTP({ email, onSuccess, onBack, onResend }: VerifyOTPProps
     setIsLoading(true);
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/verify-otp', {
+      const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -139,3 +139,5 @@ export function VerifyOTP({ email, onSuccess, onBack, onResend }: VerifyOTPProps
     </div>
   );
 }
+
+
