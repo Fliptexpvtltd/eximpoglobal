@@ -53,7 +53,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
       const rfqData = await rfqResponse.json();
       
       // Fetch trending products
-      const productsResponse = await fetch('${API_BASE_URL}/products?limit=4&approval_status=approved');
+      const productsResponse = await fetch(`${API_BASE_URL}/products?limit=4&approval_status=approved`);
       const productsData = await productsResponse.json();
 
       if (rfqData.success && rfqData.data) {
