@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Lock, AlertCircle, Check } from 'lucide-react';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface ResetPasswordProps {
   email: string;
   otp: string;

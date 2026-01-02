@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Mail, ArrowLeft, Check, Lock } from 'lucide-react';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface ForgotPasswordProps {
   onBack: () => void;
   onSuccess: (email: string) => void;

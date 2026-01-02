@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { Shield, AlertCircle, Check } from 'lucide-react';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface VerifyOTPProps {
   email: string;
   onSuccess: (otp: string) => void;
