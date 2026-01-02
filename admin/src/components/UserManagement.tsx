@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Users, Search, Filter, CheckCircle, XCircle, Trash2, Shield, Mail, Building } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';

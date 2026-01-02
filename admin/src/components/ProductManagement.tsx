@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Package, Search, Filter, CheckCircle, XCircle, Eye, AlertTriangle } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './ui/table';
@@ -15,6 +15,7 @@ interface Product {
   approval_status: 'pending' | 'approved' | 'rejected';
   supplier_id: string;
   supplier_name: string;
+  seller_company?: string;
   created_at: string;
 }
 
@@ -91,7 +92,7 @@ export function ProductManagement({ onViewProduct }: ProductManagementProps) {
 
   const filteredProducts = products.filter(product => {
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         product.seller_company.toLowerCase().includes(searchTerm.toLowerCase());
+                         product.supplier_name.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesSearch;
   });
 
