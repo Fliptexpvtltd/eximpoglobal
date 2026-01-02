@@ -25,8 +25,11 @@ export const requestPasswordReset = async (req, res) => {
       [email]
     );
 
+    console.log('👤 User lookup result:', result.rows.length > 0 ? 'Found' : 'Not found');
+
     // Always return success to prevent email enumeration
     if (result.rows.length === 0) {
+      console.log('⚠️ No user found with email:', email);
       return res.json({
         success: true,
         message: 'If an account exists with this email, you will receive a 6-digit OTP code shortly.'
@@ -34,9 +37,11 @@ export const requestPasswordReset = async (req, res) => {
     }
 
     const user = result.rows[0];
+    console.log('👤 User found:', user.email, '| Auth provider:', user.auth_provider);
 
     // Check if user uses Google auth
     if (user.auth_provider === 'google') {
+      console.log('⚠️ User uses Google auth, skipping password reset');
       return res.json({
         success: true,
         message: 'If an account exists with this email, you will receive a 6-digit OTP code shortly.'
@@ -45,6 +50,7 @@ export const requestPasswordReset = async (req, res) => {
 
     // Generate 6-digit OTP
     const otp = generateOTP();
+    console.log('🔢 Generated OTP for:', user.email);
 
     // Store OTP in database with expiry (valid for 10 minutes)
     await query(
