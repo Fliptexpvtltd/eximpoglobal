@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { query } from '../config/database.js';
 import bcrypt from 'bcryptjs';
+import { sendEmail } from '../services/emailService.js';
 
 // Verify Google token and get user info
 async function verifyGoogleToken(token) {
@@ -197,6 +198,19 @@ export const completeGoogleRegistration = async (req, res) => {
     );
     
     const user = result.rows[0];
+    
+    // Send welcome email
+    try {
+      await sendEmail(user.email, 'welcome', {
+        email: user.email,
+        fullName: user.full_name,
+        companyName: user.company_name,
+        role: user.role
+      });
+    } catch (emailError) {
+      console.error('Failed to send welcome email:', emailError);
+      // Don't fail registration if email fails
+    }
     
     // Generate full JWT token
     const token = jwt.sign(
