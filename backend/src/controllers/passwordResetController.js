@@ -10,6 +10,7 @@ const generateOTP = () => {
 export const requestPasswordReset = async (req, res) => {
   try {
     const { email } = req.body;
+    console.log('🔑 Password reset request for:', email);
 
     if (!email) {
       return res.status(400).json({
