@@ -3,6 +3,9 @@ import { toast } from 'sonner';
 import { ArrowLeft, Check, X, AlertCircle, MessageSquare, IndianRupee, Calendar, Truck, Shield } from 'lucide-react';
 import type { RFQ, Quote } from '../App';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface QuoteComparisonProps {
   rfq: RFQ;
   user?: any;
@@ -26,7 +29,7 @@ export function QuoteComparison({ rfq, user, activeMode = 'buyer', onAcceptQuote
   const fetchQuotes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/quotes/rfq/${rfq.id}`, {
+      const response = await fetch(`${API_BASE_URL}/quotes/rfq/${rfq.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -60,7 +63,7 @@ export function QuoteComparison({ rfq, user, activeMode = 'buyer', onAcceptQuote
   const handleAcceptQuote = async (quote: Quote) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/quotes/${quote.id}/accept`, {
+      const response = await fetch(`${API_BASE_URL}/quotes/${quote.id}/accept`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` }
       });

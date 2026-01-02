@@ -2,6 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { Send, Paperclip, Phone, Video, MoreVertical, Search, ArrowLeft, Plus, X } from 'lucide-react';
 import type { User } from '../App';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface ChatInterfaceProps {
   user: User | null;
   activeMode?: 'buyer' | 'seller';
@@ -99,7 +102,7 @@ export function ChatInterface({ user, activeMode = 'buyer', partnerId, onBack }:
     try {
       setLoadingUsers(true);
       // Fetch users - buyers if seller, suppliers if buyer
-      const endpoint = isSeller ? '/api/users?role=buyer' : '/api/suppliers';
+      const endpoint = isSeller ? `${API_BASE_URL}/users?role=buyer` : `${API_BASE_URL}/suppliers`;
       const response = await fetch(endpoint, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -153,7 +156,7 @@ export function ChatInterface({ user, activeMode = 'buyer', partnerId, onBack }:
   const fetchConversations = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/messages/conversations', {
+      const response = await fetch(`${API_BASE_URL}/messages/conversations`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -183,7 +186,7 @@ export function ChatInterface({ user, activeMode = 'buyer', partnerId, onBack }:
 
   const fetchMessages = async (partnerId: string) => {
     try {
-      const response = await fetch(`/api/messages/${partnerId}`, {
+      const response = await fetch(`${API_BASE_URL}/messages/${partnerId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -210,7 +213,7 @@ export function ChatInterface({ user, activeMode = 'buyer', partnerId, onBack }:
   const fetchPartnerInfo = async (partnerId: string) => {
     try {
       // Fetch user info from suppliers endpoint
-      const response = await fetch(`/api/suppliers/${partnerId}`, {
+      const response = await fetch(`${API_BASE_URL}/suppliers/${partnerId}`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
@@ -242,7 +245,7 @@ export function ChatInterface({ user, activeMode = 'buyer', partnerId, onBack }:
     
     try {
       setSending(true);
-      const response = await fetch('/api/messages', {
+      const response = await fetch(`${API_BASE_URL}/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

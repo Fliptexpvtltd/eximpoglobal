@@ -4,6 +4,9 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PublicNavigation } from './PublicNavigation';
 import { useAuth } from '../contexts/AuthContext';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface SupplierProfileProps {
   supplierId: string;
   user?: any;
@@ -28,7 +31,7 @@ export function SupplierProfile({ supplierId, user: propUser, activeMode = 'buye
 
   const fetchSupplier = async () => {
     try {
-      const response = await fetch(`/api/suppliers/${supplierId}`);
+      const response = await fetch(`${API_BASE_URL}/suppliers/${supplierId}`);
       const data = await response.json();
       
       if (data.success) {
@@ -43,7 +46,7 @@ export function SupplierProfile({ supplierId, user: propUser, activeMode = 'buye
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`/api/suppliers/${supplierId}/products`);
+      const response = await fetch(`${API_BASE_URL}/suppliers/${supplierId}/products`);
       const data = await response.json();
       
       if (data.success) {

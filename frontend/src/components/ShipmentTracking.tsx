@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { ArrowLeft, Package, MapPin, Calendar, FileText, Download, Upload, CheckCircle, Clock, AlertCircle } from 'lucide-react';
 import type { PO, Shipment } from '../App';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface ShipmentTrackingProps {
   po: PO;
   user?: any;
@@ -23,7 +26,7 @@ export function ShipmentTracking({ po, user, activeMode = 'buyer', onBack }: Shi
   const fetchShipment = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/shipments?order_id=${po.id}`, {
+      const response = await fetch(`${API_BASE_URL}/shipments?order_id=${po.id}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
