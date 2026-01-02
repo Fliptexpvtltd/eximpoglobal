@@ -56,12 +56,16 @@ export const requestPasswordReset = async (req, res) => {
     );
 
     // Send OTP email directly using Brevo API
+    console.log('📧 Preparing to send OTP email...');
     const SibApiV3Sdk = await import('sib-api-v3-sdk');
     const defaultClient = SibApiV3Sdk.default.ApiClient.instance;
     const apiKey = defaultClient.authentications['api-key'];
     apiKey.apiKey = process.env.BREVO_API_KEY;
 
+    console.log('🔑 BREVO_API_KEY configured:', process.env.BREVO_API_KEY ? 'Yes' : 'No');
+
     if (process.env.BREVO_API_KEY) {
+      console.log('📤 Sending email via Brevo to:', user.email);
       const apiInstance = new SibApiV3Sdk.default.TransactionalEmailsApi();
       const sendSmtpEmail = new SibApiV3Sdk.default.SendSmtpEmail();
       
@@ -171,10 +175,12 @@ export const requestPasswordReset = async (req, res) => {
       sendSmtpEmail.to = [{ email: user.email }];
 
       try {
-        await apiInstance.sendTransacEmail(sendSmtpEmail);
-        console.log('✅ Password reset OTP sent to:', user.email);
+        console.log('🔄 Calling Brevo API...');
+        const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        console.log('✅ Password reset OTP sent to:', user.email, 'MessageId:', result.messageId);
       } catch (emailError) {
         console.error('❌ Email send error:', emailError.message);
+        console.error('❌ Full error:', emailError);
       }
     } else {
       console.log('⚠️ BREVO_API_KEY not configured. OTP:', otp);
