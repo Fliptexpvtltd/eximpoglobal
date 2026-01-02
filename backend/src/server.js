@@ -47,14 +47,14 @@ app.get('/health', (req, res) => {
 
 // Bull Board setup for queue monitoring
 const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath('/admin/queues');
+serverAdapter.setBasePath('/api/admin/queues');
 
 createBullBoard({
   queues: [new BullMQAdapter(emailQueue)],
   serverAdapter: serverAdapter,
 });
 
-app.use('/admin/queues', serverAdapter.getRouter());
+app.use('/api/admin/queues', serverAdapter.getRouter());
 
 // Import routes
 import authRoutes from './routes/auth.js';
@@ -130,7 +130,7 @@ app.use((req, res) => {
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`📧 Email worker started and listening for jobs`);
-  console.log(`📊 Queue dashboard: http://localhost:${PORT}/admin/queues`);
+  console.log(`📊 Queue dashboard: http://localhost:${PORT}/api/admin/queues`);
   console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`Health check: http://localhost:${PORT}/health`);
   console.log(`API docs: http://localhost:${PORT}/api`);
