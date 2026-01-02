@@ -97,7 +97,19 @@ echo -e "${GREEN}✓ Database configured${NC}"
 # Step 8: Clone/Update repository
 echo -e "${YELLOW}Step 8: Deploying application code...${NC}"
 echo -e "${BLUE}Creating new release: $RELEASE_NAME${NC}"
-git clone $GITHUB_REPO $RELEASE_DIR
+
+# Use SSH instead of HTTPS for private repo
+git clone git@github.com:Fliptexpvtltd/eximpoglobal.git $RELEASE_DIR 2>&1 || \
+git clone https://github.com/Fliptexpvtltd/eximpoglobal.git $RELEASE_DIR
+
+if [ ! -d "$RELEASE_DIR" ]; then
+    echo -e "${RED}Failed to clone repository!${NC}"
+    echo -e "${YELLOW}Please ensure:${NC}"
+    echo -e "  1. GitHub SSH key is configured: ssh -T git@github.com"
+    echo -e "  2. Or repository is public"
+    exit 1
+fi
+
 cd $RELEASE_DIR
 
 # Create symlink to new release
