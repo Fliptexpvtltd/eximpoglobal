@@ -3,6 +3,9 @@ import { toast } from 'sonner';
 import { ArrowLeft, Upload, Plus, X, Save, AlertCircle } from 'lucide-react';
 import type { User } from '../App';
 
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface AddProductProps {
   user: User;
   activeMode: 'buyer' | 'seller';
