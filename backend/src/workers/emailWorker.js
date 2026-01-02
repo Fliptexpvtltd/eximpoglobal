@@ -1,6 +1,10 @@
 import { Worker } from 'bullmq';
 import Redis from 'ioredis';
 import SibApiV3Sdk from 'sib-api-v3-sdk';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Import email templates
 import { emailTemplates } from '../services/emailTemplates.js';
