@@ -43,10 +43,47 @@ export function Login({ onLogin, onSignup, onGoogleAuth, onMobilePreview, onForg
 
   // Handle native Google Sign-In response from Android
   useEffect(() => {
-    (window as any).handleNativeGoogleSignIn = (idToken: string, email: string) => {
-      console.log('Received native Google Sign-In token');
-      if (onGoogleAuth) {
-        onGoogleAuth(idToken);
+    (window as any).handleNativeGoogleSignIn = async (email: string, name: string, photoUrl: string) => {
+      console.log('🔵 Received native Google Sign-In');
+      console.log('Email:', email);
+      console.log('Name:', name);
+      
+      // Call the backend native signin endpoint
+      try {
+        setIsLoading(true);
+        const response = await fetch(`${API_BASE_URL}/auth/google/native-signin`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, name, photoUrl }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+          if (data.isNewUser) {
+            // New user - needs role selection
+            if (onGoogleAuth) {
+              // Create a mock credential with the temp token
+              await onGoogleAuth(data.tempToken);
+            }
+          } else {
+            // Existing user - complete login
+            localStorage.setItem('token', data.data.token);
+            toast.success('Signed in successfully!');
+            
+            // Reload to update auth state
+            window.location.reload();
+          }
+        } else {
+          toast.error(data.message || 'Sign-in failed');
+        }
+      } catch (error) {
+        console.error('❌ Google auth error:', error);
+        toast.error('Google sign-in failed. Please try again.');
+      } finally {
+        setIsLoading(false);
       }
     };
 
