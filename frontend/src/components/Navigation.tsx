@@ -109,10 +109,10 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
                 </div>
               </div>
 
-              {/* Mobile menu button */}
+              {/* Mobile menu button - Hidden since we have bottom nav */}
               <button 
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+                className="hidden p-2 hover:bg-gray-100 rounded-lg"
               >
                 {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -120,9 +120,9 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu - Hidden since we have bottom nav */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-gray-200 bg-white">
+          <div className="hidden border-t border-gray-200 bg-white">
             <div className="px-4 py-3 space-y-1">
               {links.map((link) => {
                 const Icon = link.icon;

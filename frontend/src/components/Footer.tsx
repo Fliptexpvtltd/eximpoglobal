@@ -1,13 +1,31 @@
-import { Globe, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram } from 'lucide-react';
+import { Globe, Mail, Phone, MapPin, Facebook, Twitter, Linkedin, Instagram, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react';
 
 interface FooterProps {
   onNavigate: (view: string) => void;
 }
 
 export function Footer({ onNavigate }: FooterProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   return (
     <footer className="w-full mt-12 bg-gray-100 border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      {/* Mobile Toggle Button */}
+      <div className="md:hidden">
+        <button
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="w-full px-6 py-3 flex items-center justify-center hover:bg-gray-200 transition-colors"
+        >
+          {isExpanded ? (
+            <ChevronUp className="w-6 h-6 text-gray-600" />
+          ) : (
+            <ChevronDown className="w-6 h-6 text-gray-600" />
+          )}
+        </button>
+      </div>
+
+      {/* Footer Content */}
+      <div className={`max-w-7xl mx-auto px-6 py-12 ${isExpanded ? 'block' : 'hidden md:block'}`}>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
@@ -54,14 +72,14 @@ export function Footer({ onNavigate }: FooterProps) {
                 </button>
               </li>
               <li>
-                <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+                <button onClick={() => onNavigate('pricing')} className="text-sm text-gray-600 hover:text-blue-600">
                   Pricing
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+                <button onClick={() => onNavigate('faq')} className="text-sm text-gray-600 hover:text-blue-600">
                   FAQ
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -71,29 +89,29 @@ export function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-semibold mb-4 text-gray-900">Services</h3>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+                <button onClick={() => onNavigate('trade-assurance')} className="text-sm text-gray-600 hover:text-blue-600">
                   Trade Assurance
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+                <button onClick={() => onNavigate('logistics-solutions')} className="text-sm text-gray-600 hover:text-blue-600">
                   Logistics Solutions
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+                <button onClick={() => onNavigate('quality-inspection')} className="text-sm text-gray-600 hover:text-blue-600">
                   Quality Inspection
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+                <button onClick={() => onNavigate('trade-financing')} className="text-sm text-gray-600 hover:text-blue-600">
                   Trade Financing
-                </a>
+                </button>
               </li>
               <li>
-                <a href="#" className="text-sm text-gray-600 hover:text-blue-600">
+                <button onClick={() => onNavigate('customs-clearance')} className="text-sm text-gray-600 hover:text-blue-600">
                   Customs Clearance
-                </a>
+                </button>
               </li>
             </ul>
           </div>
@@ -137,15 +155,15 @@ export function Footer({ onNavigate }: FooterProps) {
         <div className="border-t border-gray-300 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
           <p className="text-gray-600">&copy; 2025 EximpoGlobal. All rights reserved.</p>
           <div className="flex flex-wrap justify-center gap-6">
-            <a href="#" className="text-gray-600 hover:text-blue-600">
+            <button onClick={() => onNavigate('privacy-policy')} className="text-gray-600 hover:text-blue-600">
               Privacy Policy
-            </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600">
+            </button>
+            <button onClick={() => onNavigate('terms-of-service')} className="text-gray-600 hover:text-blue-600">
               Terms of Service
-            </a>
-            <a href="#" className="text-gray-600 hover:text-blue-600">
+            </button>
+            <button onClick={() => onNavigate('cookie-policy')} className="text-gray-600 hover:text-blue-600">
               Cookie Policy
-            </a>
+            </button>
           </div>
         </div>
       </div>

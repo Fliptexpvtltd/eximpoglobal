@@ -38,6 +38,16 @@ import { UpdateShipmentTracking } from './components/UpdateShipmentTracking';
 import { ForgotPassword } from './components/ForgotPassword';
 import { VerifyOTP } from './components/VerifyOTP';
 import { ResetPassword } from './components/ResetPassword';
+import { Pricing } from './components/Pricing';
+import { FAQ } from './components/FAQ';
+import { PrivacyPolicy } from './components/PrivacyPolicy';
+import { TermsOfService } from './components/TermsOfService';
+import { CookiePolicy } from './components/CookiePolicy';
+import { TradeAssurance } from './components/TradeAssurance';
+import { LogisticsSolutions } from './components/LogisticsSolutions';
+import { QualityInspection } from './components/QualityInspection';
+import { TradeFinancing } from './components/TradeFinancing';
+import { CustomsClearance } from './components/CustomsClearance';
 
 export type UserRole = 'buyer' | 'seller' | 'ops' | 'finance' | 'admin';
 
@@ -714,20 +724,58 @@ function AppContent() {
         {currentView === 'about' && (
           <About onNavigate={navigate} />
         )}
+
+        {currentView === 'pricing' && (
+          <Pricing onNavigate={navigate} />
+        )}
+
+        {currentView === 'faq' && (
+          <FAQ onNavigate={navigate} />
+        )}
+
+        {currentView === 'privacy-policy' && (
+          <PrivacyPolicy onNavigate={navigate} />
+        )}
+
+        {currentView === 'terms-of-service' && (
+          <TermsOfService onNavigate={navigate} />
+        )}
+
+        {currentView === 'cookie-policy' && (
+          <CookiePolicy onNavigate={navigate} />
+        )}
+
+        {currentView === 'trade-assurance' && (
+          <TradeAssurance onNavigate={navigate} />
+        )}
+
+        {currentView === 'logistics-solutions' && (
+          <LogisticsSolutions onNavigate={navigate} />
+        )}
+
+        {currentView === 'quality-inspection' && (
+          <QualityInspection onNavigate={navigate} />
+        )}
+
+        {currentView === 'trade-financing' && (
+          <TradeFinancing onNavigate={navigate} />
+        )}
+
+        {currentView === 'customs-clearance' && (
+          <CustomsClearance onNavigate={navigate} />
+        )}
           </main>
           
           {/* Footer - show only on public pages when not logged in */}
-          {!user && ['catalog', 'how-it-works', 'about'].includes(currentView) && (
+          {!user && ['catalog', 'how-it-works', 'about', 'pricing', 'faq', 'privacy-policy', 'terms-of-service', 'cookie-policy', 'trade-assurance', 'logistics-solutions', 'quality-inspection', 'trade-financing', 'customs-clearance'].includes(currentView) && (
             <Footer onNavigate={navigate} />
           )}
           
-          {user && (
-            <MobileBottomNav 
-              user={user}
-              currentView={currentView}
-              onNavigate={navigate}
-            />
-          )}
+          <MobileBottomNav 
+            user={user}
+            currentView={currentView}
+            onNavigate={navigate}
+          />
         </div>
       </div>
       )}

@@ -45,18 +45,18 @@ export function PublicNavigation({ onNavigate }: PublicNavigationProps) {
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Hidden since we have bottom nav */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+            className="hidden p-2 text-gray-700 hover:bg-gray-100 rounded-lg"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu - Hidden since we have bottom nav */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="hidden py-4 border-t border-gray-200">
             <div className="flex flex-col gap-2">
               <button 
                 onClick={() => handleNavigation('catalog')}

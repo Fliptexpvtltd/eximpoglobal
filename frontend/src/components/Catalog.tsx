@@ -107,13 +107,13 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
       
       {!user && (
         <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-          <div className="max-w-7xl mx-auto px-4 py-12 md:py-20">
-            <div className="text-center space-y-4">
-              <h1 className="text-3xl md:text-5xl">Global Trade Made Simple</h1>
-              <p className="text-lg md:text-xl text-blue-100 max-w-3xl mx-auto">
+          <div className="max-w-7xl mx-auto px-4 py-6 md:py-20">
+            <div className="text-center space-y-3 md:space-y-4">
+              <h1 className="text-2xl md:text-5xl">Global Trade Made Simple</h1>
+              <p className="text-base md:text-xl text-blue-100 max-w-3xl mx-auto">
                 Connect with verified buyers and sellers worldwide. Source products, request quotes, and manage international shipments all in one platform.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2 md:pt-4">
                 <button 
                   type="button"
                   onClick={() => requireAuth({ type: 'browse-catalog' })}
