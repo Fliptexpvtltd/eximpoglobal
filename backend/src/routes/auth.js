@@ -1,7 +1,7 @@
 import express from 'express';
 import { register, login, getProfile, updateProfile } from '../controllers/authController.js';
 import { checkEmail } from '../controllers/emailCheckController.js';
-import { googleSignIn, completeGoogleRegistration, nativeGoogleSignIn } from '../controllers/googleAuthController.js';
+import { googleSignIn, completeGoogleRegistration } from '../controllers/googleAuthController.js';
 import { requestPasswordReset, resetPassword, verifyOTP } from '../controllers/passwordResetController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { validate, schemas } from '../middleware/validator.js';
@@ -20,7 +20,6 @@ router.post('/reset-password', resetPassword);
 
 // Google OAuth routes
 router.post('/google/signin', googleSignIn);
-router.post('/google/native-signin', nativeGoogleSignIn);
 router.post('/google/complete-registration', completeGoogleRegistration);
 
 // Protected routes
