@@ -38,23 +38,18 @@ export function Login({ onLogin, onSignup, onGoogleAuth, onMobilePreview, onForg
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
 
-  // Check if running in WebView (Android app)
-  const isWebView = () => {
-    const ua = navigator.userAgent.toLowerCase();
-    return ua.includes('wv') || ua.includes('webview');
-  };
-
   // Initialize Google Sign-In
   useEffect(() => {
-    // Don't show Google Sign-In in WebView as it's not supported
-    if (isWebView()) {
-      return;
-    }
-
     const initializeGoogleSignIn = () => {
+      console.log('Attempting to initialize Google Sign-In');
+      console.log('User Agent:', navigator.userAgent);
+      console.log('Google available:', typeof (window as any).google);
+      
       if (typeof window !== 'undefined' && (window as any).google?.accounts?.id) {
+        console.log('Google Sign-In library loaded');
         const googleButton = document.getElementById('googleSignInButton');
         if (googleButton) {
+          console.log('Google button container found');
           (window as any).google.accounts.id.initialize({
             client_id: '651479721750-80l0ekebtn6088mocnaitr2qkti9pg2r.apps.googleusercontent.com',
             callback: handleGoogleResponse
@@ -70,7 +65,12 @@ export function Login({ onLogin, onSignup, onGoogleAuth, onMobilePreview, onForg
               text: 'continue_with'
             }
           );
+          console.log('Google Sign-In button rendered');
+        } else {
+          console.log('Google button container NOT found');
         }
+      } else {
+        console.log('Google Sign-In library NOT loaded');
       }
     };
 
@@ -451,20 +451,16 @@ export function Login({ onLogin, onSignup, onGoogleAuth, onMobilePreview, onForg
                     {isLoading ? 'Checking...' : 'Continue'}
                   </button>
 
-                  {!isWebView() && (
-                    <>
-                      <div className="relative my-6">
-                        <div className="absolute inset-0 flex items-center">
-                          <div className="w-full border-t border-gray-200"></div>
-                        </div>
-                        <div className="relative flex justify-center">
-                          <span className="px-4 bg-white text-sm text-gray-500">Or</span>
-                        </div>
-                      </div>
+                  <div className="relative my-6">
+                    <div className="absolute inset-0 flex items-center">
+                      <div className="w-full border-t border-gray-200"></div>
+                    </div>
+                    <div className="relative flex justify-center">
+                      <span className="px-4 bg-white text-sm text-gray-500">Or</span>
+                    </div>
+                  </div>
 
-                      <div id="googleSignInButton" className="flex justify-center mt-6"></div>
-                    </>
-                  )}
+                  <div id="googleSignInButton" className="flex justify-center mt-6"></div>
                 </form>
               )}
 
