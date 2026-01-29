@@ -66,11 +66,23 @@ router.post('/products/image',
         });
       }
 
+      // Use the location returned by multer-s3 directly
+      console.log('📤 Uploaded file location:', req.file.location);
+      console.log('📤 Uploaded file key:', req.file.key);
+
+      // Construct proper Contabo URL with bucket ID
+      const bucketId = process.env.CONTABO_BUCKET_ID || '265cb5518b244ea2bdb6eef9784e1983';
+      const bucket = process.env.CONTABO_BUCKET || 'eximpo-bucket';
+      const endpoint = process.env.CONTABO_ENDPOINT || 'https://sin1.contabostorage.com';
+      const properUrl = `${endpoint}/${bucketId}:${bucket}/${req.file.key}`;
+      
+      console.log('✅ Proper Contabo URL:', properUrl);
+
       res.json({
         success: true,
         message: 'Image uploaded successfully',
         file: {
-          url: req.file.location,
+          url: properUrl,
           key: req.file.key,
           size: req.file.size,
           mimetype: req.file.mimetype

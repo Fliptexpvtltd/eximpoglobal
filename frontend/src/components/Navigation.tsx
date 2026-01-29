@@ -44,11 +44,7 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
           <div className="flex items-center justify-between h-16 gap-4">
             {/* Logo - visible on all screens */}
             <div className="flex items-center gap-2">
-              <Globe 
-                className="w-8 h-8"
-                style={{ color: isSeller ? '#059669' : '#2563eb' }}
-              />
-              <span className="font-bold text-gray-900">EximpoGlobal</span>
+              {/* Logo removed - shown in sidebar instead */}
             </div>
             
             <div className="flex items-center gap-2 md:gap-4">

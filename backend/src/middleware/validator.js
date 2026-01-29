@@ -27,7 +27,7 @@ export const validate = (schema) => {
 // Common validation schemas
 export const schemas = {
   register: Joi.object({
-    email: Joi.string().email().required(),
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
     password: Joi.string().min(6).required(),
     role: Joi.string().valid('buyer', 'seller', 'admin').required(),
     companyName: Joi.string().required(),
@@ -37,19 +37,23 @@ export const schemas = {
   }),
 
   login: Joi.object({
-    email: Joi.string().email().required(),
+    email: Joi.string().email({ tlds: { allow: false } }).required(),
     password: Joi.string().required()
   }),
 
   product: Joi.object({
     name: Joi.string().required(),
     category: Joi.string().required(),
+    subcategory: Joi.string().optional(),
     description: Joi.string().optional(),
-    price: Joi.number().positive().optional(),
-    moq: Joi.number().integer().positive().optional(),
+    price: Joi.number().positive().optional().allow(null),
+    moq: Joi.number().integer().positive().optional().allow(null),
     unit: Joi.string().optional(),
     incoterms: Joi.array().items(Joi.string()).optional(),
-    certifications: Joi.array().items(Joi.string()).optional()
+    certifications: Joi.array().items(Joi.string()).optional(),
+    images: Joi.array().items(Joi.string()).optional(),
+    specifications: Joi.object().optional(),
+    available: Joi.boolean().optional()
   }),
 
   rfq: Joi.object({

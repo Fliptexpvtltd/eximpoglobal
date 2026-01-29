@@ -346,3 +346,44 @@ export const getSupplierStats = async (req, res) => {
     });
   }
 };
+
+// Get product categories by supplier
+export const getSupplierProductCategories = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verify supplier exists
+    const supplierCheck = await pool.query(
+      "SELECT id FROM users WHERE id = $1 AND role = 'seller'",
+      [id]
+    );
+
+    if (supplierCheck.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: 'Supplier not found'
+      });
+    }
+
+    // Get product categories with counts
+    const result = await pool.query(
+      `SELECT category as name, COUNT(*) as count
+       FROM products 
+       WHERE supplier_id = $1 AND available = true
+       GROUP BY category
+       ORDER BY count DESC`,
+      [id]
+    );
+
+    res.json({
+      success: true,
+      data: result.rows
+    });
+  } catch (error) {
+    console.error('Error fetching product categories:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch product categories'
+    });
+  }
+};

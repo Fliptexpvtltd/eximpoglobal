@@ -3,6 +3,14 @@ import { register, login, getProfile, updateProfile } from '../controllers/authC
 import { checkEmail } from '../controllers/emailCheckController.js';
 import { googleSignIn, completeGoogleRegistration } from '../controllers/googleAuthController.js';
 import { requestPasswordReset, resetPassword, verifyOTP } from '../controllers/passwordResetController.js';
+import { 
+  getUserStats, 
+  getCompanyDetails, 
+  updateCompanyDetails,
+  getPaymentMethods,
+  getUserPreferences,
+  updateUserPreferences
+} from '../controllers/userProfileController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { validate, schemas } from '../middleware/validator.js';
 
@@ -25,5 +33,11 @@ router.post('/google/complete-registration', completeGoogleRegistration);
 // Protected routes
 router.get('/profile', authMiddleware, getProfile);
 router.put('/profile', authMiddleware, updateProfile);
+router.get('/profile/stats', authMiddleware, getUserStats);
+router.get('/profile/company', authMiddleware, getCompanyDetails);
+router.put('/profile/company', authMiddleware, updateCompanyDetails);
+router.get('/profile/payment-methods', authMiddleware, getPaymentMethods);
+router.get('/profile/preferences', authMiddleware, getUserPreferences);
+router.put('/profile/preferences', authMiddleware, updateUserPreferences);
 
 export default router;

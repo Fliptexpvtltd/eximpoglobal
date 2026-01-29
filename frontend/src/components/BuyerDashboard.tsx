@@ -81,7 +81,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
           name: p.name,
           category: p.category,
           hsCode: p.specifications?.hsCode || '',
-          price: parseFloat(p.price),
+          price: p.price ? parseFloat(p.price) : 0,
           currency: 'INR',
           moq: p.moq,
           leadTime: p.specifications?.leadTime || 'Contact Supplier',
@@ -368,11 +368,13 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
                 <div className="flex items-center justify-between">
                   <div>
                     <div className="text-sm text-gray-600">From</div>
-                    <div className="text-xl">₹{product.price}</div>
+                    <div className="text-xl">
+                      {product.price ? `₹${product.price}` : 'Contact Supplier'}
+                    </div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm text-gray-600">MOQ</div>
-                    <div>{product.moq} units</div>
+                    <div>{product.moq ? `${product.moq} units` : 'Flexible'}</div>
                   </div>
                 </div>
               </div>

@@ -94,6 +94,15 @@ export const createProduct = async (req, res) => {
   try {
     const { name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications } = req.body;
 
+    // Debug logging
+    console.log('📦 Creating product with data:', {
+      name,
+      category,
+      images: images,
+      imagesType: typeof images,
+      imagesLength: Array.isArray(images) ? images.length : 'not an array'
+    });
+
     const result = await query(
       `INSERT INTO products (supplier_id, name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications, approval_status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, 'pending')

@@ -9,8 +9,11 @@ const s3 = new AWS.S3({
   endpoint: process.env.CONTABO_ENDPOINT || 'https://sin1.contabostorage.com',
   accessKeyId: process.env.CONTABO_ACCESS_KEY || '98d59d8c643a4403a2dc26a27b37b922',
   secretAccessKey: process.env.CONTABO_SECRET_KEY || 'DFFRGjxnKy1qygDs7W5iobjqMmyq11lZ',
+  region: process.env.CONTABO_REGION || 'SIN',
   s3ForcePathStyle: true,
-  signatureVersion: 'v4'
+  signatureVersion: 'v4',
+  sslEnabled: true,
+  s3BucketEndpoint: false
 });
 
 // Use just the base bucket name for S3 operations
@@ -171,8 +174,8 @@ export const getFileUrl = (fileKey) => {
   // If it's already a full URL, return it
   if (fileKey.startsWith('http')) return fileKey;
   
-  // Contabo public URL format: https://sin1.contabostorage.com/ACCESS_KEY:BUCKET/path
-  return `https://sin1.contabostorage.com/${ACCESS_KEY}:${BUCKET_NAME}/${fileKey}`;
+  // Use standard S3-compatible URL format for Contabo
+  return `https://sin1.contabostorage.com/${BUCKET_NAME}/${fileKey}`;
 };
 
 // Get signed URL for temporary access (optional, for private files)

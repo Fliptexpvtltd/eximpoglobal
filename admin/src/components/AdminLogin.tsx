@@ -4,7 +4,7 @@ import { Shield, Mail, Lock, AlertCircle } from 'lucide-react';
 
 export function AdminLogin() {
   const { login } = useAuth();
-  const [email, setEmail] = useState('admin@eximpo.com');
+  const [email, setEmail] = useState('admin@eximpo.local');
   const [password, setPassword] = useState('admin123');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);

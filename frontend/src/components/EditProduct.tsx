@@ -127,7 +127,7 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
     });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
       const file = files[0];
@@ -142,11 +142,39 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
         return;
       }
 
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages([...images, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
+      const uploadingToast = toast.loading('Uploading image...');
+
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        
+        if (!token) {
+          toast.error('Authentication required. Please login again.', { id: uploadingToast });
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const response = await fetch(`${API_BASE_URL}/uploads/products/image`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.file) {
+          setImages([...images, data.file.url]);
+          toast.success('Image uploaded successfully', { id: uploadingToast });
+        } else {
+          toast.error(data.message || 'Failed to upload image', { id: uploadingToast });
+        }
+      } catch (error) {
+        console.error('Image upload error:', error);
+        toast.error('Failed to upload image. Please try again.', { id: uploadingToast });
+      }
     }
   };
 

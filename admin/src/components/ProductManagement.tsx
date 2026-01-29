@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Package, Search, Filter, CheckCircle, XCircle, Eye, AlertTriangle } from 'lucide-react';
+import { Package, Search, Filter, CheckCircle, XCircle, Eye, AlertTriangle, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
@@ -82,6 +82,34 @@ export function ProductManagement({ onViewProduct }: ProductManagementProps) {
     } catch (error) {
       console.error('Error approving product:', error);
       showAlert('error', 'Failed to update product');
+    }
+  };
+
+  const handleDeleteProduct = async (productId: string, productName: string) => {
+    if (!confirm(`Are you sure you want to delete "${productName}"? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        showAlert('success', 'Product deleted successfully');
+        fetchProducts();
+      } else {
+        showAlert('error', data.message || 'Failed to delete product');
+      }
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      showAlert('error', 'Failed to delete product');
     }
   };
 
@@ -352,6 +380,14 @@ export function ProductManagement({ onViewProduct }: ProductManagementProps) {
                             Approve
                           </Button>
                         )}
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleDeleteProduct(product.id, product.name)}
+                          className="text-red-600 hover:text-red-800 hover:bg-red-50"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>

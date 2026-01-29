@@ -24,8 +24,7 @@ export function PublicNavigation({ onNavigate }: PublicNavigationProps) {
             onClick={() => handleNavigation('catalog')}
             className="flex items-center gap-3"
           >
-            <Globe className="w-8 h-8 text-blue-600" />
-            <span className="text-xl text-gray-900">EximpoGlobal</span>
+            <img src="https://sin1.contabostorage.com/265cb5518b244ea2bdb6eef9784e1983:eximpo-bucket/brand/eximpo-global-llp-logo.svg" alt="Eximpo Logo" className="h-10 w-auto" />
           </button>
 
           {/* Right - Auth Buttons (Desktop) */}

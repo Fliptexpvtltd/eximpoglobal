@@ -44,7 +44,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
           name: p.name,
           category: p.category,
           hsCode: p.specifications?.hsCode || '',
-          price: parseFloat(p.price),
+          price: p.price ? parseFloat(p.price) : 0,
           currency: 'USD',
           moq: p.moq,
           leadTime: p.specifications?.leadTime || 'Contact Supplier',
@@ -83,7 +83,8 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.category.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = selectedCategory === 'All Categories' || product.category === selectedCategory;
-    const matchesPrice = product.price >= priceRange[0] && product.price <= priceRange[1];
+    // Include products with price 0 (null in DB) or within the price range
+    const matchesPrice = product.price === 0 || (product.price >= priceRange[0] && product.price <= priceRange[1]);
     return matchesSearch && matchesCategory && matchesPrice;
   });
 
@@ -391,11 +392,15 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                 <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
                   <div>
                     <div className="text-sm text-gray-600">From</div>
-                    <div className="text-2xl text-blue-600">₹{product.price}</div>
+                    <div className="text-2xl text-blue-600">
+                      {product.price ? `₹${product.price}` : 'Contact Supplier'}
+                    </div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm text-gray-600">MOQ</div>
-                    <div className="text-gray-900">{product.moq} units</div>
+                    <div className="text-gray-900">
+                      {product.moq ? `${product.moq} units` : 'Flexible'}
+                    </div>
                   </div>
                 </div>
                 

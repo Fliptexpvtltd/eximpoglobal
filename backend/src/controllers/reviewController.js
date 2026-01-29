@@ -104,6 +104,46 @@ export const getSupplierReviews = async (req, res) => {
   }
 };
 
+// Get reviews by supplier ID (alternative endpoint for route params)
+export const getReviewsBySupplier = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+
+    const result = await pool.query(
+      `SELECT r.*, u.company_name as reviewer_name, u.country as reviewer_country
+       FROM reviews r
+       JOIN users u ON r.reviewer_id = u.id
+       WHERE r.supplier_id = $1
+       ORDER BY r.created_at DESC
+       LIMIT $2 OFFSET $3`,
+      [id, limit, offset]
+    );
+
+    const countResult = await pool.query(
+      'SELECT COUNT(*) FROM reviews WHERE supplier_id = $1',
+      [id]
+    );
+
+    res.json({
+      success: true,
+      data: result.rows,
+      pagination: {
+        total: parseInt(countResult.rows[0].count),
+        page: parseInt(page),
+        limit: parseInt(limit)
+      }
+    });
+  } catch (error) {
+    console.error('Get reviews error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch reviews'
+    });
+  }
+};
+
 // Update helpful votes
 export const voteHelpful = async (req, res) => {
   try {

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { User, Building2, Mail, Phone, MapPin, Shield, CreditCard, Settings, LogOut, Upload, Check, X, FileText, Calendar, Globe, Briefcase, Hash, AlertCircle, Save, Camera } from 'lucide-react';
 import type { User as UserType } from '../App';
+import api from '../services/api';
+import { toast } from 'sonner';
 
 interface ProfileProps {
   user: UserType;
@@ -16,45 +18,44 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
   
   const [activeSection, setActiveSection] = useState<'overview' | 'edit-profile' | 'company' | 'kyc' | 'payment' | 'preferences'>('overview');
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<any>(null);
   
   // Profile form data
   const [profileData, setProfileData] = useState({
     fullName: user?.name || '',
     email: user?.email || '',
-    phone: '+1 234 567 8900',
-    position: 'Procurement Manager',
-    department: 'Supply Chain',
-    address: '123 Business St, Suite 100',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10001',
-    country: 'United States'
+    phone: user?.phone || '',
+    position: '',
+    department: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: user?.country || ''
   });
 
   // Company form data
   const [companyData, setCompanyData] = useState({
     companyName: user?.companyName || '',
-    legalName: user?.companyName || '',
-    businessType: 'Corporation',
-    industry: 'Manufacturing',
-    yearEstablished: '2010',
-    employeeCount: '50-200',
-    registrationNumber: 'US-123-456-789',
-    taxId: 'US-987-654-321',
-    website: 'https://example.com',
-    description: 'Leading manufacturer and distributor of quality products',
-    address: '123 Business St',
-    city: 'New York',
-    state: 'NY',
-    zipCode: '10001',
-    country: 'United States'
+    legalName: '',
+    businessType: '',
+    industry: '',
+    yearEstablished: '',
+    employeeCount: '',
+    registrationNumber: '',
+    taxId: '',
+    website: '',
+    description: '',
+    address: '',
+    city: '',
+    state: '',
+    zipCode: '',
+    country: ''
   });
 
   // Payment methods
-  const [paymentMethods, setPaymentMethods] = useState([
-    { id: 1, type: 'credit_card', last4: '4242', brand: 'Visa', expiryMonth: 12, expiryYear: 2025, isDefault: true },
-    { id: 2, type: 'bank_account', last4: '6789', bankName: 'Chase Bank', accountType: 'Business Checking', isDefault: false }
-  ]);
+  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
 
   // Preferences
   const [preferences, setPreferences] = useState({
@@ -68,6 +69,143 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
     orderUpdates: true,
     priceAlerts: true
   });
+
+  // Fetch profile stats on mount
+  useEffect(() => {
+    fetchUserStats();
+    fetchCompanyDetails();
+    fetchPaymentMethods();
+    fetchPreferences();
+  }, []);
+
+  const fetchUserStats = async () => {
+    try {
+      const response = await api.get('/auth/profile/stats');
+      if (response.success) {
+        setStats(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch user stats:', error);
+    }
+  };
+
+  const fetchCompanyDetails = async () => {
+    try {
+      const response = await api.get('/auth/profile/company');
+      if (response.success && response.data) {
+        setCompanyData(prev => ({
+          ...prev,
+          legalName: response.data.legal_name || '',
+          businessType: response.data.business_type || '',
+          industry: response.data.industry || '',
+          yearEstablished: response.data.year_established || '',
+          employeeCount: response.data.employee_count || '',
+          registrationNumber: response.data.registration_number || '',
+          taxId: response.data.tax_id || '',
+          website: response.data.website || '',
+          description: response.data.description || '',
+          address: response.data.address || '',
+          city: response.data.city || '',
+          state: response.data.state || '',
+          zipCode: response.data.zip_code || '',
+          country: response.data.company_country || response.data.country || ''
+        }));
+      }
+    } catch (error) {
+      console.error('Failed to fetch company details:', error);
+    }
+  };
+
+  const fetchPaymentMethods = async () => {
+    try {
+      const response = await api.get('/auth/profile/payment-methods');
+      if (response.success) {
+        setPaymentMethods(response.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch payment methods:', error);
+    }
+  };
+
+  const fetchPreferences = async () => {
+    try {
+      const response = await api.get('/auth/profile/preferences');
+      if (response.success && response.data) {
+        setPreferences({
+          language: response.data.language || 'en',
+          currency: response.data.currency || 'USD',
+          timezone: response.data.timezone || 'America/New_York',
+          dateFormat: response.data.date_format || 'MM/DD/YYYY',
+          emailNotifications: response.data.email_notifications !== undefined ? response.data.email_notifications : true,
+          smsNotifications: response.data.sms_notifications || false,
+          marketingEmails: response.data.marketing_emails || false,
+          orderUpdates: response.data.order_updates !== undefined ? response.data.order_updates : true,
+          priceAlerts: response.data.price_alerts !== undefined ? response.data.price_alerts : true
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch preferences:', error);
+    }
+  };
+
+  const handleSaveCompany = async () => {
+    setLoading(true);
+    try {
+      const response = await api.put('/auth/profile/company', {
+        legalName: companyData.legalName,
+        businessType: companyData.businessType,
+        industry: companyData.industry,
+        yearEstablished: companyData.yearEstablished,
+        employeeCount: companyData.employeeCount,
+        registrationNumber: companyData.registrationNumber,
+        taxId: companyData.taxId,
+        website: companyData.website,
+        description: companyData.description,
+        address: companyData.address,
+        city: companyData.city,
+        state: companyData.state,
+        zipCode: companyData.zipCode,
+        country: companyData.country
+      });
+      
+      if (response.success) {
+        toast.success('Company details updated successfully');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to update company details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSavePreferences = async () => {
+    setLoading(true);
+    try {
+      const response = await api.put('/auth/profile/preferences', {
+        language: preferences.language,
+        currency: preferences.currency,
+        timezone: preferences.timezone,
+        dateFormat: preferences.dateFormat,
+        emailNotifications: preferences.emailNotifications,
+        smsNotifications: preferences.smsNotifications,
+        marketingEmails: preferences.marketingEmails,
+        orderUpdates: preferences.orderUpdates,
+        priceAlerts: preferences.priceAlerts
+      });
+      
+      if (response.success) {
+        toast.success('Preferences updated successfully');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to update preferences');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSave = () => {
     setShowSuccess(true);
@@ -150,19 +288,27 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-gray-900 mb-1">24</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">
+            {stats?.activeOrders || 0}
+          </div>
           <div className="text-sm text-gray-600">Active Orders</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-gray-900 mb-1">156</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">
+            {stats?.totalOrders || 0}
+          </div>
           <div className="text-sm text-gray-600">Total Orders</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-gray-900 mb-1">$2.4M</div>
-          <div className="text-sm text-gray-600">Total Spent</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">
+            ${stats?.totalSpent ? (stats.totalSpent / 1000000).toFixed(1) + 'M' : stats?.totalRevenue ? (stats.totalRevenue / 1000000).toFixed(1) + 'M' : '0'}
+          </div>
+          <div className="text-sm text-gray-600">{isSeller ? 'Total Revenue' : 'Total Spent'}</div>
         </div>
         <div className="bg-white rounded-xl border border-gray-200 p-4">
-          <div className="text-2xl font-bold text-gray-900 mb-1">98%</div>
+          <div className="text-2xl font-bold text-gray-900 mb-1">
+            {stats?.onTimeRate || 0}%
+          </div>
           <div className="text-sm text-gray-600">On-Time Rate</div>
         </div>
       </div>
@@ -454,11 +600,12 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
             Cancel
           </button>
           <button
-            onClick={handleSave}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            onClick={handleSaveCompany}
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            Save Changes
+            {loading ? 'Saving...' : 'Save Changes'}
           </button>
         </div>
       </div>
@@ -591,7 +738,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
       <h2 className="text-xl font-bold text-gray-900 mb-6">Payment Methods</h2>
       
       <div className="space-y-4">
-        {paymentMethods.map((method) => (
+        {paymentMethods.length > 0 ? paymentMethods.map((method) => (
           <div key={method.id} className="border border-gray-200 rounded-lg p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -603,14 +750,14 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
                         {method.brand} ending in {method.last4}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Expires {method.expiryMonth}/{method.expiryYear}
+                        Expires {method.expiry_month}/{method.expiry_year}
                       </p>
                     </>
                   )}
                   {method.type === 'bank_account' && (
                     <>
                       <p className="font-medium text-gray-900">
-                        {method.bankName} - {method.accountType}
+                        {method.bank_name} - {method.account_type}
                       </p>
                       <p className="text-sm text-gray-500">
                         Account ending in {method.last4}
@@ -620,7 +767,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                {method.isDefault && (
+                {method.is_default && (
                   <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">Default</span>
                 )}
                 <button className="text-sm text-blue-600 hover:text-blue-700">Edit</button>
@@ -628,7 +775,11 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
               </div>
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="text-center py-8 text-gray-500">
+            No payment methods added yet
+          </div>
+        )}
       </div>
 
       <button className="mt-6 w-full px-4 py-3 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center justify-center gap-2">
@@ -752,11 +903,12 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
             Cancel
           </button>
           <button
-            onClick={handleSave}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+            onClick={handleSavePreferences}
+            disabled={loading}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <Save className="w-4 h-4" />
-            Save Preferences
+            {loading ? 'Saving...' : 'Save Preferences'}
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Image,
   Dimensions,
+  ActivityIndicator,
 } from 'react-native';
 import {
   ArrowLeft,
@@ -26,6 +27,9 @@ import { theme } from '../../theme';
 
 const { width } = Dimensions.get('window');
 
+// API Configuration - adjust based on your environment
+const API_BASE_URL = 'http://localhost:5000/api'; // Change to your backend URL
+
 interface SupplierProfileScreenProps {
   route: {
     params: {
@@ -35,68 +39,71 @@ interface SupplierProfileScreenProps {
   navigation: any;
 }
 
-const supplier = {
-  id: 's1',
-  name: 'Shanghai Textile Co., Ltd.',
-  verified: true,
-  rating: 4.8,
-  totalReviews: 127,
-  yearsInBusiness: 8,
-  country: 'China',
-  city: 'Shanghai',
-  mainProducts: ['Textiles', 'Apparel', 'Home Textiles'],
-  employeeCount: '200-500',
-  annualRevenue: '₹10M - ₹50M',
-  onTimeDelivery: 96,
-  responseTime: '< 2 hours',
-  topMarkets: ['USA', 'EU', 'Australia'],
-  description: 'Leading manufacturer of organic cotton textiles with 8+ years of experience in international trade. We specialize in sustainable production methods and maintain strict quality control standards.',
-  certifications: ['ISO 9001', 'GOTS', 'OEKO-TEX', 'BSCI', 'Sedex'],
-  factoryImages: [
-    'https://images.unsplash.com/photo-1599765824376-a87eb981b2ee?w=400',
-    'https://images.unsplash.com/photo-1644079446600-219068676743?w=400',
-    'https://images.unsplash.com/photo-1758691737246-95bf8f09a997?w=400',
-  ],
-};
-
-const reviews = [
-  {
-    id: 1,
-    author: 'Fashion Retail Inc.',
-    country: 'USA',
-    rating: 5,
-    date: '2025-10-15',
-    comment: 'Excellent quality and communication. Delivery was on time and product met all specifications. Highly recommended!',
-  },
-  {
-    id: 2,
-    author: 'TechWear GmbH',
-    country: 'Germany',
-    rating: 5,
-    date: '2025-09-28',
-    comment: 'Great supplier with consistent quality. This is our 3rd order and we are very satisfied with their service.',
-  },
-  {
-    id: 3,
-    author: 'Retail Corp',
-    country: 'UK',
-    rating: 4,
-    date: '2025-09-10',
-    comment: 'Good product quality and professional team. Minor delay in shipping but overall positive experience.',
-  },
-];
-
-const productCategories = [
-  { name: 'T-Shirts & Tops', count: 12 },
-  { name: 'Hoodies & Sweatshirts', count: 8 },
-  { name: 'Dresses & Skirts', count: 6 },
-  { name: 'Home Textiles', count: 10 },
-  { name: 'Accessories', count: 6 },
-];
-
 export default function SupplierProfileScreen({ route, navigation }: SupplierProfileScreenProps) {
   const [activeTab, setActiveTab] = useState<'about' | 'products' | 'reviews'>('about');
   const { supplierId } = route.params;
+  
+  const [loading, setLoading] = useState(true);
+  const [supplier, setSupplier] = useState<any>(null);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [productCategories, setProductCategories] = useState<any[]>([]);
+
+  useEffect(() => {
+    fetchSupplierData();
+    fetchReviews();
+    fetchProductCategories();
+  }, [supplierId]);
+
+  const fetchSupplierData = async () => {
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/suppliers/${supplierId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setSupplier(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch supplier data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchReviews = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/suppliers/${supplierId}/reviews?limit=5`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setReviews(data.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch reviews:', error);
+    }
+  };
+
+  const fetchProductCategories = async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/suppliers/${supplierId}/product-categories`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setProductCategories(data.data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch product categories:', error);
+    }
+  };
+
+  if (loading || !supplier) {
+    return (
+      <View style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
+        <Text style={styles.loadingText}>Loading supplier profile...</Text>
+      </View>
+    );
+  }
 
   const renderStars = (rating: number) => {
     return (
@@ -133,19 +140,19 @@ export default function SupplierProfileScreen({ route, navigation }: SupplierPro
           <View style={styles.infoHeader}>
             <View style={styles.infoHeaderLeft}>
               <View style={styles.nameRow}>
-                <Text style={styles.supplierName}>{supplier.name}</Text>
+                <Text style={styles.supplierName}>{supplier.company_name}</Text>
                 {supplier.verified && (
                   <CheckCircle size={20} color={theme.colors.success} />
                 )}
               </View>
               <View style={styles.locationRow}>
                 <MapPin size={14} color={theme.colors.textLight} />
-                <Text style={styles.locationText}>{supplier.city}, {supplier.country}</Text>
+                <Text style={styles.locationText}>{supplier.country}</Text>
               </View>
               <View style={styles.ratingRow}>
-                {renderStars(Math.round(supplier.rating))}
+                {renderStars(Math.round(supplier.rating || 0))}
                 <Text style={styles.ratingText}>
-                  {supplier.rating} ({supplier.totalReviews} reviews)
+                  {supplier.rating || 0} ({supplier.total_reviews || 0} reviews)
                 </Text>
               </View>
             </View>
@@ -331,6 +338,15 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: theme.colors.background,
+  },
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: theme.spacing.md,
+    fontSize: 14,
+    color: theme.colors.textLight,
   },
   header: {
     flexDirection: 'row',

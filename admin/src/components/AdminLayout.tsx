@@ -46,10 +46,7 @@ export function AdminLayout({ children, currentView, onNavigate }: AdminLayoutPr
         <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
           {sidebarOpen && (
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">E</span>
-              </div>
-              <span className="font-bold text-gray-900">Eximpo Admin</span>
+              <img src="https://sin1.contabostorage.com/265cb5518b244ea2bdb6eef9784e1983:eximpo-bucket/brand/eximpo-global-llp-logo.svg" alt="Eximpo Logo" className="h-10 w-auto" />
             </div>
           )}
           <button

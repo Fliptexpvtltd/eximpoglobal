@@ -16,7 +16,7 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'catalog', label: 'Browse Products', icon: Search },
     { id: 'rfq-builder', label: 'Create RFQ', icon: FileText },
-    { id: 'chat', label: 'Messages', icon: MessageSquare, badge: 3 },
+    { id: 'chat', label: 'Messages', icon: MessageSquare },
     { id: 'shipments', label: 'Shipments', icon: Package },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
@@ -24,7 +24,7 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
   const sellerLinks = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'catalog', label: 'My Products', icon: Package },
-    { id: 'chat', label: 'Messages', icon: MessageSquare, badge: 3 },
+    { id: 'chat', label: 'Messages', icon: MessageSquare },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];
 
@@ -46,13 +46,7 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
       {/* Logo and Toggle */}
       <div className={`h-16 border-b border-gray-200 flex items-center ${sidebarOpen ? 'justify-between px-4' : 'justify-center'}`}>
         {sidebarOpen && (
-          <div className="flex items-center gap-2">
-            <Globe 
-              className="w-8 h-8"
-              style={{ color: isSeller ? '#059669' : '#2563eb' }}
-            />
-            <span className="font-bold text-gray-900">EximpoGlobal</span>
-          </div>
+          <img src="https://sin1.contabostorage.com/265cb5518b244ea2bdb6eef9784e1983:eximpo-bucket/brand/eximpo-global-llp-logo.svg" alt="Eximpo Logo" className="h-10 w-auto" />
         )}
         <button
           onClick={onToggleSidebar}

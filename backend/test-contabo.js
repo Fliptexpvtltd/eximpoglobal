@@ -1,73 +1,59 @@
 import AWS from 'aws-sdk';
+import dotenv from 'dotenv';
 
-// Test different Contabo configurations
-const configs = [
-  {
-    name: 'Config 1: Basic bucket',
-    endpoint: 'https://sin1.contabostorage.com',
-    accessKeyId: '98d59d8c643a4403a2dc26a27b37b922',
-    secretAccessKey: 'DFFRGjxnKy1qygDs7W5iobjqMmyq11lZ',
-    bucket: 'iestorage',
-    s3ForcePathStyle: true
-  },
-  {
-    name: 'Config 2: With region',
-    endpoint: 'https://sin1.contabostorage.com',
-    accessKeyId: '98d59d8c643a4403a2dc26a27b37b922',
-    secretAccessKey: 'DFFRGjxnKy1qygDs7W5iobjqMmyq11lZ',
-    bucket: 'iestorage',
-    region: 'sin1',
-    s3ForcePathStyle: true
-  },
-  {
-    name: 'Config 3: Signature v2',
-    endpoint: 'https://sin1.contabostorage.com',
-    accessKeyId: '98d59d8c643a4403a2dc26a27b37b922',
-    secretAccessKey: 'DFFRGjxnKy1qygDs7W5iobjqMmyq11lZ',
-    bucket: 'iestorage',
-    s3ForcePathStyle: true,
-    signatureVersion: 'v2'
+dotenv.config();
+
+const s3 = new AWS.S3({
+  endpoint: 'https://sin1.contabostorage.com',
+  accessKeyId: '5d131ccc93635599625a12bf094ca08a',
+  secretAccessKey: '65cdba00e2a5f3744e73233eeb35a13e',
+  s3ForcePathStyle: true,
+  signatureVersion: 'v4',
+  region: 'SIN'
+});
+
+console.log('Testing Contabo connection...');
+console.log('Endpoint:', 'https://sin1.contabostorage.com');
+console.log('Bucket:', 'eximpo-bucket');
+console.log('Access Key:', '5d131ccc93635599625a12bf094ca08a');
+
+// Test 1: List objects
+s3.listObjectsV2({ 
+  Bucket: 'eximpo-bucket',
+  MaxKeys: 1 
+}, (err, data) => {
+  if (err) {
+    console.error('\n❌ List Objects Error:');
+    console.error('Code:', err.code);
+    console.error('Message:', err.message);
+    console.error('Status:', err.statusCode);
+    console.error('Full Error:', JSON.stringify(err, null, 2));
+  } else {
+    console.log('\n✅ List Objects Success!');
+    console.log('Contents:', data.Contents?.length || 0, 'objects');
   }
-];
-
-async function testConfig(config) {
-  const s3 = new AWS.S3({
-    endpoint: config.endpoint,
-    accessKeyId: config.accessKeyId,
-    secretAccessKey: config.secretAccessKey,
-    region: config.region,
-    s3ForcePathStyle: config.s3ForcePathStyle,
-    signatureVersion: config.signatureVersion
+  
+  // Test 2: Upload a test file
+  console.log('\nTesting upload...');
+  const testContent = 'Hello from Eximpo test';
+  
+  s3.upload({
+    Bucket: 'eximpo-bucket',
+    Key: 'test/test-' + Date.now() + '.txt',
+    Body: testContent,
+    ContentType: 'text/plain',
+    ACL: 'public-read'
+  }, (uploadErr, uploadData) => {
+    if (uploadErr) {
+      console.error('\n❌ Upload Error:');
+      console.error('Code:', uploadErr.code);
+      console.error('Message:', uploadErr.message);
+      console.error('Status:', uploadErr.statusCode);
+    } else {
+      console.log('\n✅ Upload Success!');
+      console.log('Location:', uploadData.Location);
+      console.log('Key:', uploadData.Key);
+    }
+    process.exit(0);
   });
-
-  console.log(`\nTesting: ${config.name}`);
-  console.log(`Bucket: ${config.bucket}`);
-  
-  try {
-    const result = await s3.listObjectsV2({ 
-      Bucket: config.bucket,
-      MaxKeys: 1 
-    }).promise();
-    
-    console.log('✅ SUCCESS!');
-    console.log(`   Contents: ${result.Contents ? result.Contents.length : 0} items`);
-    return true;
-  } catch (error) {
-    console.log(`❌ FAILED: ${error.code} - ${error.message}`);
-    return false;
-  }
-}
-
-async function runTests() {
-  console.log('='.repeat(60));
-  console.log('CONTABO OBJECT STORAGE CONNECTION TEST');
-  console.log('='.repeat(60));
-  
-  for (const config of configs) {
-    await testConfig(config);
-  }
-  
-  console.log('\n' + '='.repeat(60));
-}
-
-runTests();
+});

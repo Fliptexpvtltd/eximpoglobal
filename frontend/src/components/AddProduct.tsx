@@ -26,6 +26,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
     unit: 'pieces',
     leadTime: '',
     origin: 'China',
+    incoterms: ['FOB', 'CIF', 'EXW'] as string[],
     specifications: '',
     features: '',
     certifications: [] as string[],
@@ -74,10 +75,13 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
     });
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
+    console.log('📸 File selected:', files);
+    
     if (files && files.length > 0) {
       const file = files[0];
+      console.log('📸 File details:', { name: file.name, size: file.size, type: file.type });
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
@@ -91,12 +95,50 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
         return;
       }
 
-      // Create preview URL
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImages([...images, reader.result as string]);
-      };
-      reader.readAsDataURL(file);
+      // Show loading toast
+      const uploadingToast = toast.loading('Uploading image...');
+
+      try {
+        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        console.log('🔑 Token exists:', !!token);
+        
+        if (!token) {
+          toast.error('Authentication required. Please login again.', { id: uploadingToast });
+          return;
+        }
+
+        // Create FormData for file upload
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const uploadUrl = `${API_BASE_URL}/uploads/products/image`;
+        console.log('📤 Uploading to:', uploadUrl);
+
+        // Upload to backend
+        const response = await fetch(uploadUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+          body: formData,
+        });
+
+        console.log('📥 Response status:', response.status);
+        const data = await response.json();
+        console.log('📥 Response data:', data);
+
+        if (data.success && data.file) {
+          console.log('✅ Upload successful, URL:', data.file.url);
+          setImages([...images, data.file.url]);
+          toast.success('Image uploaded successfully', { id: uploadingToast });
+        } else {
+          console.error('❌ Upload failed:', data);
+          toast.error(data.message || 'Failed to upload image', { id: uploadingToast });
+        }
+      } catch (error) {
+        console.error('❌ Image upload error:', error);
+        toast.error('Failed to upload image. Please try again.', { id: uploadingToast });
+      }
     }
   };
 
@@ -129,7 +171,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
         price: formData.price ? parseFloat(formData.price) : null,
         moq: formData.moq ? parseInt(formData.moq) : null,
         unit: formData.unit,
-        incoterms: ['FOB', 'CIF', 'EXW'], // Default incoterms
+        incoterms: formData.incoterms,
         certifications: formData.certifications,
         images: images,
         specifications: {
@@ -168,7 +210,9 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
           }
         }, 2000);
       } else {
-        console.error('Server error:', data);
+        console.error('❌ Server error response:', data);
+        console.error('❌ Error message:', data.message);
+        console.error('❌ Error details:', data.error);
         if (response.status === 403) {
           toast.error('Access forbidden. You must be logged in as a Seller to add products.');
         } else {
@@ -267,12 +311,15 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Product Description <span className="text-red-500">*</span>
               </label>
+              <p className="text-xs text-gray-500 mb-2">
+                Provide a comprehensive description that will appear in the "Description" tab
+              </p>
               <textarea
                 required
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                rows={4}
-                placeholder="Provide a detailed description of your product..."
+                rows={6}
+                placeholder="Provide a detailed description of your product, including manufacturing details, quality measures, and unique selling points..."
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -281,11 +328,14 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Key Features
               </label>
+              <p className="text-xs text-gray-500 mb-2">
+                List the main features and benefits (one per line)
+              </p>
               <textarea
                 value={formData.features}
                 onChange={(e) => setFormData({ ...formData, features: e.target.value })}
-                rows={3}
-                placeholder="List key features (one per line)"
+                rows={5}
+                placeholder="Example:&#10;Pre-shrunk fabric for size stability&#10;Double-stitched seams for durability&#10;Environmentally friendly production&#10;Available in multiple colors and sizes"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -294,11 +344,14 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Technical Specifications
               </label>
+              <p className="text-xs text-gray-500 mb-2">
+                Enter detailed specifications that will appear in the "Specifications" tab
+              </p>
               <textarea
                 value={formData.specifications}
                 onChange={(e) => setFormData({ ...formData, specifications: e.target.value })}
-                rows={3}
-                placeholder="Enter technical specifications..."
+                rows={5}
+                placeholder="Example:&#10;Material: 100% Organic Cotton&#10;Weight: 180 GSM&#10;Sizes Available: XS to 3XL&#10;Color Options: 15+ colors&#10;Production Capacity: 10,000 units/month"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
@@ -313,15 +366,14 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Unit Price <span className="text-red-500">*</span>
+                  Unit Price <span className="text-gray-400 text-xs">(Optional)</span>
                 </label>
                 <input
                   type="number"
-                  required
                   step="0.01"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                  placeholder="0.00"
+                  placeholder="0.00 (Leave empty if price varies)"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -346,14 +398,13 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Minimum Order Quantity (MOQ) <span className="text-red-500">*</span>
+                  Minimum Order Quantity (MOQ) <span className="text-gray-400 text-xs">(Optional)</span>
                 </label>
                 <input
                   type="number"
-                  required
                   value={formData.moq}
                   onChange={(e) => setFormData({ ...formData, moq: e.target.value })}
-                  placeholder="100"
+                  placeholder="100 (Leave empty if flexible)"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -378,14 +429,13 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Lead Time <span className="text-red-500">*</span>
+                  Lead Time <span className="text-gray-400 text-xs">(Optional)</span>
                 </label>
                 <input
                   type="text"
-                  required
                   value={formData.leadTime}
                   onChange={(e) => setFormData({ ...formData, leadTime: e.target.value })}
-                  placeholder="e.g., 15-30 days"
+                  placeholder="e.g., 15-30 days (Leave empty if varies)"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
@@ -415,20 +465,33 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
             {images.map((image, index) => (
-              <div key={index} className="relative aspect-square border border-gray-200 rounded-lg overflow-hidden group">
-                <img src={image} alt={`Product ${index + 1}`} className="w-full h-full object-cover" />
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImage(index)}
-                  className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-                {index === 0 && (
-                  <div className="absolute bottom-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs rounded">
-                    Main
-                  </div>
-                )}
+              <div key={index} className="space-y-2">
+                <div className="relative aspect-square border border-gray-200 rounded-lg overflow-hidden group bg-gray-100">
+                  <img 
+                    src={image} 
+                    alt={`Product ${index + 1}`} 
+                    className="w-full h-full object-cover"
+                    onError={() => console.error('❌ Image load error:', image)}
+                    onLoad={() => console.log('✅ Image loaded:', image)}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(index)}
+                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity z-10"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  {index === 0 && (
+                    <div className="absolute bottom-2 left-2 px-2 py-1 bg-blue-600 text-white text-xs rounded z-10">
+                      Main
+                    </div>
+                  )}
+                </div>
+                <div className="text-xs text-gray-500 break-all bg-gray-50 p-2 rounded">
+                  <a href={image} target="_blank" rel="noopener noreferrer" className="hover:text-blue-600">
+                    {image.length > 60 ? `${image.substring(0, 60)}...` : image}
+                  </a>
+                </div>
               </div>
             ))}
             <label className="aspect-square border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50 transition-colors cursor-pointer">
@@ -550,9 +613,38 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
 
         {/* Shipping Details */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping Details</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping & Incoterms</h2>
           
           <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Supported Incoterms
+              </label>
+              <p className="text-xs text-gray-500 mb-2">
+                Select shipping terms you can offer (will appear in "Shipping & Incoterms" tab)
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {['FOB', 'CIF', 'EXW', 'FCA', 'CPT', 'CIP', 'DAP', 'DDP'].map((term) => (
+                  <label key={term} className="flex items-center gap-2 p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.incoterms?.includes(term) || false}
+                      onChange={(e) => {
+                        const currentTerms = formData.incoterms || [];
+                        if (e.target.checked) {
+                          setFormData({ ...formData, incoterms: [...currentTerms, term] });
+                        } else {
+                          setFormData({ ...formData, incoterms: currentTerms.filter(t => t !== term) });
+                        }
+                      }}
+                      className="w-4 h-4 text-blue-600 rounded"
+                    />
+                    <span className="text-sm font-medium">{term}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Packaging Details
@@ -561,7 +653,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
                 value={formData.packagingDetails}
                 onChange={(e) => setFormData({ ...formData, packagingDetails: e.target.value })}
                 rows={2}
-                placeholder="Describe how the product will be packaged..."
+                placeholder="Describe how the product will be packaged (e.g., Individual poly bags, 50 units per carton)"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
