@@ -26,7 +26,47 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [showFilters, setShowFilters] = useState(false);
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState('INR');
+
+  // Currency conversion rates (base: INR)
+  const currencyRates: Record<string, number> = {
+    INR: 1,
+    USD: 0.012,
+    EUR: 0.011,
+    GBP: 0.0095,
+    KES: 1.54,
+    TZS: 28.2,
+    UGX: 45.8,
+    GNF: 103.5,
+    RWF: 15.8,
+  };
+
+  // Currency symbols
+  const currencySymbols: Record<string, string> = {
+    INR: '₹',
+    USD: '$',
+    EUR: '€',
+    GBP: '£',
+    KES: 'KSh',
+    TZS: 'TSh',
+    UGX: 'USh',
+    GNF: 'FG',
+    RWF: 'FRw',
+  };
+
+  const convertPrice = (price: number, fromCurrency: string = 'INR'): number => {
+    if (!price) return 0;
+    // Convert from INR to selected currency
+    const convertedPrice = price * currencyRates[currency];
+    return Math.round(convertedPrice * 100) / 100; // Round to 2 decimal places
+  };
+
+  const formatPrice = (price: number): string => {
+    if (!price) return 'Contact Supplier';
+    const converted = convertPrice(price);
+    const symbol = currencySymbols[currency];
+    return `${symbol}${converted.toLocaleString()}`;
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -141,7 +181,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-2xl md:text-3xl mb-2 font-bold text-gray-900">
-                  {isSeller ? '🏪 My Products' : '🛒 Browse Products'}
+                  {isSeller ? 'My Products' : 'Browse Products'}
                 </h1>
                 <p className="text-base md:text-xl text-gray-600">
                   {isSeller ? 'Manage your product listings and inventory' : 'Discover verified suppliers from around the world'}
@@ -199,12 +239,36 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
             onChange={(e) => setCurrency(e.target.value)}
             className={`flex-1 md:flex-none px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 ${isSeller ? 'focus:ring-emerald-500' : 'focus:ring-blue-500'} focus:border-transparent`}
           >
-            <option value="INR">₹ INR</option>
-            <option value="USD">$ USD</option>
-            <option value="EUR">€ EUR</option>
-            <option value="GBP">£ GBP</option>
+            <option value="INR">₹ INR (India)</option>
+            <option value="USD">$ USD (United States)</option>
+            <option value="EUR">€ EUR (Europe)</option>
+            <option value="GBP">£ GBP (United Kingdom)</option>
+            <option value="KES">KSh KES (Kenya)</option>
+            <option value="TZS">TSh TZS (Tanzania)</option>
+            <option value="UGX">USh UGX (Uganda)</option>
+            <option value="GNF">FG GNF (Guinea)</option>
+            <option value="RWF">FRw RWF (Rwanda)</option>
           </select>
         </div>
+      </div>
+
+      {/* Category Chips */}
+      <div className="flex items-center gap-3 overflow-x-auto pb-2 scrollbar-hide">
+        {categories.map(category => (
+          <button
+            key={category}
+            onClick={() => setSelectedCategory(category)}
+            className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+              selectedCategory === category 
+                ? isSeller
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-blue-600 text-white'
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {category}
+          </button>
+        ))}
       </div>
       
       {showFilters && (
@@ -227,90 +291,34 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
             </div>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 gap-6">
             <div>
               <h4 className="mb-3 text-gray-900">Category</h4>
-              <div className="space-y-2">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
                 {categories.map(category => (
-                  <label key={category} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedCategories.includes(category)}
-                      onChange={() => toggleFilter(category, selectedCategories, setSelectedCategories)}
-                      className="rounded"
-                    />
-                    <span className="text-sm text-gray-700">{category}</span>
-                  </label>
+                  <option key={category} value={category}>{category}</option>
                 ))}
-              </div>
+              </select>
             </div>
             
             <div>
-              <h4 className="mb-3 text-gray-900">Certifications</h4>
-              <div className="space-y-2">
-                {certifications.map(cert => (
-                  <label key={cert} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedCertifications.includes(cert)}
-                      onChange={() => toggleFilter(cert, selectedCertifications, setSelectedCertifications)}
-                      className="rounded"
-                    />
-                    <span className="text-sm text-gray-700">{cert}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="mb-3 text-gray-900">Origin</h4>
-              <div className="space-y-2">
-                {origins.map(origin => (
-                  <label key={origin} className="flex items-center gap-2 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      checked={selectedOrigins.includes(origin)}
-                      onChange={() => toggleFilter(origin, selectedOrigins, setSelectedOrigins)}
-                      className="rounded"
-                    />
-                    <span className="text-sm text-gray-700">{origin}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-            
-            <div>
-              <h4 className="mb-3 text-gray-900">Price Range (₹)</h4>
+              <h4 className="mb-3 text-gray-900">Price Range ({currency === 'INR' ? '₹' : '$'})</h4>
               <div className="space-y-3">
                 <input
                   type="number"
-                  value={priceRange.min}
-                  onChange={(e) => setPriceRange({ ...priceRange, min: e.target.value })}
+                  value={priceRange[0]}
+                  onChange={(e) => setPriceRange([parseInt(e.target.value) || 0, priceRange[1]])}
                   placeholder="Min"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 />
                 <input
                   type="number"
-                  value={priceRange.max}
-                  onChange={(e) => setPriceRange({ ...priceRange, max: e.target.value })}
-                  placeholder="Max"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                />
-              </div>
-              
-              <h4 className="mb-3 mt-6 text-gray-900">MOQ Range</h4>
-              <div className="space-y-3">
-                <input
-                  type="number"
-                  value={moqRange.min}
-                  onChange={(e) => setMoqRange({ ...moqRange, min: e.target.value })}
-                  placeholder="Min"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                />
-                <input
-                  type="number"
-                  value={moqRange.max}
-                  onChange={(e) => setMoqRange({ ...moqRange, max: e.target.value })}
+                  value={priceRange[1]}
+                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 100000])}
                   placeholder="Max"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 />
@@ -321,17 +329,10 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
       )}
       
       <div>
-        <div className="flex items-center justify-between mb-4">
+        <div className="mb-4">
           <p className="text-gray-600">
             {filteredProducts.length} products found
           </p>
-          <select className="px-3 py-2 border border-gray-300 rounded-lg text-sm">
-            <option>Best Match</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
-            <option>Rating: High to Low</option>
-            <option>Lead Time: Shortest</option>
-          </select>
         </div>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -393,7 +394,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                   <div>
                     <div className="text-sm text-gray-600">From</div>
                     <div className="text-2xl text-blue-600">
-                      {product.price ? `₹${product.price}` : 'Contact Supplier'}
+                      {formatPrice(product.price)}
                     </div>
                   </div>
                   <div className="text-right">

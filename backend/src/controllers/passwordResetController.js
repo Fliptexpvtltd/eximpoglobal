@@ -1,5 +1,10 @@
 import bcrypt from 'bcryptjs';
 import { query } from '../config/database.js';
+import SibApiV3Sdk from 'sib-api-v3-sdk';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
 
 // Generate 6-digit OTP
 const generateOTP = () => {
@@ -53,18 +58,25 @@ export const requestPasswordReset = async (req, res) => {
     console.log('🔢 Generated OTP for:', user.email);
 
     // Store OTP in database with expiry (valid for 10 minutes)
-    await query(
-      `INSERT INTO password_resets (user_id, token, expires_at, used) 
-       VALUES ($1, $2, NOW() + INTERVAL '10 minutes', false)
-       ON CONFLICT (user_id) 
-       DO UPDATE SET token = $2, expires_at = NOW() + INTERVAL '10 minutes', used = false, created_at = NOW()`,
-      [user.id, otp]
-    );
+    try {
+      await query(
+        `INSERT INTO password_resets (user_id, token, expires_at, used) 
+         VALUES ($1, $2, NOW() + INTERVAL '10 minutes', false)
+         ON CONFLICT (user_id) 
+         DO UPDATE SET token = $2, expires_at = NOW() + INTERVAL '10 minutes', used = false, created_at = NOW()`,
+        [user.id, otp]
+      );
+      console.log('✅ OTP stored in database for user:', user.email);
+    } catch (dbError) {
+      console.error('❌ Database error storing OTP:', dbError.message);
+      console.error('⚠️ Note: Ensure password_resets table exists. Run: migrate-password-resets.sql');
+      // Continue with email sending attempt even if DB storage fails
+    }
 
     // Send OTP email directly using Brevo API
     console.log('📧 Preparing to send OTP email...');
-    const SibApiV3Sdk = await import('sib-api-v3-sdk');
-    const defaultClient = SibApiV3Sdk.default.ApiClient.instance;
+    
+    const defaultClient = SibApiV3Sdk.ApiClient.instance;
     const apiKey = defaultClient.authentications['api-key'];
     apiKey.apiKey = process.env.BREVO_API_KEY;
 
@@ -72,8 +84,8 @@ export const requestPasswordReset = async (req, res) => {
 
     if (process.env.BREVO_API_KEY) {
       console.log('📤 Sending email via Brevo to:', user.email);
-      const apiInstance = new SibApiV3Sdk.default.TransactionalEmailsApi();
-      const sendSmtpEmail = new SibApiV3Sdk.default.SendSmtpEmail();
+      const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+      const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
       
       sendSmtpEmail.subject = 'Password Reset OTP - Eximpo Global';
       sendSmtpEmail.htmlContent = `

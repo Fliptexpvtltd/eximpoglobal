@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
     phone VARCHAR(50),
     country VARCHAR(100),
     verified BOOLEAN DEFAULT false,
+    auth_provider VARCHAR(50) DEFAULT 'local' CHECK (auth_provider IN ('local', 'google')),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -164,6 +165,23 @@ CREATE TABLE IF NOT EXISTS messages (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    type VARCHAR(50) NOT NULL CHECK (type IN ('message', 'quote', 'order', 'alert', 'info')),
+    title VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    related_id UUID,
+    is_read BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Indexes for notifications
+CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+CREATE INDEX IF NOT EXISTS idx_notifications_user_read ON notifications(user_id, is_read);
+
 -- Analytics/Metrics table
 CREATE TABLE IF NOT EXISTS analytics_events (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -173,6 +191,17 @@ CREATE TABLE IF NOT EXISTS analytics_events (
     ip_address INET,
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Password Resets table (for OTP-based password reset)
+CREATE TABLE IF NOT EXISTS password_resets (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+    token VARCHAR(10) NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+    used BOOLEAN DEFAULT false,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Indexes for better query performance
@@ -192,6 +221,8 @@ CREATE INDEX IF NOT EXISTS idx_messages_receiver ON messages(receiver_id);
 CREATE INDEX IF NOT EXISTS idx_messages_created ON messages(created_at);
 CREATE INDEX IF NOT EXISTS idx_analytics_user ON analytics_events(user_id);
 CREATE INDEX IF NOT EXISTS idx_analytics_type ON analytics_events(event_type);
+CREATE INDEX IF NOT EXISTS idx_password_resets_user ON password_resets(user_id);
+CREATE INDEX IF NOT EXISTS idx_password_resets_expires ON password_resets(expires_at);
 
 -- Function to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
@@ -222,6 +253,9 @@ CREATE TRIGGER update_shipments_updated_at BEFORE UPDATE ON shipments
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_supplier_profiles_updated_at BEFORE UPDATE ON supplier_profiles
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_password_resets_updated_at BEFORE UPDATE ON password_resets
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Insert sample admin user (password: admin123)

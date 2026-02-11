@@ -43,17 +43,27 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
       bg-white border-r border-gray-200 transition-all duration-300 flex flex-col h-screen
       hidden lg:flex flex-shrink-0 sticky top-0
     `}>
-      {/* Logo and Toggle */}
-      <div className={`h-16 border-b border-gray-200 flex items-center ${sidebarOpen ? 'justify-between px-4' : 'justify-center'}`}>
-        {sidebarOpen && (
-          <img src="https://sin1.contabostorage.com/265cb5518b244ea2bdb6eef9784e1983:eximpo-bucket/brand/eximpo-global-llp-logo.svg" alt="Eximpo Logo" className="h-10 w-auto" />
+      {/* User Profile at Top */}
+      <div className="border-b border-gray-200 p-4">
+        {sidebarOpen ? (
+          <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+              <span className="text-white font-semibold text-sm">
+                {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.companyName}</p>
+            </div>
+          </div>
+        ) : (
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto">
+            <span className="text-white font-semibold text-sm">
+              {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
+            </span>
+          </div>
         )}
-        <button
-          onClick={onToggleSidebar}
-          className="p-2 hover:bg-gray-100 rounded-lg transition"
-        >
-          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
       </div>
 
       {/* Navigation Links */}
@@ -122,27 +132,14 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
         })}
       </nav>
 
-      {/* User Info at Bottom */}
-      <div className="border-t border-gray-200 p-4">
-        {sidebarOpen ? (
-          <div className="flex items-center gap-3 px-3 py-2 bg-gray-50 rounded-lg">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-semibold text-sm">
-                {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
-              </span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
-              <p className="text-xs text-gray-500 truncate">{user?.companyName}</p>
-            </div>
-          </div>
-        ) : (
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center mx-auto">
-            <span className="text-white font-semibold text-sm">
-              {user?.name?.split(' ').map(n => n[0]).join('') || 'U'}
-            </span>
-          </div>
-        )}
+      {/* Toggle Button at Bottom */}
+      <div className="border-t border-gray-200 p-4 flex justify-center">
+        <button
+          onClick={onToggleSidebar}
+          className="p-2 hover:bg-gray-100 rounded-lg transition"
+        >
+          {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
     </aside>
   );

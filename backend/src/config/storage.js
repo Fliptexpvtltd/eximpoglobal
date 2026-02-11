@@ -21,7 +21,10 @@ const s3 = new AWS.S3({
   s3ForcePathStyle: true,
   signatureVersion: 'v4',
   sslEnabled: true,
-  s3BucketEndpoint: false
+  s3BucketEndpoint: false,
+  // Fix for XML parsing error with Contabo
+  s3DisableBodySigning: true,
+  computeChecksums: false
 });
 
 // Use just the base bucket name for S3 operations
@@ -93,7 +96,9 @@ export const createUploadMiddleware = (type = 'image', fieldName = 'file', maxCo
         cb(null, `${folder}/${filename}`);
       },
       contentType: multerS3.AUTO_CONTENT_TYPE,
-      acl: 'public-read'
+      acl: 'public-read',
+      // Handle Contabo response format
+      shouldTransformResponse: false
     }),
     fileFilter: fileFilter(allowedTypes),
     limits: {

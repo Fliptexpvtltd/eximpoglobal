@@ -1,6 +1,10 @@
 package net.eximpoglobal;
 
 import android.content.Intent;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.os.Bundle;
 import android.util.Log;
 import android.webkit.WebView;
@@ -8,6 +12,10 @@ import android.webkit.WebViewClient;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.CookieManager;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
+import android.view.View;
+import android.widget.Button;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -21,16 +29,22 @@ import com.google.android.gms.tasks.Task;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
+    private View noNetworkLayout;
     private GoogleSignInClient googleSignInClient;
     private ActivityResultLauncher<Intent> signInLauncher;
     private static final String TAG = "EximpoWebView";
+    private static final String BASE_URL = "https://app.eximpoglobal.net";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
         
-        webView = new WebView(this);
-        setContentView(webView);
+        webView = findViewById(R.id.webview);
+        noNetworkLayout = findViewById(R.id.no_network_layout);
+        Button retryButton = findViewById(R.id.retry_button);
+        
+        retryButton.setOnClickListener(v -> loadWebsite());
 
         // Configure Google Sign-In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -73,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         // Enable additional features for modern web apps
         webSettings.setLoadWithOverviewMode(true);
         webSettings.setUseWideViewPort(true);
-        webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        webSettings.setCacheMode(WebSettings.LOAD_NO_CACHE); // Don't use cache to detect network issues
         
         // Disable zoom
         webSettings.setSupportZoom(false);
@@ -92,9 +106,19 @@ public class MainActivity extends AppCompatActivity {
             }
             
             @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                super.onReceivedError(view, request, error);
+                if (request.isForMainFrame()) {
+                    Log.e(TAG, "Error loading page: " + error.getDescription());
+                    showNoNetwork();
+                }
+            }
+            
+            @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
                 Log.d(TAG, "Page started: " + url + ", canGoBack: " + view.canGoBack());
+                hideNoNetwork();
                 // Hide Capacitor splash immediately when page starts loading
                 String hideCapacitorSplash = "javascript:(function() { " +
                     "var style = document.createElement('style'); " +
@@ -140,7 +164,46 @@ public class MainActivity extends AppCompatActivity {
         });
         
         // Load the website
-        webView.loadUrl("https://app.eximpoglobal.net");
+        loadWebsite();
+    }
+    
+    private void loadWebsite() {
+        if (!isNetworkAvailable()) {
+            showNoNetwork();
+            return;
+        }
+        hideNoNetwork();
+        webView.loadUrl(BASE_URL);
+    }
+    
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            Network network = connectivityManager.getActiveNetwork();
+            if (network == null) return false;
+            
+            NetworkCapabilities capabilities = connectivityManager.getNetworkCapabilities(network);
+            return capabilities != null && (
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
+                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
+            );
+        }
+        return false;
+    }
+    
+    private void showNoNetwork() {
+        runOnUiThread(() -> {
+            webView.setVisibility(View.GONE);
+            noNetworkLayout.setVisibility(View.VISIBLE);
+        });
+    }
+    
+    private void hideNoNetwork() {
+        runOnUiThread(() -> {
+            noNetworkLayout.setVisibility(View.GONE);
+            webView.setVisibility(View.VISIBLE);
+        });
     }
 
     public void startNativeGoogleSignIn() {

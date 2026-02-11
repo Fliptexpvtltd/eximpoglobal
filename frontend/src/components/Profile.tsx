@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Building2, Mail, Phone, MapPin, Shield, CreditCard, Settings, LogOut, Upload, Check, X, FileText, Calendar, Globe, Briefcase, Hash, AlertCircle, Save, Camera } from 'lucide-react';
+import { User, Building2, Mail, Phone, MapPin, Shield, Settings, LogOut, Upload, Check, X, FileText, Calendar, Globe, Briefcase, Hash, AlertCircle, Save, Camera } from 'lucide-react';
 import type { User as UserType } from '../App';
 import api from '../services/api';
 import { toast } from 'sonner';
@@ -16,7 +16,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
   const themeColor = isSeller ? '#059669' : '#2563eb';
   const themeBgLight = isSeller ? '#d1fae5' : '#dbeafe';
   
-  const [activeSection, setActiveSection] = useState<'overview' | 'edit-profile' | 'company' | 'kyc' | 'payment' | 'preferences'>('overview');
+  const [activeSection, setActiveSection] = useState<'overview' | 'edit-profile' | 'company' | 'kyc' | 'preferences'>('overview');
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
@@ -54,8 +54,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
     country: ''
   });
 
-  // Payment methods
-  const [paymentMethods, setPaymentMethods] = useState<any[]>([]);
+
 
   // Preferences
   const [preferences, setPreferences] = useState({
@@ -74,7 +73,6 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
   useEffect(() => {
     fetchUserStats();
     fetchCompanyDetails();
-    fetchPaymentMethods();
     fetchPreferences();
   }, []);
 
@@ -116,16 +114,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
     }
   };
 
-  const fetchPaymentMethods = async () => {
-    try {
-      const response = await api.get('/auth/profile/payment-methods');
-      if (response.success) {
-        setPaymentMethods(response.data || []);
-      }
-    } catch (error) {
-      console.error('Failed to fetch payment methods:', error);
-    }
-  };
+
 
   const fetchPreferences = async () => {
     try {
@@ -223,8 +212,6 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
         return renderCompanyDetails();
       case 'kyc':
         return renderKYC();
-      case 'payment':
-        return renderPaymentMethods();
       case 'preferences':
         return renderPreferences();
       default:
@@ -520,7 +507,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
               <option>Electronics</option>
               <option>Textiles</option>
               <option>Automotive</option>
-              <option>Food & Beverage</option>
+              <option>Spices</option>
             </select>
           </div>
         </div>
@@ -733,73 +720,6 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
     </div>
   );
 
-  const renderPaymentMethods = () => (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-xl font-bold text-gray-900 mb-6">Payment Methods</h2>
-      
-      <div className="space-y-4">
-        {paymentMethods.length > 0 ? paymentMethods.map((method) => (
-          <div key={method.id} className="border border-gray-200 rounded-lg p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <CreditCard className="w-5 h-5 text-gray-600" />
-                <div>
-                  {method.type === 'credit_card' && (
-                    <>
-                      <p className="font-medium text-gray-900">
-                        {method.brand} ending in {method.last4}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Expires {method.expiry_month}/{method.expiry_year}
-                      </p>
-                    </>
-                  )}
-                  {method.type === 'bank_account' && (
-                    <>
-                      <p className="font-medium text-gray-900">
-                        {method.bank_name} - {method.account_type}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Account ending in {method.last4}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                {method.is_default && (
-                  <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full">Default</span>
-                )}
-                <button className="text-sm text-blue-600 hover:text-blue-700">Edit</button>
-                <button className="text-sm text-red-600 hover:text-red-700">Remove</button>
-              </div>
-            </div>
-          </div>
-        )) : (
-          <div className="text-center py-8 text-gray-500">
-            No payment methods added yet
-          </div>
-        )}
-      </div>
-
-      <button className="mt-6 w-full px-4 py-3 border-2 border-dashed border-gray-300 text-gray-600 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors flex items-center justify-center gap-2">
-        <Upload className="w-5 h-5" />
-        Add Payment Method
-      </button>
-
-      <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-        <h3 className="font-bold text-gray-900 mb-2">Supported Payment Methods</h3>
-        <ul className="text-sm text-gray-600 space-y-1">
-          <li>• Credit/Debit Cards (Visa, Mastercard, Amex)</li>
-          <li>• Bank Account (ACH Transfer)</li>
-          <li>• Wire Transfer (for large orders)</li>
-          <li>• Letter of Credit (L/C)</li>
-          <li>• Escrow Service</li>
-        </ul>
-      </div>
-    </div>
-  );
-
   const renderPreferences = () => (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
       <h2 className="text-xl font-bold text-gray-900 mb-6">Preferences</h2>
@@ -928,7 +848,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
       )}
 
       <div className="p-6 rounded-xl text-white" style={{ background: `linear-gradient(to right, ${themeColor}, ${isSeller ? '#047857' : '#1e40af'})` }}>
-        <h1 className="text-2xl md:text-3xl mb-2">{isSeller ? '🏪 Seller Profile' : '🛒 Buyer Profile'}</h1>
+        <h1 className="text-2xl md:text-3xl mb-2">{isSeller ? 'Seller Profile' : 'Buyer Profile'}</h1>
         <p className="text-base md:text-xl opacity-90">Manage your account settings and preferences</p>
       </div>
 
@@ -977,16 +897,6 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
             {user.kycStatus === 'pending' && (
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-500 rounded-full"></span>
             )}
-          </button>
-          <button
-            onClick={() => setActiveSection('payment')}
-            className={`px-4 py-3 rounded-lg transition-colors text-sm font-medium ${
-              activeSection === 'payment'
-                ? 'bg-blue-50 text-blue-600'
-                : 'text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            Payment
           </button>
           <button
             onClick={() => setActiveSection('preferences')}

@@ -1,5 +1,6 @@
 import pool from '../config/database.js';
 import { sendEmail } from '../services/emailService.js';
+import { createNotification } from './notificationController.js';
 
 // Generate unique order number
 const generateOrderNumber = () => {
@@ -223,6 +224,15 @@ export const createOrder = async (req, res) => {
         deliveryAddress: delivery_address,
         buyerCompany: buyerResult.rows.length > 0 ? buyerResult.rows[0].company_name : 'Buyer'
       }).catch(err => console.error('Failed to send order notification email to seller:', err));
+
+      // Create notification for seller
+      await createNotification(
+        quote.seller_id,
+        'order',
+        'Order Confirmed',
+        `New order ${orderNumber} from ${buyerResult.rows.length > 0 ? buyerResult.rows[0].company_name : 'Buyer'} - $${order.total_amount}`,
+        order.id
+      );
     }
 
     res.status(201).json({
@@ -282,6 +292,33 @@ export const updateOrderStatus = async (req, res) => {
       'UPDATE orders SET status = $1 WHERE id = $2 RETURNING *',
       [status, id]
     );
+
+    // Create notification for buyer based on new status
+    if (status === 'confirmed') {
+      await createNotification(
+        order.buyer_id,
+        'order',
+        'Order Confirmed',
+        'Your order has been confirmed by the supplier',
+        id
+      );
+    } else if (status === 'shipped') {
+      await createNotification(
+        order.buyer_id,
+        'order',
+        'Order Shipped',
+        'Your order has been shipped. Track your delivery status.',
+        id
+      );
+    } else if (status === 'delivered') {
+      await createNotification(
+        order.buyer_id,
+        'order',
+        'Order Delivered',
+        'Your order has been delivered. Please confirm receipt.',
+        id
+      );
+    }
 
     res.json({
       success: true,

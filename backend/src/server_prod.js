@@ -70,8 +70,10 @@ import uploadRoutes from './routes/uploads.js';
 import messageRoutes from './routes/messageRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import seoRoutes from './routes/seo.js';
 
 // API routes
+app.use('/api/seo', seoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/rfqs', rfqRoutes);

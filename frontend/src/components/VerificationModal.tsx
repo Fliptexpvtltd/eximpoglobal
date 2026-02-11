@@ -288,7 +288,7 @@ export function VerificationModal({ user, isOpen, onClose, onComplete }: Verific
             <option value="machinery">Machinery & Equipment</option>
             <option value="automotive">Automotive Parts</option>
             <option value="chemicals">Chemicals & Materials</option>
-            <option value="food">Food & Beverages</option>
+            <option value="spices">Spices</option>
             <option value="other">Other</option>
           </select>
         </div>

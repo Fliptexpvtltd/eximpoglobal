@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, HelpCircle, MessageCircle, Mail, Phone, FileText, Video, ChevronDown, ChevronUp, ExternalLink } from 'lucide-react';
 
 interface HelpProps {
@@ -11,10 +11,50 @@ export function Help({ user, activeMode }: HelpProps) {
   const [activeCategory, setActiveCategory] = useState('getting-started');
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null);
 
+  // Initialize Brevo Conversations
+  useEffect(() => {
+    // Check if script is already loaded
+    if ((window as any).BrevoConversations) {
+      // If already loaded, auto-open chat after a short delay
+      setTimeout(() => {
+        if ((window as any).BrevoConversations) {
+          (window as any).BrevoConversations('openChat', true);
+        }
+      }, 500);
+      return;
+    }
+
+    (function(d, w, c) {
+      (w as any).BrevoConversationsID = '6936eb93f9a6f3d7300c38ea';
+      (w as any)[c] = (w as any)[c] || function() {
+        ((w as any)[c].q = (w as any)[c].q || []).push(arguments);
+      };
+      const s = d.createElement('script');
+      s.async = true;
+      s.src = 'https://conversations-widget.brevo.com/brevo-conversations.js';
+      s.onload = () => {
+        // Auto-open chat when script loads
+        setTimeout(() => {
+          if ((window as any).BrevoConversations) {
+            (window as any).BrevoConversations('openChat', true);
+          }
+        }, 500);
+      };
+      if (d.head) d.head.appendChild(s);
+    })(document, window, 'BrevoConversations');
+  }, []);
+
+  const handleStartChat = () => {
+    // Open Brevo chat widget
+    if ((window as any).BrevoConversations) {
+      (window as any).BrevoConversations('openChat', true);
+    }
+  };
+
   const categories = [
     { id: 'getting-started', label: 'Getting Started', icon: HelpCircle },
     { id: 'rfq-quotes', label: 'RFQs & Quotes', icon: FileText },
-    { id: 'orders-payments', label: 'Orders & Payments', icon: FileText },
+    { id: 'orders', label: 'Orders', icon: FileText },
     { id: 'shipping', label: 'Shipping & Tracking', icon: FileText },
     { id: 'account', label: 'Account Management', icon: FileText }
   ];
@@ -56,22 +96,22 @@ export function Help({ user, activeMode }: HelpProps) {
         answer: 'Go to "Quote Comparison" to see all quotes for your RFQ in a side-by-side format. Compare prices, delivery times, payment terms, and supplier ratings to make an informed decision.'
       }
     ],
-    'orders-payments': [
-      {
-        question: 'What payment methods are accepted?',
-        answer: 'We accept credit cards (Visa, Mastercard, Amex), wire transfers, and ACH payments. For international transactions, we support multiple currencies and local payment methods depending on your region.'
-      },
+    'orders': [
       {
         question: 'How do I create a purchase order?',
         answer: 'After accepting a quote, click "Create Purchase Order". Review the order details, add any special instructions, and submit. Both you and the supplier will receive a copy of the PO.'
       },
       {
-        question: 'Is my payment information secure?',
-        answer: 'Absolutely. We use bank-level encryption (256-bit SSL) to protect all payment information. We are PCI DSS compliant and never store your full credit card details on our servers.'
-      },
-      {
         question: 'Can I get an invoice for my purchase?',
         answer: 'Yes! Invoices are automatically generated for all purchases and can be downloaded from your dashboard. You can also access them in the "Billing History" section under Settings.'
+      },
+      {
+        question: 'What are the payment terms options?',
+        answer: 'Payment terms are negotiated directly between buyers and sellers. Common terms include advance payment, partial deposits, or payment on delivery. Discuss terms with your supplier before creating a PO.'
+      },
+      {
+        question: 'How do I track my PO status?',
+        answer: 'Go to "Purchase Orders" in your dashboard to see all orders. Click on any order to view detailed status updates including order confirmation, production, shipment, and delivery.'
       }
     ],
     'shipping': [
@@ -171,7 +211,10 @@ export function Help({ user, activeMode }: HelpProps) {
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Live Chat</h3>
             <p className="text-sm text-gray-600 mb-4">Get instant help from our support team</p>
-            <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button 
+              onClick={handleStartChat}
+              className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
               Start Chat
             </button>
           </div>
@@ -181,9 +224,9 @@ export function Help({ user, activeMode }: HelpProps) {
               <Mail className="w-6 h-6 text-green-600" />
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Email Support</h3>
-            <p className="text-sm text-gray-600 mb-4">We typically respond within 24 hours</p>
+            <p className="text-sm text-gray-600 mb-4">contact@eximpoglobal.net</p>
             <a
-              href="mailto:support@eximpo.com"
+              href="mailto:contact@eximpoglobal.net"
               className="block w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-center"
             >
               Send Email
@@ -195,9 +238,18 @@ export function Help({ user, activeMode }: HelpProps) {
               <Phone className="w-6 h-6 text-purple-600" />
             </div>
             <h3 className="font-bold text-gray-900 mb-2">Phone Support</h3>
-            <p className="text-sm text-gray-600 mb-4">Mon-Fri, 9 AM - 6 PM EST</p>
+            <p className="text-sm text-gray-600 mb-2">Mon-Fri, 9 AM - 6 PM IST</p>
+            <div className="flex gap-3 mb-4">
+              <a href="tel:+917386663696" className="text-sm text-purple-600 hover:underline">
+                +91 7386663696
+              </a>
+              <span className="text-gray-300">•</span>
+              <a href="tel:+254733336633" className="text-sm text-purple-600 hover:underline">
+                +254 733336633
+              </a>
+            </div>
             <a
-              href="tel:+1-800-123-4567"
+              href="tel:+917386663696"
               className="block w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-center"
             >
               Call Now
@@ -231,30 +283,7 @@ export function Help({ user, activeMode }: HelpProps) {
               })}
             </div>
 
-            <div className="mt-6 pt-6 border-t border-gray-200">
-              <h3 className="font-bold text-gray-900 mb-4">Resources</h3>
-              <div className="space-y-3">
-                {resources.map((resource, index) => {
-                  const Icon = resource.icon;
-                  return (
-                    <a
-                      key={index}
-                      href={resource.link}
-                      className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors group"
-                    >
-                      <Icon className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-900 group-hover:text-blue-600 mb-1">
-                          {resource.title}
-                        </p>
-                        <p className="text-xs text-gray-500">{resource.description}</p>
-                      </div>
-                      <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-600" />
-                    </a>
-                  );
-                })}
-              </div>
-            </div>
+            
           </div>
         </div>
 
@@ -305,7 +334,7 @@ export function Help({ user, activeMode }: HelpProps) {
             <p className="text-blue-700 mb-4">
               Can't find what you're looking for? Our support team is here to help.
             </p>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button onClick={handleStartChat} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
               Contact Support Team
             </button>
           </div>

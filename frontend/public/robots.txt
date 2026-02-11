@@ -1,0 +1,39 @@
+# robots.txt for EximpoGlobal B2B Marketplace
+# https://eximpoglobal.net/robots.txt
+
+User-agent: *
+Allow: /
+
+# Allow search engines to crawl public pages
+Allow: /?view=catalog
+Allow: /?view=how-it-works
+Allow: /?view=about
+Allow: /?view=pricing
+Allow: /?view=faq
+Allow: /?view=privacy-policy
+Allow: /?view=terms-of-service
+Allow: /?view=cookie-policy
+Allow: /?view=trade-assurance
+Allow: /?view=logistics-solutions
+Allow: /?view=quality-inspection
+Allow: /?view=trade-financing
+Allow: /?view=customs-clearance
+
+# Disallow private/authenticated areas
+Disallow: /?view=dashboard
+Disallow: /?view=auth
+Disallow: /?view=profile
+Disallow: /?view=settings
+Disallow: /?view=chat
+Disallow: /?view=rfq-builder
+Disallow: /?view=my-rfqs
+Disallow: /?view=purchase-order
+Disallow: /?view=shipments
+Disallow: /?view=analytics
+Disallow: /api/
+
+# Crawl-delay (optional, adjust based on server capacity)
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://eximpoglobal.net/sitemap.xml

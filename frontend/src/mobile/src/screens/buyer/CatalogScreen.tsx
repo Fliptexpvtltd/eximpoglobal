@@ -31,8 +31,8 @@ const categories = [
   'Electronics',
   'Textiles & Apparel',
   'Machinery',
-  'Home & Garden',
-  'Chemicals',
+  'Pharma',
+  'Polymers',
   'Automotive',
 ];
 

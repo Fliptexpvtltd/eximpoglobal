@@ -1,4 +1,5 @@
 import pool from '../config/database.js';
+import { createNotification } from './notificationController.js';
 
 // Get conversations for a user
 export const getConversations = async (req, res) => {
@@ -144,6 +145,23 @@ export const sendMessage = async (req, res) => {
        VALUES ($1, $2, $3, $4, $5, false, CURRENT_TIMESTAMP)
        RETURNING *`,
       [sender_id, receiver_id, message.trim(), rfq_id || null, order_id || null]
+    );
+
+    // Get sender company name for notification
+    const senderInfo = await pool.query(
+      'SELECT company_name FROM users WHERE id = $1',
+      [sender_id]
+    );
+
+    const senderCompany = senderInfo.rows.length > 0 ? senderInfo.rows[0].company_name : 'User';
+
+    // Create notification for receiver
+    await createNotification(
+      receiver_id,
+      'message',
+      'New Message',
+      `Message from ${senderCompany}: ${message.trim().substring(0, 50)}${message.trim().length > 50 ? '...' : ''}`,
+      result.rows[0].id
     );
 
     res.json({

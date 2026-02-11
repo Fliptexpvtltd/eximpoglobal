@@ -12,7 +12,13 @@ drawable eximpo_logo
 drawable eximpo_logo_full
 drawable ic_launcher_background
 drawable splash_logo
+id no_network_layout
+id retry_button
+id splash_image
+id webview
+layout activity_main
 layout activity_splash
+layout no_network
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round

@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowLeft, Star, MapPin, CheckCircle, Shield, Award, Clock, Package, FileText, MessageSquare, TrendingUp, Users, Truck } from 'lucide-react';
 import type { Product } from '../App';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PublicNavigation } from './PublicNavigation';
 import { useAuth } from '../contexts/AuthContext';
+import { PageSEO } from './PageSEO';
 
 interface ProductDetailProps {
   product: Product;
@@ -29,15 +30,6 @@ const shippingOptions = [
   { incoterm: 'DDP', description: 'Delivered Duty Paid - Door to door', estimatedCost: 850 },
 ];
 
-const specifications = [
-  { label: 'Material', value: '100% Organic Cotton' },
-  { label: 'Weight', value: '180-200 GSM' },
-  { label: 'Colors Available', value: '15+ colors' },
-  { label: 'Sizes', value: 'XS, S, M, L, XL, XXL, XXXL' },
-  { label: 'Packaging', value: 'Individual poly bags, 100 pcs/carton' },
-  { label: 'Customization', value: 'Logo printing, embroidery available' },
-];
-
 export function ProductDetail({ product, user: propUser, activeMode = 'buyer', onCreateRFQ, onOrderSample, onViewSupplier, onContactSupplier, onBack }: ProductDetailProps) {
   const { user: authUser } = useAuth();
   const user = propUser || authUser;
@@ -45,13 +37,34 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
   const isSeller = effectiveRole === 'seller';
   const themeColor = isSeller ? '#059669' : '#2563eb';
   
-  const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'shipping'>('description');
+  const [activeTab, setActiveTab] = useState<'description' | 'specifications'>('description');
+  const [seoData, setSeoData] = useState<any>(null);
+
+  // Fetch SEO data from backend
+  useEffect(() => {
+    const fetchSEOData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/api/seo/page/product?productId=${product.id}`);
+        const data = await response.json();
+        if (data.success) {
+          setSeoData(data.seoData);
+        }
+      } catch (error) {
+        console.error('Error fetching SEO data:', error);
+      }
+    };
+
+    if (product.id) {
+      fetchSEOData();
+    }
+  }, [product.id]);
 
   return (
-    <>
-      {!user && <PublicNavigation />}
-      
-      <div className={user ? "space-y-6" : "max-w-7xl mx-auto px-4 py-6 space-y-6"}>
+    <PageSEO seoData={seoData}>
+      <>
+        {!user && <PublicNavigation />}
+        
+        <div className={user ? "space-y-6" : "max-w-7xl mx-auto px-4 py-6 space-y-6"}>
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
@@ -258,27 +271,6 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
                   </li>
                 </ul>
               </div>
-              
-              {/* Cost Calculator */}
-              <div className="bg-white rounded-xl border border-gray-200 p-5">
-                <h3 className="mb-3 flex items-center gap-2">
-                  <Truck className="w-5 h-5 text-blue-600" />
-                  Landed Cost
-                </h3>
-                <p className="text-sm text-gray-600 mb-4">
-                  Calculate total including duties & shipping
-                </p>
-                <select className="w-full px-4 py-2 border border-gray-300 rounded-lg mb-3">
-                  <option>Select destination</option>
-                  <option>United States</option>
-                  <option>United Kingdom</option>
-                  <option>Germany</option>
-                  <option>Australia</option>
-                </select>
-                <button className="w-full px-4 py-3 bg-gray-100 text-gray-900 rounded-lg hover:bg-gray-200">
-                  Calculate
-                </button>
-              </div>
 
               {/* Quick Stats */}
               <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-5">
@@ -330,16 +322,6 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
               >
                 Specifications
               </button>
-              <button
-                onClick={() => setActiveTab('shipping')}
-                className={`px-6 py-4 whitespace-nowrap transition-colors ${
-                  activeTab === 'shipping'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Shipping & Incoterms
-              </button>
             </div>
           </div>
 
@@ -349,42 +331,7 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
               <div className="max-w-4xl">
                 <h2 className="text-2xl mb-4">Product Description</h2>
                 <div className="prose max-w-none text-gray-700 space-y-4">
-                  <p>
-                    Our premium organic cotton t-shirts are manufactured in our ISO 9001 certified facility with strict quality control measures. Each piece is made from 100% GOTS certified organic cotton, ensuring both environmental sustainability and exceptional comfort.
-                  </p>
-                  <p>
-                    Perfect for brands looking for high-quality basics, these t-shirts offer excellent print and embroidery surfaces. Available in a wide range of colors and sizes, with customization options to match your brand identity.
-                  </p>
-                  <h3 className="text-xl mt-6 mb-3">Key Features:</h3>
-                  <ul className="space-y-2 text-gray-700">
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Pre-shrunk fabric for size stability</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Double-stitched seams for durability</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Reinforced neck and shoulder seams</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Environmentally friendly production process</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span>Available in regular and premium weight options</span>
-                    </li>
-                  </ul>
-                  
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-6">
-                    <h4 className="text-blue-900 mb-2">Why Choose Our Products?</h4>
-                    <p className="text-blue-800 text-sm">
-                      With over 8 years of experience in textile manufacturing and export, we've served 500+ satisfied customers across 30+ countries. Our commitment to quality and timely delivery has earned us a 96% on-time delivery rate and 4.8/5 customer satisfaction score.
-                    </p>
-                  </div>
+                  <p className="whitespace-pre-wrap">{product.description || 'No description available.'}</p>
                 </div>
               </div>
             )}
@@ -392,14 +339,18 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
             {activeTab === 'specifications' && (
               <div className="max-w-4xl">
                 <h2 className="text-2xl mb-6">Technical Specifications</h2>
-                <div className="grid md:grid-cols-2 gap-6">
-                  {specifications.map((spec) => (
-                    <div key={spec.label} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                      <div className="text-sm text-gray-600 mb-2">{spec.label}</div>
-                      <div className="text-lg text-gray-900">{spec.value}</div>
-                    </div>
-                  ))}
-                </div>
+                {product.specifications && Object.keys(product.specifications).length > 0 ? (
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {Object.entries(product.specifications).map(([key, value]) => (
+                      <div key={key} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                        <div className="text-sm text-gray-600 mb-2">{key}</div>
+                        <div className="text-lg text-gray-900">{value}</div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-600">No specifications available.</p>
+                )}
 
                 <div className="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-5">
                   <h3 className="text-amber-900 mb-3 flex items-center gap-2">
@@ -417,48 +368,10 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
                 </div>
               </div>
             )}
-
-            {activeTab === 'shipping' && (
-              <div className="max-w-4xl">
-                <h2 className="text-2xl mb-4">Shipping Options & Incoterms</h2>
-                <p className="text-gray-600 mb-6">
-                  Choose from multiple shipping options based on your needs. All prices are estimates and will be confirmed in your quote.
-                </p>
-                <div className="space-y-4">
-                  {shippingOptions.map((option) => (
-                    <div key={option.incoterm} className="border border-gray-200 rounded-xl p-5 hover:border-blue-500 hover:shadow-md transition-all cursor-pointer">
-                      <div className="flex items-start justify-between mb-3">
-                        <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                            <Package className="w-5 h-5 text-blue-600" />
-                          </div>
-                          <div>
-                            <div className="text-xl mb-1">{option.incoterm}</div>
-                            <p className="text-sm text-gray-600">{option.description}</p>
-                          </div>
-                        </div>
-                        <div className="text-xl text-blue-600 whitespace-nowrap ml-4">
-                          {option.estimatedCost === 0 ? 'Included' : `+₹${option.estimatedCost}`}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-8 bg-gray-50 rounded-lg p-5 border border-gray-200">
-                  <h3 className="mb-3">Need help choosing?</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Not sure which Incoterm is right for you? Our trade specialists can help you choose the best shipping option based on your location and requirements.
-                  </p>
-                  <button className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm">
-                    Contact Trade Specialist
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
     </>
+    </PageSEO>
   );
 }

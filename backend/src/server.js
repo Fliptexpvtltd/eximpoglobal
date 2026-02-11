@@ -70,8 +70,11 @@ import uploadRoutes from './routes/uploads.js';
 import messageRoutes from './routes/messageRoutes.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import seoRoutes from './routes/seo.js';
 
 // API routes
+app.use('/api/seo', seoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/rfqs', rfqRoutes);
@@ -85,6 +88,7 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 // API info endpoint
 app.get('/api', (req, res) => {
@@ -103,7 +107,8 @@ app.get('/api', (req, res) => {
       analytics: '/api/analytics/*',
       uploads: '/api/uploads/*',
       messages: '/api/messages/*',
-      reviews: '/api/reviews/*'
+      reviews: '/api/reviews/*',
+      notifications: '/api/notifications/*'
     }
   });
 });

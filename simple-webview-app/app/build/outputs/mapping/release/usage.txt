@@ -14596,10 +14596,14 @@ kotlinx.coroutines.test.TestCoroutineContext
 kotlinx.coroutines.test.TestCoroutineContextKt
 kotlinx.coroutines.test.TimedRunnableObsolete
 net.eximpoglobal.MainActivity:
+    private static final java.lang.String BASE_URL
     private static final java.lang.String TAG
 net.eximpoglobal.R$color
 net.eximpoglobal.R$drawable
+net.eximpoglobal.R$id:
+    private void <init>()
 net.eximpoglobal.R$layout:
+    public static int no_network
     private void <init>()
 net.eximpoglobal.R$mipmap
 net.eximpoglobal.R$string
@@ -14607,6 +14611,7 @@ net.eximpoglobal.R$style
 net.eximpoglobal.R
 net.eximpoglobal.SplashActivity:
     private static final int SPLASH_DURATION
+    private static final java.lang.String SPLASH_IMAGE_URL
 org.intellij.lang.annotations.Flow
 org.intellij.lang.annotations.Identifier
 org.intellij.lang.annotations.JdkConstants$AdjustableOrientation
@@ -20025,13 +20030,23 @@ kotlinx.coroutines.scheduling.WorkQueue:
     public static boolean pollTo()
     public static long tryStealFrom()
 net.eximpoglobal.GoogleSignInBridge$1
-net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$0
-net.eximpoglobal.MainActivity$1:
-    public final synthetic net.eximpoglobal.MainActivity this$0
+net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1
+net.eximpoglobal.MainActivity$$InternalSyntheticLambda$2$dab9e4ad47563b733e3c4292339e3c8992e640bb9f5df30aad673028e0d1e7b0$0
 net.eximpoglobal.MainActivity$2
 net.eximpoglobal.MainActivity:
     public static void handleSignInResult()
-    public static void lambda$onCreate$0()
+    public final void hideNoNetwork()
+    public static boolean isNetworkAvailable()
+    public static synthetic void lambda$hideNoNetwork$3()
+    public static synthetic void lambda$onCreate$0()
+    public static void lambda$onCreate$1()
+    public static synthetic void lambda$showNoNetwork$2()
+    public final void showNoNetwork()
     public static void startNativeGoogleSignIn()
+net.eximpoglobal.R$id
 net.eximpoglobal.R$layout
+net.eximpoglobal.SplashActivity$$InternalSyntheticLambda$1$f6c8f149b28a0afe9d2c1d5635cfe6ad1e5a135199a2376a35f9706010332e90$0
+net.eximpoglobal.SplashActivity$$InternalSyntheticLambda$2$fca72b27506f9f44f4134cdb7e436ac562a47f6b6ef3dec5445c615e835421e8$0
 net.eximpoglobal.SplashActivity$1
+net.eximpoglobal.SplashActivity:
+    public static synthetic void lambda$onCreate$1$1()

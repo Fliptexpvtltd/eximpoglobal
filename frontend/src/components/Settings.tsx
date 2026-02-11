@@ -214,7 +214,7 @@ export function Settings({ user, activeMode }: SettingsProps) {
                         <option>Electronics</option>
                         <option>Textiles</option>
                         <option>Automotive</option>
-                        <option>Food & Beverage</option>
+                        <option>Spices</option>
                       </select>
                     </div>
 

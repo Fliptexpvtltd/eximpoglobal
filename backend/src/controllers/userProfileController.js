@@ -220,33 +220,6 @@ export const updateCompanyDetails = async (req, res) => {
   }
 };
 
-// Get payment methods
-export const getPaymentMethods = async (req, res) => {
-  try {
-    const userId = req.user.userId || req.user.id;
-
-    const result = await pool.query(
-      `SELECT id, type, last4, brand, bank_name, account_type, 
-              expiry_month, expiry_year, is_default, created_at
-       FROM payment_methods
-       WHERE user_id = $1
-       ORDER BY is_default DESC, created_at DESC`,
-      [userId]
-    );
-
-    res.json({
-      success: true,
-      data: result.rows
-    });
-  } catch (error) {
-    console.error('Error fetching payment methods:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to fetch payment methods',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-};
 
 // Get user preferences
 export const getUserPreferences = async (req, res) => {

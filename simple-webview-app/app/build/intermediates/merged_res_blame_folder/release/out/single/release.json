@@ -636,6 +636,10 @@
         "source": "net.eximpoglobal.app-appcompat-1.6.1-12:/drawable-xhdpi-v4/abc_scrubber_primary_mtrl_alpha.9.png"
     },
     {
+        "merged": "net.eximpoglobal.app-merged_res-24:/layout_activity_main.xml.flat",
+        "source": "net.eximpoglobal.app-main-25:/layout/activity_main.xml"
+    },
+    {
         "merged": "net.eximpoglobal.app-merged_res-24:/drawable-mdpi-v4_abc_switch_track_mtrl_alpha.9.png.flat",
         "source": "net.eximpoglobal.app-appcompat-1.6.1-12:/drawable-mdpi-v4/abc_switch_track_mtrl_alpha.9.png"
     },
@@ -1354,6 +1358,10 @@
     {
         "merged": "net.eximpoglobal.app-merged_res-24:/drawable-mdpi-v4_abc_popup_background_mtrl_mult.9.png.flat",
         "source": "net.eximpoglobal.app-appcompat-1.6.1-12:/drawable-mdpi-v4/abc_popup_background_mtrl_mult.9.png"
+    },
+    {
+        "merged": "net.eximpoglobal.app-merged_res-24:/layout_no_network.xml.flat",
+        "source": "net.eximpoglobal.app-main-25:/layout/no_network.xml"
     },
     {
         "merged": "net.eximpoglobal.app-merged_res-24:/drawable-mdpi-v4_abc_text_select_handle_middle_mtrl.png.flat",

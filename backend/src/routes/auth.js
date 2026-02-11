@@ -7,7 +7,6 @@ import {
   getUserStats, 
   getCompanyDetails, 
   updateCompanyDetails,
-  getPaymentMethods,
   getUserPreferences,
   updateUserPreferences
 } from '../controllers/userProfileController.js';
@@ -36,7 +35,7 @@ router.put('/profile', authMiddleware, updateProfile);
 router.get('/profile/stats', authMiddleware, getUserStats);
 router.get('/profile/company', authMiddleware, getCompanyDetails);
 router.put('/profile/company', authMiddleware, updateCompanyDetails);
-router.get('/profile/payment-methods', authMiddleware, getPaymentMethods);
+
 router.get('/profile/preferences', authMiddleware, getUserPreferences);
 router.put('/profile/preferences', authMiddleware, updateUserPreferences);
 

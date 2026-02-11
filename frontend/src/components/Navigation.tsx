@@ -1,16 +1,23 @@
 import { useState } from 'react';
 import { Globe, Home, Search, FileText, MessageSquare, Package, BarChart3, LogOut, Bell, User, Menu, X } from 'lucide-react';
 import type { User } from '../App';
+import { NotificationPanel, Notification } from './NotificationPanel';
 
 interface NavigationProps {
   user: User;
   currentView: string;
   onNavigate: (view: string) => void;
   onLogout: () => void;
+  notifications: Notification[];
+  notificationPanelOpen: boolean;
+  onToggleNotificationPanel: (open: boolean) => void;
+  onMarkNotificationAsRead: (id: string) => void;
+  onDismissNotification: (id: string) => void;
 }
 
-export function Navigation({ user, currentView, onNavigate, onLogout }: NavigationProps) {
+export function Navigation({ user, currentView, onNavigate, onLogout, notifications, notificationPanelOpen, onToggleNotificationPanel, onMarkNotificationAsRead, onDismissNotification }: NavigationProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const unreadNotificationCount = notifications.filter((n) => !n.isRead).length;
   const buyerLinks = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'catalog', label: 'Browse Products', icon: Search },
@@ -41,13 +48,13 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
     <>
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between h-16 gap-4">
-            {/* Logo - visible on all screens */}
+          <div className="flex items-center justify-center h-16 gap-4 relative">
+            {/* Logo - centered on all screen sizes */}
             <div className="flex items-center gap-2">
-              {/* Logo removed - shown in sidebar instead */}
+              <img src="https://sin1.contabostorage.com/265cb5518b244ea2bdb6eef9784e1983:eximpo-bucket/brand/eximpo-global-llp-logo.svg" alt="Eximpo Logo" className="h-12 w-auto" />
             </div>
             
-            <div className="flex items-center gap-2 md:gap-4">
+            <div className="flex items-center gap-2 md:gap-4 absolute right-0">
               
               {user.kycStatus === 'pending' && (
                 <div className="hidden md:block px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
@@ -60,16 +67,32 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
                 </div>
               )}
               
-              <button className="relative p-2 hover:bg-gray-100 rounded-lg">
-                <Bell className="w-5 h-5 text-gray-600" />
-                <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
+              <div className="relative">
+                <button 
+                  onClick={() => onToggleNotificationPanel(!notificationPanelOpen)}
+                  className="relative p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <Bell className="w-5 h-5 text-gray-600" />
+                  {unreadNotificationCount > 0 && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+                
+                {notificationPanelOpen && (
+                  <NotificationPanel
+                    notifications={notifications}
+                    onClose={() => onToggleNotificationPanel(false)}
+                    onMarkAsRead={onMarkNotificationAsRead}
+                    onDismiss={onDismissNotification}
+                  />
+                )}
+              </div>
               
               <div className="hidden md:flex items-center gap-3 border-l border-gray-200 pl-4">
                 <div className="hidden lg:block text-right">
                   <div className="text-sm text-gray-900">{user.name}</div>
                   <div className="text-xs" style={{ color: isSeller ? '#059669' : '#2563eb' }}>
-                    {isSeller ? '🏪 Seller' : '🛒 Buyer'} • {user.companyName}
+                    {isSeller ? 'Seller' : 'Buyer'} • {user.companyName}
                   </div>
                 </div>
                 
@@ -83,13 +106,19 @@ export function Navigation({ user, currentView, onNavigate, onLogout }: Navigati
                   
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                     <div className="p-2">
-                      <button className="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg text-sm text-gray-700">
+                      <button 
+                        onClick={() => onNavigate('profile')}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg text-sm text-gray-700">
                         Profile Settings
                       </button>
-                      <button className="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg text-sm text-gray-700">
+                      <button 
+                        onClick={() => onNavigate('profile')}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg text-sm text-gray-700">
                         Company Details
                       </button>
-                      <button className="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg text-sm text-gray-700">
+                      <button 
+                        onClick={() => onNavigate('profile')}
+                        className="w-full text-left px-4 py-2 hover:bg-gray-50 rounded-lg text-sm text-gray-700">
                         Preferences
                       </button>
                       <hr className="my-2" />

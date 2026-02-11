@@ -8,6 +8,13 @@ interface FooterProps {
 export function Footer({ onNavigate }: FooterProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // Helper function to handle link clicks - updates URL and calls navigate
+  const handleLinkClick = (view: string) => (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.history.pushState(null, '', `?view=${view}`);
+    onNavigate(view);
+  };
+
   return (
     <footer className="w-full mt-12 bg-gray-100 border-t border-gray-200">
       {/* Mobile Toggle Button */}
@@ -57,29 +64,29 @@ export function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-semibold mb-4 text-gray-900">Quick Links</h3>
             <ul className="space-y-3">
               <li>
-                <button onClick={() => onNavigate('catalog')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=catalog" onClick={handleLinkClick('catalog')} className="text-sm text-gray-600 hover:text-blue-600">
                   Browse Products
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('how-it-works')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=how-it-works" onClick={handleLinkClick('how-it-works')} className="text-sm text-gray-600 hover:text-blue-600">
                   How It Works
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('about')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=about" onClick={handleLinkClick('about')} className="text-sm text-gray-600 hover:text-blue-600">
                   About Us
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('pricing')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=pricing" onClick={handleLinkClick('pricing')} className="text-sm text-gray-600 hover:text-blue-600">
                   Pricing
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('faq')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=faq" onClick={handleLinkClick('faq')} className="text-sm text-gray-600 hover:text-blue-600">
                   FAQ
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -89,29 +96,29 @@ export function Footer({ onNavigate }: FooterProps) {
             <h3 className="font-semibold mb-4 text-gray-900">Services</h3>
             <ul className="space-y-3">
               <li>
-                <button onClick={() => onNavigate('trade-assurance')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=trade-assurance" onClick={handleLinkClick('trade-assurance')} className="text-sm text-gray-600 hover:text-blue-600">
                   Trade Assurance
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('logistics-solutions')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=logistics-solutions" onClick={handleLinkClick('logistics-solutions')} className="text-sm text-gray-600 hover:text-blue-600">
                   Logistics Solutions
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('quality-inspection')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=quality-inspection" onClick={handleLinkClick('quality-inspection')} className="text-sm text-gray-600 hover:text-blue-600">
                   Quality Inspection
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('trade-financing')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=trade-financing" onClick={handleLinkClick('trade-financing')} className="text-sm text-gray-600 hover:text-blue-600">
                   Trade Financing
-                </button>
+                </a>
               </li>
               <li>
-                <button onClick={() => onNavigate('customs-clearance')} className="text-sm text-gray-600 hover:text-blue-600">
+                <a href="?view=customs-clearance" onClick={handleLinkClick('customs-clearance')} className="text-sm text-gray-600 hover:text-blue-600">
                   Customs Clearance
-                </button>
+                </a>
               </li>
             </ul>
           </div>
@@ -155,15 +162,15 @@ export function Footer({ onNavigate }: FooterProps) {
         <div className="border-t border-gray-300 mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm">
           <p className="text-gray-600">&copy; 2025 EximpoGlobal. All rights reserved.</p>
           <div className="flex flex-wrap justify-center gap-6">
-            <button onClick={() => onNavigate('privacy-policy')} className="text-gray-600 hover:text-blue-600">
+            <a href="?view=privacy-policy" onClick={handleLinkClick('privacy-policy')} className="text-gray-600 hover:text-blue-600">
               Privacy Policy
-            </button>
-            <button onClick={() => onNavigate('terms-of-service')} className="text-gray-600 hover:text-blue-600">
+            </a>
+            <a href="?view=terms-of-service" onClick={handleLinkClick('terms-of-service')} className="text-gray-600 hover:text-blue-600">
               Terms of Service
-            </button>
-            <button onClick={() => onNavigate('cookie-policy')} className="text-gray-600 hover:text-blue-600">
+            </a>
+            <a href="?view=cookie-policy" onClick={handleLinkClick('cookie-policy')} className="text-gray-600 hover:text-blue-600">
               Cookie Policy
-            </button>
+            </a>
           </div>
         </div>
       </div>

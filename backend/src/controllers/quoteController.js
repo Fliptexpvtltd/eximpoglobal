@@ -1,5 +1,6 @@
 import pool from '../config/database.js';
 import { sendEmail } from '../services/emailService.js';
+import { createNotification } from './notificationController.js';
 
 // Get all quotes for a user (seller sees their quotes, buyer sees quotes for their RFQs)
 export const getQuotes = async (req, res) => {
@@ -234,7 +235,7 @@ export const createQuote = async (req, res) => {
 
     // Get buyer and seller info for email
     const buyerInfo = await pool.query(
-      'SELECT u.email, u.full_name, u.company_name FROM rfqs r JOIN users u ON r.buyer_id = u.id WHERE r.id = $1',
+      'SELECT u.id, u.email, u.full_name, u.company_name FROM rfqs r JOIN users u ON r.buyer_id = u.id WHERE r.id = $1',
       [rfq_id]
     );
 
@@ -248,6 +249,15 @@ export const createQuote = async (req, res) => {
         deliveryTime: delivery_time || 'Contact supplier',
         currency: 'USD'
       });
+
+      // Create notification for buyer
+      await createNotification(
+        buyer.id,
+        'quote',
+        'Quote Received',
+        `Quote from ${req.user.company_name || 'Supplier'} - $${total_amount}`,
+        quote.id
+      );
     }
 
     res.status(201).json({

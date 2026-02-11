@@ -548,7 +548,9 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
         </div>
         
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">5 Unread Messages</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {analytics?.messages?.unread_count || 0} Unread Messages
+          </h3>
           <p className="text-gray-600 mb-4">Respond to buyer inquiries quickly to improve your rating</p>
           <button 
             onClick={() => onNavigate('chat')}
@@ -559,7 +561,9 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
         </div>
         
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">12 Orders in Production</h3>
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            {analytics?.overview?.active_orders || 0} Orders in Progress
+          </h3>
           <p className="text-gray-600 mb-4">Update milestones to keep buyers informed</p>
           <button className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
             Update Status
