@@ -25,8 +25,11 @@ interface SEOMetadata {
  * PageSEO Component
  * Dynamically sets meta tags and structured data for each page
  */
-export const PageSEO: React.FC<{ seoData: SEOMetadata; children?: React.ReactNode }> = ({ seoData, children }) => {
+export const PageSEO: React.FC<{ seoData: SEOMetadata | null; children?: React.ReactNode }> = ({ seoData, children }) => {
   useEffect(() => {
+    // Early return if no SEO data
+    if (!seoData) return;
+
     // Set page title
     if (seoData.title) {
       document.title = seoData.title;

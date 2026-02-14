@@ -6,6 +6,8 @@ import { PublicNavigation } from './PublicNavigation';
 import { useAuth } from '../contexts/AuthContext';
 import { PageSEO } from './PageSEO';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+
 interface ProductDetailProps {
   product: Product;
   user?: any;
@@ -44,7 +46,7 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
   useEffect(() => {
     const fetchSEOData = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/api/seo/page/product?productId=${product.id}`);
+        const response = await fetch(`${API_BASE_URL}/seo/page/product?productId=${product.id}`);
         const data = await response.json();
         if (data.success) {
           setSeoData(data.seoData);
