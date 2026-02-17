@@ -151,7 +151,7 @@ export function HowItWorks({ onNavigate }: HowItWorksProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-16 md:space-y-24">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16 pb-20 lg:pb-16 space-y-16 md:space-y-24">
         
         {/* For Buyers Section */}
         <section>

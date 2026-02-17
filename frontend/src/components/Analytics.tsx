@@ -75,7 +75,7 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
   const conversionRate = isSeller ? overview.quote_conversion_rate : overview.rfq_acceptance_rate;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 lg:pb-6">
       <div 
         className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-6 rounded-xl text-white"
         style={{ background: `linear-gradient(to right, ${isSeller ? '#059669' : '#2563eb'}, ${isSeller ? '#047857' : '#1e40af'})` }}

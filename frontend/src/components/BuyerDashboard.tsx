@@ -92,6 +92,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
           certifications: p.certifications || [],
           image: p.images?.[0] || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770',
           description: p.description,
+          specifications: p.specifications || {},
           variants: [],
         }));
         setProducts(mappedProducts);
@@ -152,7 +153,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 lg:pb-6">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl text-gray-900 mb-2 font-bold">{greeting}, {user.name}</h1>

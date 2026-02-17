@@ -57,7 +57,7 @@ export function Settings({ user, activeMode }: SettingsProps) {
   ];
 
   return (
-    <div>
+    <div className="pb-20 lg:pb-0">
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Settings</h1>

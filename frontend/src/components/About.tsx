@@ -104,7 +104,7 @@ export function About({ onNavigate }: AboutProps) {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16 space-y-16 md:space-y-24">
+      <div className="max-w-7xl mx-auto px-4 py-12 md:py-16 pb-20 lg:pb-16 space-y-16 md:space-y-24">
         
         {/* Mission & Vision */}
         <section className="grid md:grid-cols-2 gap-8 md:gap-12">

@@ -1,0 +1,4 @@
+#Tue Feb 17 12:04:36 IST 2026
+base.0=E\:\\projects\\eximpo\\simple-webview-app\\app\\build\\intermediates\\dex\\release\\minifyReleaseWithR8\\classes.dex
+renamed.0=classes.dex
+path.0=classes.dex

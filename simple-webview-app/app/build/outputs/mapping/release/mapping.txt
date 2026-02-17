@@ -3,8 +3,8 @@
 # min_api: 24
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.2"}
-# pg_map_id: 45c0791
-# pg_map_hash: SHA-256 45c07910e4254d250b18e8d17fc03bbd06c367b72029ac0d4c75a37953995cfd
+# pg_map_id: 5775180
+# pg_map_hash: SHA-256 577518000a2aed30424898f9ccedf4c63a81292bc6e2be5f8c8ffa050b9406f2
 android.app.AppComponentFactory -> android.app.AppComponentFactory:
 # {"id":"com.android.tools.r8.synthesized"}
 android.support.v4.app.RemoteActionCompatParcelizer -> android.support.v4.app.RemoteActionCompatParcelizer:
@@ -306,49 +306,49 @@ androidx.activity.ComponentActivity$1 -> androidx.activity.e:
     1:8:void $r8$init$synthetic(java.lang.Object,int):0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(ILjava/lang/Object;)V"}
-    9:30:void net.eximpoglobal.SplashActivity$1.run():0:0 -> run
+    9:30:void net.eximpoglobal.app.SplashActivity$1.run():0:0 -> run
     9:30:void run$bridge():0 -> run
       # {"id":"com.android.tools.r8.synthesized"}
-    31:34:void net.eximpoglobal.GoogleSignInBridge$1.run():0:0 -> run
+    31:34:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0:0 -> run
     31:34:void run$bridge():0 -> run
-    35:36:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0:0 -> run
-    35:36:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    35:36:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0:0 -> run
+    35:36:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     35:36:void run$bridge():0 -> run
     37:44:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    37:44:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0 -> run
+    37:44:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    37:44:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    37:44:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     37:44:void run$bridge():0 -> run
     45:58:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    45:58:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0 -> run
-    45:58:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    45:58:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    45:58:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     45:58:void run$bridge():0 -> run
     59:75:android.content.Intent com.google.android.gms.auth.api.signin.internal.zbm.zbb(android.content.Context,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> run
     59:75:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0 -> run
-    59:75:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0 -> run
-    59:75:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    59:75:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    59:75:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     59:75:void run$bridge():0 -> run
     76:86:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    76:86:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0 -> run
-    76:86:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    76:86:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    76:86:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     76:86:void run$bridge():0 -> run
     87:102:android.content.Intent com.google.android.gms.auth.api.signin.internal.zbm.zba(android.content.Context,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> run
     87:102:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0 -> run
-    87:102:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0 -> run
-    87:102:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    87:102:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    87:102:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     87:102:void run$bridge():0 -> run
-    103:104:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0:0 -> run
-    103:104:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    103:104:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0:0 -> run
+    103:104:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     103:104:void run$bridge():0 -> run
     105:108:void androidx.activity.result.ActivityResultLauncher.launch(java.lang.Object):0:0 -> run
-    105:108:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0 -> run
+    105:108:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    105:108:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    105:108:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     105:108:void run$bridge():0 -> run
     109:113:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    109:113:void net.eximpoglobal.MainActivity.startNativeGoogleSignIn():0 -> run
-    109:113:void net.eximpoglobal.GoogleSignInBridge$1.run():0 -> run
+    109:113:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    109:113:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
     109:113:void run$bridge():0 -> run
     114:117:void androidx.lifecycle.ProcessLifecycleOwner.dispatchPauseIfNeeded():0:0 -> run
     114:117:void androidx.lifecycle.ProcessLifecycleOwner$1.run():0 -> run
@@ -626,12 +626,12 @@ androidx.activity.OnBackPressedDispatcher -> androidx.activity.r:
     19:24:void onBackPressed():0 -> b
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     25:31:void onBackPressed():0:0 -> b
-    32:83:void net.eximpoglobal.MainActivity$2.handleOnBackPressed():0:0 -> b
+    32:83:void net.eximpoglobal.app.MainActivity$2.handleOnBackPressed():0:0 -> b
     32:83:void onBackPressed():0 -> b
     84:94:void androidx.activity.OnBackPressedCallback.setEnabled(boolean):0:0 -> b
-    84:94:void net.eximpoglobal.MainActivity$2.handleOnBackPressed():0 -> b
+    84:94:void net.eximpoglobal.app.MainActivity$2.handleOnBackPressed():0 -> b
     84:94:void onBackPressed():0 -> b
-    95:103:void net.eximpoglobal.MainActivity$2.handleOnBackPressed():0:0 -> b
+    95:103:void net.eximpoglobal.app.MainActivity$2.handleOnBackPressed():0:0 -> b
     95:103:void onBackPressed():0 -> b
     104:106:void androidx.fragment.app.FragmentManager.handleOnBackPressed():0:0 -> b
     104:106:void androidx.fragment.app.FragmentManager$1.handleOnBackPressed():0 -> b
@@ -4043,11 +4043,11 @@ androidx.appcompat.app.AppLocalesStorageHelper$SerialExecutor$$ExternalSynthetic
     1:10:void androidx.appcompat.app.AppLocalesStorageHelper$SerialExecutor$$InternalSyntheticLambda$1$d83da90378edfef33d93bb4a13a0581c0950b0fd40ae81dacd53befaa7b3780c$0.$r8$init$synthetic(java.lang.Object,java.lang.Object,int):0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(Ljava/lang/Object;ILjava/lang/Object;)V"}
-    18:25:void net.eximpoglobal.SplashActivity.lambda$onCreate$0(android.graphics.Bitmap,android.widget.ImageView):0:0 -> run
+    18:25:void net.eximpoglobal.app.SplashActivity.lambda$onCreate$0(android.graphics.Bitmap,android.widget.ImageView):0:0 -> run
     18:25:void androidx.appcompat.app.AppLocalesStorageHelper$SerialExecutor$$InternalSyntheticLambda$1$d83da90378edfef33d93bb4a13a0581c0950b0fd40ae81dacd53befaa7b3780c$0.run$bridge():0 -> run
       # {"id":"com.android.tools.r8.synthesized"}
     26:30:void androidx.appcompat.app.AppLocalesStorageHelper$SerialExecutor$$InternalSyntheticLambda$1$d83da90378edfef33d93bb4a13a0581c0950b0fd40ae81dacd53befaa7b3780c$0.run$bridge():0:0 -> run
-    31:64:void net.eximpoglobal.SplashActivity.lambda$onCreate$1(android.widget.ImageView):0:0 -> run
+    31:64:void net.eximpoglobal.app.SplashActivity.lambda$onCreate$1(android.widget.ImageView):0:0 -> run
     31:64:void androidx.appcompat.app.AppLocalesStorageHelper$SerialExecutor$$InternalSyntheticLambda$1$d83da90378edfef33d93bb4a13a0581c0950b0fd40ae81dacd53befaa7b3780c$0.run$bridge():0 -> run
     65:72:void androidx.core.content.res.ResourcesCompat$FontCallback.lambda$callbackSuccessAsync$0(android.graphics.Typeface):0:0 -> run
     65:72:void androidx.appcompat.app.AppLocalesStorageHelper$SerialExecutor$$InternalSyntheticLambda$1$d83da90378edfef33d93bb4a13a0581c0950b0fd40ae81dacd53befaa7b3780c$0.run$bridge():0 -> run
@@ -15499,82 +15499,82 @@ androidx.core.view.inputmethod.InputConnectionCompat$$ExternalSyntheticLambda1 -
     1:6:void androidx.core.view.inputmethod.InputConnectionCompat$$InternalSyntheticLambda$1$9ca49cbbfd3efba151d118d3a92f0eaa941bc2c8d62e7c5cde2c2e096aa30913$0.$r8$init$synthetic(android.view.KeyEvent$Callback):0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
     12:20:int androidx.activity.result.ActivityResult.getResultCode():0:0 -> a
-    12:20:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    12:20:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    12:20:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    12:20:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
     21:24:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0:0 -> a
-    21:24:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    21:24:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    21:24:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    21:24:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    21:24:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    21:24:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     25:73:com.google.android.gms.auth.api.signin.GoogleSignInResult com.google.android.gms.auth.api.signin.internal.zbm.zbd(android.content.Intent):0:0 -> a
     25:73:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    25:73:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    25:73:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    25:73:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    25:73:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    25:73:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    25:73:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     74:82:boolean com.google.android.gms.common.api.Status.isSuccess():0:0 -> a
     74:82:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    74:82:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    74:82:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    74:82:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    74:82:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    74:82:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    74:82:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(4)"]}
     83:91:com.google.android.gms.tasks.Task com.google.android.gms.tasks.Tasks.forResult(java.lang.Object):0:0 -> a
     83:91:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    83:91:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    83:91:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    83:91:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    83:91:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    83:91:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    83:91:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     92:95:boolean com.google.android.gms.common.api.Status.hasResolution():0:0 -> a
     92:95:com.google.android.gms.common.api.ApiException com.google.android.gms.common.internal.ApiExceptionUtil.fromStatus(com.google.android.gms.common.api.Status):0 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
     92:95:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    92:95:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    92:95:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    92:95:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    92:95:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    92:95:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    92:95:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     96:97:com.google.android.gms.common.api.ApiException com.google.android.gms.common.internal.ApiExceptionUtil.fromStatus(com.google.android.gms.common.api.Status):0:0 -> a
     96:97:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    96:97:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    96:97:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    96:97:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    96:97:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    96:97:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    96:97:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     98:101:void com.google.android.gms.common.api.ResolvableApiException.<init>(com.google.android.gms.common.api.Status):0:0 -> a
     98:101:com.google.android.gms.common.api.ApiException com.google.android.gms.common.internal.ApiExceptionUtil.fromStatus(com.google.android.gms.common.api.Status):0 -> a
     98:101:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    98:101:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    98:101:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    98:101:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    98:101:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    98:101:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    98:101:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     102:106:com.google.android.gms.common.api.ApiException com.google.android.gms.common.internal.ApiExceptionUtil.fromStatus(com.google.android.gms.common.api.Status):0:0 -> a
     102:106:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    102:106:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    102:106:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    102:106:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    102:106:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    102:106:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    102:106:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     107:114:com.google.android.gms.tasks.Task com.google.android.gms.tasks.Tasks.forException(java.lang.Exception):0:0 -> a
     107:114:com.google.android.gms.tasks.Task com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(android.content.Intent):0 -> a
-    107:114:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    107:114:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    107:114:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
-    115:120:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0:0 -> a
-    115:120:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    115:120:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    107:114:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    107:114:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    107:114:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
+    115:120:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0:0 -> a
+    115:120:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    115:120:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     121:122:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInAccount.getIdToken():0:0 -> a
-    121:122:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    121:122:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    121:122:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    121:122:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    121:122:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    121:122:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     123:124:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInAccount.getEmail():0:0 -> a
-    123:124:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    123:124:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    123:124:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
-    125:165:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0:0 -> a
-    125:165:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    125:165:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    123:124:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    123:124:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    123:124:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
+    125:165:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0:0 -> a
+    125:165:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    125:165:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     166:167:int com.google.android.gms.common.api.Status.getStatusCode():0:0 -> a
     166:167:int com.google.android.gms.common.api.ApiException.getStatusCode():0 -> a
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    166:167:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0 -> a
-    166:167:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    166:167:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
-    168:178:void net.eximpoglobal.MainActivity.handleSignInResult(android.content.Intent):0:0 -> a
-    168:178:void net.eximpoglobal.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
-    168:178:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$1.onActivityResult(java.lang.Object):0 -> a
+    166:167:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0 -> a
+    166:167:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    166:167:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
+    168:178:void net.eximpoglobal.app.MainActivity.handleSignInResult(android.content.Intent):0:0 -> a
+    168:178:void net.eximpoglobal.app.MainActivity.lambda$onCreate$1(androidx.activity.result.ActivityResult):0 -> a
+    168:178:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1.onActivityResult(java.lang.Object):0 -> a
     16:19:void androidx.core.view.inputmethod.InputContentInfoCompat.requestPermission():0:0 -> b
     16:19:boolean androidx.core.view.inputmethod.InputConnectionCompat.lambda$createOnCommitContentListenerUsingPerformReceiveContent$0(android.view.View,androidx.core.view.inputmethod.InputContentInfoCompat,int,android.os.Bundle):0 -> b
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
@@ -28866,13 +28866,13 @@ kotlinx.coroutines.scheduling.WorkQueue -> kotlinx.coroutines.scheduling.l:
     52:66:kotlinx.coroutines.scheduling.Task add$default(kotlinx.coroutines.scheduling.WorkQueue,kotlinx.coroutines.scheduling.Task,boolean,int,java.lang.Object):0 -> e
     52:66:long tryStealLastScheduled(kotlinx.coroutines.scheduling.WorkQueue,boolean):0 -> e
     67:73:long tryStealLastScheduled(kotlinx.coroutines.scheduling.WorkQueue,boolean):0:0 -> e
-net.eximpoglobal.GoogleSignInBridge -> z1.a:
+net.eximpoglobal.app.GoogleSignInBridge -> z1.a:
 # {"id":"sourceFile","fileName":"GoogleSignInBridge.java"}
     android.app.Activity activity -> a
     1:1:void signIn():0:0 -> signIn
-net.eximpoglobal.GoogleSignInBridge$1 -> R8$$REMOVED$$CLASS$$354:
+net.eximpoglobal.app.GoogleSignInBridge$1 -> R8$$REMOVED$$CLASS$$354:
 # {"id":"sourceFile","fileName":"GoogleSignInBridge.java"}
-net.eximpoglobal.MainActivity -> net.eximpoglobal.MainActivity:
+net.eximpoglobal.app.MainActivity -> net.eximpoglobal.app.MainActivity:
 # {"id":"sourceFile","fileName":"MainActivity.java"}
     android.webkit.WebView webView -> u
     android.view.View noNetworkLayout -> v
@@ -28882,71 +28882,71 @@ net.eximpoglobal.MainActivity -> net.eximpoglobal.MainActivity:
       # {"id":"com.android.tools.r8.residualsignature","signature":"Landroidx/activity/result/d;"}
     int $r8$clinit -> y
       # {"id":"com.android.tools.r8.synthesized"}
-    51:80:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
-    51:80:void onCreate(android.os.Bundle):0 -> onCreate
-    81:82:java.util.ArrayList com.google.android.gms.auth.api.signin.GoogleSignInOptions.zag(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
-    81:82:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    81:82:void onCreate(android.os.Bundle):0 -> onCreate
-    83:86:java.util.Map com.google.android.gms.auth.api.signin.GoogleSignInOptions.zai(java.util.List):0:0 -> onCreate
-    83:86:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    83:86:void onCreate(android.os.Bundle):0 -> onCreate
-    87:88:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
-    87:88:void onCreate(android.os.Bundle):0 -> onCreate
-    89:96:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestEmail():0:0 -> onCreate
-    89:96:void onCreate(android.os.Bundle):0 -> onCreate
-    97:113:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.zaa(java.lang.String):0:0 -> onCreate
-    97:113:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestIdToken(java.lang.String):0 -> onCreate
-    97:113:void onCreate(android.os.Bundle):0 -> onCreate
-    114:140:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0:0 -> onCreate
-    114:140:void onCreate(android.os.Bundle):0 -> onCreate
-    141:145:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestId():0:0 -> onCreate
-    141:145:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0 -> onCreate
-    141:145:void onCreate(android.os.Bundle):0 -> onCreate
-    146:158:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0:0 -> onCreate
-    146:158:void onCreate(android.os.Bundle):0 -> onCreate
-    159:161:void com.google.android.gms.auth.api.signin.GoogleSignInOptions.<init>(int,java.util.ArrayList,android.accounts.Account,boolean,boolean,boolean,java.lang.String,java.lang.String,java.util.Map,java.lang.String,com.google.android.gms.auth.api.signin.zad):0:0 -> onCreate
-    159:161:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0 -> onCreate
-    159:161:void onCreate(android.os.Bundle):0 -> onCreate
-    162:165:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
-    162:165:void onCreate(android.os.Bundle):0 -> onCreate
-    166:173:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
-    166:173:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    166:173:void onCreate(android.os.Bundle):0 -> onCreate
-    174:179:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0:0 -> onCreate
-    174:179:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    174:179:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    174:179:void onCreate(android.os.Bundle):0 -> onCreate
-    180:182:com.google.android.gms.common.api.GoogleApi$Settings$Builder com.google.android.gms.common.api.GoogleApi$Settings$Builder.setLooper(android.os.Looper):0:0 -> onCreate
-    180:182:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0 -> onCreate
-    180:182:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    180:182:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    180:182:void onCreate(android.os.Bundle):0 -> onCreate
-    183:197:com.google.android.gms.common.api.GoogleApi$Settings com.google.android.gms.common.api.GoogleApi$Settings$Builder.build():0:0 -> onCreate
-    183:197:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0 -> onCreate
-    183:197:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    183:197:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    183:197:void onCreate(android.os.Bundle):0 -> onCreate
-    198:202:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.GoogleApi$Settings):0:0 -> onCreate
-    198:202:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0 -> onCreate
-    198:202:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    198:202:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
-    198:202:void onCreate(android.os.Bundle):0 -> onCreate
-    203:204:void onCreate(android.os.Bundle):0:0 -> onCreate
-    205:207:void androidx.activity.result.ActivityResultLauncher.<init>():0:0 -> onCreate
-    205:207:void androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.<init>():0 -> onCreate
-    205:207:void onCreate(android.os.Bundle):0 -> onCreate
-    208:212:void onCreate(android.os.Bundle):0:0 -> onCreate
-    213:242:androidx.activity.result.ActivityResultLauncher androidx.activity.ComponentActivity.registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultRegistry,androidx.activity.result.ActivityResultCallback):0:0 -> onCreate
-    213:242:androidx.activity.result.ActivityResultLauncher androidx.activity.ComponentActivity.registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):0 -> onCreate
-    213:242:void onCreate(android.os.Bundle):0 -> onCreate
-    243:314:void onCreate(android.os.Bundle):0:0 -> onCreate
-    315:321:void net.eximpoglobal.GoogleSignInBridge.<init>(android.app.Activity):0:0 -> onCreate
-    315:321:void onCreate(android.os.Bundle):0 -> onCreate
-    322:358:void onCreate(android.os.Bundle):0:0 -> onCreate
-    359:366:void com.google.android.gms.common.internal.Preconditions.checkArgument(boolean,java.lang.Object):0:0 -> onCreate
-    359:366:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.zaa(java.lang.String):0 -> onCreate
-    359:366:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestIdToken(java.lang.String):0 -> onCreate
-    359:366:void onCreate(android.os.Bundle):0 -> onCreate
+    1:1:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
+    1:1:void onCreate(android.os.Bundle):0 -> onCreate
+    2:2:java.util.ArrayList com.google.android.gms.auth.api.signin.GoogleSignInOptions.zag(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
+    2:2:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    2:2:void onCreate(android.os.Bundle):0 -> onCreate
+    3:3:java.util.Map com.google.android.gms.auth.api.signin.GoogleSignInOptions.zai(java.util.List):0:0 -> onCreate
+    3:3:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    3:3:void onCreate(android.os.Bundle):0 -> onCreate
+    4:4:void com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.<init>(com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
+    4:4:void onCreate(android.os.Bundle):0 -> onCreate
+    5:5:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestEmail():0:0 -> onCreate
+    5:5:void onCreate(android.os.Bundle):0 -> onCreate
+    6:6:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.zaa(java.lang.String):0:0 -> onCreate
+    6:6:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestIdToken(java.lang.String):0 -> onCreate
+    6:6:void onCreate(android.os.Bundle):0 -> onCreate
+    7:7:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0:0 -> onCreate
+    7:7:void onCreate(android.os.Bundle):0 -> onCreate
+    8:8:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestId():0:0 -> onCreate
+    8:8:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0 -> onCreate
+    8:8:void onCreate(android.os.Bundle):0 -> onCreate
+    9:9:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0:0 -> onCreate
+    9:9:void onCreate(android.os.Bundle):0 -> onCreate
+    10:10:void com.google.android.gms.auth.api.signin.GoogleSignInOptions.<init>(int,java.util.ArrayList,android.accounts.Account,boolean,boolean,boolean,java.lang.String,java.lang.String,java.util.Map,java.lang.String,com.google.android.gms.auth.api.signin.zad):0:0 -> onCreate
+    10:10:com.google.android.gms.auth.api.signin.GoogleSignInOptions com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.build():0 -> onCreate
+    10:10:void onCreate(android.os.Bundle):0 -> onCreate
+    11:11:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
+    11:11:void onCreate(android.os.Bundle):0 -> onCreate
+    12:12:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> onCreate
+    12:12:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    12:12:void onCreate(android.os.Bundle):0 -> onCreate
+    13:13:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0:0 -> onCreate
+    13:13:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    13:13:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    13:13:void onCreate(android.os.Bundle):0 -> onCreate
+    14:14:com.google.android.gms.common.api.GoogleApi$Settings$Builder com.google.android.gms.common.api.GoogleApi$Settings$Builder.setLooper(android.os.Looper):0:0 -> onCreate
+    14:14:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0 -> onCreate
+    14:14:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    14:14:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    14:14:void onCreate(android.os.Bundle):0 -> onCreate
+    15:15:com.google.android.gms.common.api.GoogleApi$Settings com.google.android.gms.common.api.GoogleApi$Settings$Builder.build():0:0 -> onCreate
+    15:15:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0 -> onCreate
+    15:15:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    15:15:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    15:15:void onCreate(android.os.Bundle):0 -> onCreate
+    16:16:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.GoogleApi$Settings):0:0 -> onCreate
+    16:16:void com.google.android.gms.common.api.GoogleApi.<init>(android.app.Activity,com.google.android.gms.common.api.Api,com.google.android.gms.common.api.Api$ApiOptions,com.google.android.gms.common.api.internal.StatusExceptionMapper):0 -> onCreate
+    16:16:void com.google.android.gms.auth.api.signin.GoogleSignInClient.<init>(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    16:16:com.google.android.gms.auth.api.signin.GoogleSignInClient com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(android.app.Activity,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0 -> onCreate
+    16:16:void onCreate(android.os.Bundle):0 -> onCreate
+    17:17:void onCreate(android.os.Bundle):0:0 -> onCreate
+    18:18:void androidx.activity.result.ActivityResultLauncher.<init>():0:0 -> onCreate
+    18:18:void androidx.activity.result.contract.ActivityResultContracts$StartActivityForResult.<init>():0 -> onCreate
+    18:18:void onCreate(android.os.Bundle):0 -> onCreate
+    19:19:void onCreate(android.os.Bundle):0:0 -> onCreate
+    20:20:androidx.activity.result.ActivityResultLauncher androidx.activity.ComponentActivity.registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultRegistry,androidx.activity.result.ActivityResultCallback):0:0 -> onCreate
+    20:20:androidx.activity.result.ActivityResultLauncher androidx.activity.ComponentActivity.registerForActivityResult(androidx.activity.result.contract.ActivityResultContract,androidx.activity.result.ActivityResultCallback):0 -> onCreate
+    20:20:void onCreate(android.os.Bundle):0 -> onCreate
+    21:21:void onCreate(android.os.Bundle):0:0 -> onCreate
+    22:22:void net.eximpoglobal.app.GoogleSignInBridge.<init>(android.app.Activity):0:0 -> onCreate
+    22:22:void onCreate(android.os.Bundle):0 -> onCreate
+    23:23:void onCreate(android.os.Bundle):0:0 -> onCreate
+    24:24:void com.google.android.gms.common.internal.Preconditions.checkArgument(boolean,java.lang.Object):0:0 -> onCreate
+    24:24:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.zaa(java.lang.String):0 -> onCreate
+    24:24:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestIdToken(java.lang.String):0 -> onCreate
+    24:24:void onCreate(android.os.Bundle):0 -> onCreate
     3:44:boolean isNetworkAvailable():0:0 -> p
     3:44:void loadWebsite():0 -> p
     45:56:void hideNoNetwork():0:0 -> p
@@ -28954,47 +28954,47 @@ net.eximpoglobal.MainActivity -> net.eximpoglobal.MainActivity:
     57:60:void loadWebsite():0:0 -> p
     61:69:void showNoNetwork():0:0 -> p
     61:69:void loadWebsite():0 -> p
-net.eximpoglobal.MainActivity$$ExternalSyntheticLambda0 -> z1.b:
+net.eximpoglobal.app.MainActivity$$ExternalSyntheticLambda0 -> z1.b:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
-    net.eximpoglobal.MainActivity net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$0.f$0 -> a
+    net.eximpoglobal.app.MainActivity net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.f$0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
-    1:1:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$0.<init>(net.eximpoglobal.MainActivity):0:0 -> <init>
+    1:1:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.<init>(net.eximpoglobal.app.MainActivity):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
-    5:8:void net.eximpoglobal.MainActivity.lambda$onCreate$0(android.view.View):0:0 -> onClick
-    5:8:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$1$09cb51445173e31b49b7a587e11338784810dd19a203b8875edbb63113e4129e$0.onClick(android.view.View):0 -> onClick
+    5:8:void net.eximpoglobal.app.MainActivity.lambda$onCreate$0(android.view.View):0:0 -> onClick
+    5:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.onClick(android.view.View):0 -> onClick
       # {"id":"com.android.tools.r8.synthesized"}
-net.eximpoglobal.MainActivity$$ExternalSyntheticLambda1 -> z1.c:
+net.eximpoglobal.app.MainActivity$$ExternalSyntheticLambda1 -> z1.c:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
-    int net.eximpoglobal.MainActivity$$InternalSyntheticLambda$2$5cd26c3777f86bdb56972bdbae93ca037b2bca33e0e81d7a08569ff1a11a3d72$0.$r8$classId -> a
+    int net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.$r8$classId -> a
       # {"id":"com.android.tools.r8.synthesized"}
-    net.eximpoglobal.MainActivity net.eximpoglobal.MainActivity$$InternalSyntheticLambda$2$5cd26c3777f86bdb56972bdbae93ca037b2bca33e0e81d7a08569ff1a11a3d72$0.f$0 -> b
+    net.eximpoglobal.app.MainActivity net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.f$0 -> b
       # {"id":"com.android.tools.r8.synthesized"}
-    1:8:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$2$5cd26c3777f86bdb56972bdbae93ca037b2bca33e0e81d7a08569ff1a11a3d72$0.<init>(net.eximpoglobal.MainActivity):0:0 -> <init>
-    1:8:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$2$5cd26c3777f86bdb56972bdbae93ca037b2bca33e0e81d7a08569ff1a11a3d72$0.$r8$init$synthetic(net.eximpoglobal.MainActivity,int):0 -> <init>
+    1:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.<init>(net.eximpoglobal.app.MainActivity):0:0 -> <init>
+    1:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.$r8$init$synthetic(net.eximpoglobal.app.MainActivity,int):0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
-    11:21:void net.eximpoglobal.MainActivity.lambda$showNoNetwork$2():0:0 -> run
-    11:21:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$2$5cd26c3777f86bdb56972bdbae93ca037b2bca33e0e81d7a08569ff1a11a3d72$0.run$bridge():0 -> run
+    11:21:void net.eximpoglobal.app.MainActivity.lambda$showNoNetwork$2():0:0 -> run
+    11:21:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.run$bridge():0 -> run
       # {"id":"com.android.tools.r8.synthesized"}
-    22:32:void net.eximpoglobal.MainActivity.lambda$hideNoNetwork$3():0:0 -> run
-    22:32:void net.eximpoglobal.MainActivity$$InternalSyntheticLambda$2$5cd26c3777f86bdb56972bdbae93ca037b2bca33e0e81d7a08569ff1a11a3d72$0.run$bridge():0 -> run
-net.eximpoglobal.MainActivity$1 -> z1.d:
+    22:32:void net.eximpoglobal.app.MainActivity.lambda$hideNoNetwork$3():0:0 -> run
+    22:32:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.run$bridge():0 -> run
+net.eximpoglobal.app.MainActivity$1 -> z1.d:
 # {"id":"sourceFile","fileName":"MainActivity.java"}
-    net.eximpoglobal.MainActivity this$0 -> a
-    1:1:void <init>(net.eximpoglobal.MainActivity):0:0 -> <init>
+    net.eximpoglobal.app.MainActivity this$0 -> a
+    1:1:void <init>(net.eximpoglobal.app.MainActivity):0:0 -> <init>
     1:1:void onPageFinished(android.webkit.WebView,java.lang.String):0:0 -> onPageFinished
-    42:52:void net.eximpoglobal.MainActivity.hideNoNetwork():0:0 -> onPageStarted
+    42:52:void net.eximpoglobal.app.MainActivity.hideNoNetwork():0:0 -> onPageStarted
     42:52:void onPageStarted(android.webkit.WebView,java.lang.String,android.graphics.Bitmap):0 -> onPageStarted
     53:56:void onPageStarted(android.webkit.WebView,java.lang.String,android.graphics.Bitmap):0:0 -> onPageStarted
-    40:49:void net.eximpoglobal.MainActivity.showNoNetwork():0:0 -> onReceivedError
+    40:49:void net.eximpoglobal.app.MainActivity.showNoNetwork():0:0 -> onReceivedError
     40:49:void onReceivedError(android.webkit.WebView,android.webkit.WebResourceRequest,android.webkit.WebResourceError):0 -> onReceivedError
     1:1:boolean shouldOverrideUrlLoading(android.webkit.WebView,java.lang.String):0:0 -> shouldOverrideUrlLoading
-net.eximpoglobal.MainActivity$2 -> R8$$REMOVED$$CLASS$$355:
+net.eximpoglobal.app.MainActivity$2 -> R8$$REMOVED$$CLASS$$355:
 # {"id":"sourceFile","fileName":"MainActivity.java"}
-net.eximpoglobal.SplashActivity -> net.eximpoglobal.SplashActivity:
+net.eximpoglobal.app.SplashActivity -> net.eximpoglobal.app.SplashActivity:
 # {"id":"sourceFile","fileName":"SplashActivity.java"}
     int $r8$clinit -> u
       # {"id":"com.android.tools.r8.synthesized"}
-net.eximpoglobal.SplashActivity$1 -> R8$$REMOVED$$CLASS$$356:
+net.eximpoglobal.app.SplashActivity$1 -> R8$$REMOVED$$CLASS$$356:
 # {"id":"sourceFile","fileName":"SplashActivity.java"}

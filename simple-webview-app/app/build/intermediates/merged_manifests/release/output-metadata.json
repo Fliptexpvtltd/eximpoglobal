@@ -4,15 +4,15 @@
     "type": "MERGED_MANIFESTS",
     "kind": "Directory"
   },
-  "applicationId": "net.eximpoglobal",
+  "applicationId": "net.eximpoglobal.app",
   "variantName": "release",
   "elements": [
     {
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 1,
-      "versionName": "1.0",
+      "versionCode": 4,
+      "versionName": "1.3",
       "outputFile": "AndroidManifest.xml"
     }
   ],

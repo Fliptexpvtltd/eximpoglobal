@@ -182,7 +182,7 @@ export function Help({ user, activeMode }: HelpProps) {
     : currentFaqs;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 lg:pb-6">
       {/* Header */}
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Help & Support</h1>

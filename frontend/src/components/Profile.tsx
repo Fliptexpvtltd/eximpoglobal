@@ -836,7 +836,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 lg:pb-6">
       {/* Success Message */}
       {showSuccess && (
         <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">

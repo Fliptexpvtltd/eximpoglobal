@@ -4,7 +4,7 @@
     "type": "BUNDLE",
     "kind": "RegularFile"
   },
-  "applicationId": "net.eximpoglobal",
+  "applicationId": "net.eximpoglobal.app",
   "variantName": "release",
   "elements": [
     {

@@ -183,7 +183,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20 lg:pb-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>

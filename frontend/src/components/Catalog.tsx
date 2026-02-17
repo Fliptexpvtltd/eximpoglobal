@@ -4,6 +4,7 @@ import type { Product } from '../App';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PublicNavigation } from './PublicNavigation';
 import { useAuth } from '../contexts/AuthContext';
+import { ApplicationsSlider } from './ApplicationsSlider';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -95,6 +96,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
           certifications: p.certifications || [],
           image: p.images?.[0] || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770',
           description: p.description,
+          specifications: p.specifications || {},
           variants: [],
         }));
         setProducts(transformedProducts);
@@ -175,7 +177,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
         </div>
       )}
       
-      <div className={user ? "space-y-6" : "max-w-7xl mx-auto px-4 py-6 space-y-6"}>
+      <div className={user ? "space-y-6 pb-6" : "max-w-7xl mx-auto px-4 py-6 space-y-6 pb-6"}>
         {user && (
           <div className="mb-6">
             <div className="flex items-center justify-between">
@@ -414,6 +416,9 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
         </div>
       </div>
       </div>
+      
+      {/* Applications Slider Section */}
+      <ApplicationsSlider />
     </>
   );
 }

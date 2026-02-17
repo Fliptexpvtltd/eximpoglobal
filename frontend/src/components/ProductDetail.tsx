@@ -66,7 +66,7 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
       <>
         {!user && <PublicNavigation />}
         
-        <div className={user ? "space-y-6" : "max-w-7xl mx-auto px-4 py-6 space-y-6"}>
+        <div className={user ? "space-y-6 pb-20 lg:pb-6" : "max-w-7xl mx-auto px-4 py-6 pb-20 lg:pb-6 space-y-6"}>
         <button
           onClick={onBack}
           className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
@@ -303,12 +303,12 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
         <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
           {/* Tabs */}
           <div className="border-b border-gray-200">
-            <div className="flex overflow-x-auto">
+            <div className="flex overflow-x-auto scrollbar-hide">
               <button
                 onClick={() => setActiveTab('description')}
-                className={`px-6 py-4 whitespace-nowrap transition-colors ${
+                className={`flex-1 px-4 md:px-6 py-3 md:py-4 whitespace-nowrap transition-colors font-medium ${
                   activeTab === 'description'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
+                    ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -316,9 +316,9 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
               </button>
               <button
                 onClick={() => setActiveTab('specifications')}
-                className={`px-6 py-4 whitespace-nowrap transition-colors ${
+                className={`flex-1 px-4 md:px-6 py-3 md:py-4 whitespace-nowrap transition-colors font-medium ${
                   activeTab === 'specifications'
-                    ? 'border-b-2 border-blue-600 text-blue-600'
+                    ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -328,25 +328,29 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
           </div>
 
           {/* Tab Content */}
-          <div className="p-6">
+          <div className="p-4 md:p-6">
             {activeTab === 'description' && (
-              <div className="max-w-4xl">
-                <h2 className="text-2xl mb-4">Product Description</h2>
-                <div className="prose max-w-none text-gray-700 space-y-4">
-                  <p className="whitespace-pre-wrap">{product.description || 'No description available.'}</p>
+              <div className="w-full">
+                <h2 className="text-lg md:text-xl font-bold mb-3 md:mb-4 text-gray-900">Product Description</h2>
+                <div className="w-full">
+                  <p className="text-gray-700 text-sm md:text-base leading-relaxed whitespace-pre-wrap break-words">
+                    {product.description || 'No description available.'}
+                  </p>
                 </div>
               </div>
             )}
 
             {activeTab === 'specifications' && (
-              <div className="max-w-4xl">
-                <h2 className="text-2xl mb-6">Technical Specifications</h2>
+              <div className="w-full">
+                <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-gray-900">Technical Specifications</h2>
                 {product.specifications && Object.keys(product.specifications).length > 0 ? (
-                  <div className="grid md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     {Object.entries(product.specifications).map(([key, value]) => (
-                      <div key={key} className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                        <div className="text-sm text-gray-600 mb-2">{key}</div>
-                        <div className="text-lg text-gray-900">{value}</div>
+                      <div key={key} className="bg-gray-50 rounded-lg p-3 md:p-4 border border-gray-200">
+                        <div className="text-xs md:text-sm font-medium text-gray-600 mb-1 capitalize">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </div>
+                        <div className="text-sm md:text-base text-gray-900 font-medium break-words">{String(value)}</div>
                       </div>
                     ))}
                   </div>
@@ -354,19 +358,23 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
                   <p className="text-gray-600">No specifications available.</p>
                 )}
 
-                <div className="mt-8 bg-amber-50 border border-amber-200 rounded-lg p-5">
-                  <h3 className="text-amber-900 mb-3 flex items-center gap-2">
-                    <Shield className="w-5 h-5" />
+                <div className="mt-6 md:mt-8 bg-amber-50 border border-amber-200 rounded-lg p-4 md:p-5">
+                  <h3 className="text-sm md:text-base font-semibold text-amber-900 mb-3 flex items-center gap-2">
+                    <Shield className="w-4 h-4 md:w-5 md:h-5" />
                     Quality Certifications
                   </h3>
-                  <div className="grid sm:grid-cols-2 gap-3">
-                    {product.certifications.map((cert) => (
-                      <div key={cert} className="flex items-center gap-2 text-amber-800 text-sm">
-                        <CheckCircle className="w-4 h-4" />
-                        <span>{cert}</span>
-                      </div>
-                    ))}
-                  </div>
+                  {product.certifications && product.certifications.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-3">
+                      {product.certifications.map((cert) => (
+                        <div key={cert} className="flex items-center gap-2 text-amber-800 text-xs md:text-sm">
+                          <CheckCircle className="w-3 h-3 md:w-4 md:h-4 flex-shrink-0" />
+                          <span className="break-words">{cert}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-amber-700 text-xs md:text-sm">No certifications listed.</p>
+                  )}
                 </div>
               </div>
             )}

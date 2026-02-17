@@ -2,8 +2,10 @@
 <resources>
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/purple_500</item>
-        <item name="colorPrimaryDark">@color/purple_700</item>
+        <item name="colorPrimaryDark">#2563EB</item>
         <item name="colorAccent">@color/teal_200</item>
+        <item name="android:statusBarColor">#2563EB</item>
+        <item name="android:windowLightStatusBar">false</item>
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.Light.NoActionBar">
