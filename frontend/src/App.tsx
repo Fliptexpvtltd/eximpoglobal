@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Toaster, toast } from 'sonner';
+import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { AuthModal } from './components/AuthModal';
 import { Login } from './components/Login';
 import { RoleSelection } from './components/RoleSelection';
 import { BuyerDashboard } from './components/BuyerDashboard';
@@ -186,7 +185,17 @@ type View =
   | 'forgot-password'
   | 'verify-otp'
   | 'reset-password'
-  | 'about';
+  | 'about'
+  | 'pricing'
+  | 'faq'
+  | 'privacy-policy'
+  | 'terms-of-service'
+  | 'cookie-policy'
+  | 'trade-assurance'
+  | 'logistics-solutions'
+  | 'quality-inspection'
+  | 'trade-financing'
+  | 'customs-clearance';
 
 function AppContent() {
   const { user, isLoading, requireAuth, logout, login, signup, selectRole, googleAuth, authStep } = useAuth();
@@ -203,7 +212,6 @@ function AppContent() {
   const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
   const [selectedPO, setSelectedPO] = useState<PO | null>(null);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
@@ -212,19 +220,6 @@ function AppContent() {
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentView]);
-
-  // Debug user object whenever it changes
-  useEffect(() => {
-    if (user) {
-      console.log('🔍 Current user state:', {
-        email: user.email,
-        role: user.role,
-        roleType: typeof user.role,
-        name: user.name,
-        companyName: user.companyName
-      });
-    }
-  }, [user]);
 
   // Save currentView to localStorage whenever it changes (only for public views)
   useEffect(() => {
@@ -242,12 +237,6 @@ function AppContent() {
   useEffect(() => {
     if (currentView === 'auth' && user && !isLoading) {
       console.log('✅ User logged in, redirecting to dashboard');
-      console.log('👤 User info:', { 
-        email: user.email, 
-        role: user.role, 
-        name: user.name,
-        roleType: typeof user.role 
-      });
       setCurrentView('dashboard');
     }
   }, [user, currentView, isLoading]);
@@ -365,11 +354,6 @@ function AppContent() {
   const handleCreatePO = (quote: Quote) => {
     setSelectedQuote(quote);
     setCurrentView('purchase-order');
-  };
-
-  const handleViewShipment = (po: PO) => {
-    setSelectedPO(po);
-    setCurrentView('shipment-tracking');
   };
 
   const navigate = (view: View | { view: View; productId?: string; orderId?: string }) => {
@@ -521,7 +505,7 @@ function AppContent() {
           <Sidebar 
             user={user} 
             currentView={currentView} 
-            onNavigate={navigate}
+            onNavigate={(view: any) => navigate(view as View)}
             sidebarOpen={sidebarOpen}
             onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
           />
@@ -534,7 +518,7 @@ function AppContent() {
             <Navigation 
               user={user} 
               currentView={currentView} 
-              onNavigate={navigate}
+              onNavigate={(view: any) => navigate(view as View)}
               onLogout={() => {
                 logout();
                 setCurrentView('catalog');
@@ -561,7 +545,7 @@ function AppContent() {
         {currentView === 'dashboard' && user && user.role === 'seller' && (
           <SellerDashboard 
             user={user} 
-            onNavigate={navigate}
+            onNavigate={(view: any) => navigate(view as View)}
           />
         )}
         
@@ -570,7 +554,7 @@ function AppContent() {
             user={user}
             onViewProduct={handleViewProduct}
             onViewSupplier={handleViewSupplier}
-            onNavigate={navigate}
+            onNavigate={(view: any) => navigate(view as View)}
           />
         )}
         
@@ -592,81 +576,33 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'rfq-builder' && user && (
-          user.role === 'buyer' ? (
-            <RFQBuilder 
-              initialProduct={selectedProduct}
-              user={user}
-              onSubmit={(rfq) => {
-                setSelectedRFQ(rfq);
-                setCurrentView('quote-comparison');
-              }}
-              onCancel={() => setCurrentView('dashboard')}
-            />
-          ) : (
-            <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-lg shadow-md text-center">
-              <div className="text-6xl mb-4">🔒</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Buyer Access Only</h2>
-              <p className="text-gray-600 mb-4">
-                This feature is only available for buyer accounts. Your current role: <span className="font-semibold">{user.role || 'Not set'}</span>
-              </p>
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          )
+        {currentView === 'rfq-builder' && user && user.role === 'buyer' && (
+          <RFQBuilder 
+            initialProduct={selectedProduct}
+            user={user}
+            onSubmit={(rfq) => {
+              setSelectedRFQ(rfq);
+              setCurrentView('quote-comparison');
+            }}
+            onCancel={() => setCurrentView('dashboard')}
+          />
         )}
         
-        {currentView === 'my-rfqs' && user && (
-          user.role === 'buyer' ? (
-            <MyRFQs
-              onBack={() => setCurrentView('dashboard')}
-              onViewQuotes={handleViewQuotes}
-            />
-          ) : (
-            <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-lg shadow-md text-center">
-              <div className="text-6xl mb-4">🔒</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Buyer Access Only</h2>
-              <p className="text-gray-600 mb-4">
-                This feature is only available for buyer accounts. Your current role: <span className="font-semibold">{user.role || 'Not set'}</span>
-              </p>
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          )
+        {currentView === 'my-rfqs' && user && user.role === 'buyer' && (
+          <MyRFQs
+            onBack={() => setCurrentView('dashboard')}
+            onViewQuotes={handleViewQuotes}
+          />
         )}
         
-        {currentView === 'quote-comparison' && selectedRFQ && user && (
-          user.role === 'buyer' ? (
-            <QuoteComparison 
-              rfq={selectedRFQ}
-              user={user}
-              onAcceptQuote={handleCreatePO}
-              onChat={() => setCurrentView('chat')}
-              onBack={() => setCurrentView('dashboard')}
-            />
-          ) : (
-            <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-lg shadow-md text-center">
-              <div className="text-6xl mb-4">🔒</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Buyer Access Only</h2>
-              <p className="text-gray-600 mb-4">
-                This feature is only available for buyer accounts. Your current role: <span className="font-semibold">{user.role || 'Not set'}</span>
-              </p>
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          )
+        {currentView === 'quote-comparison' && selectedRFQ && user && user.role === 'buyer' && (
+          <QuoteComparison 
+            rfq={selectedRFQ}
+            user={user}
+            onAcceptQuote={handleCreatePO}
+            onChat={() => setCurrentView('chat')}
+            onBack={() => setCurrentView('dashboard')}
+          />
         )}
         
         {currentView === 'chat' && user && (
@@ -680,56 +616,24 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'purchase-order' && user && (
-          user.role === 'buyer' ? (
-            <PurchaseOrder 
-              user={user}
-              quote={selectedQuote || undefined}
-              onSubmit={(po) => {
-                setSelectedPO(po);
-                setCurrentView('dashboard');
-              }}
-              onCancel={() => setCurrentView('dashboard')}
-            />
-          ) : (
-            <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-lg shadow-md text-center">
-              <div className="text-6xl mb-4">🔒</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Buyer Access Only</h2>
-              <p className="text-gray-600 mb-4">
-                This feature is only available for buyer accounts. Your current role: <span className="font-semibold">{user.role || 'Not set'}</span>
-              </p>
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          )
+        {currentView === 'purchase-order' && user && user.role === 'buyer' && (
+          <PurchaseOrder 
+            user={user}
+            quote={selectedQuote || undefined}
+            onSubmit={(po) => {
+              setSelectedPO(po);
+              setCurrentView('dashboard');
+            }}
+            onCancel={() => setCurrentView('dashboard')}
+          />
         )}
         
-        {currentView === 'shipment-tracking' && selectedPO && user && (
-          user.role === 'buyer' ? (
-            <ShipmentTracking 
-              po={selectedPO}
-              user={user}
-              onBack={() => setCurrentView('dashboard')}
-            />
-          ) : (
-            <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-lg shadow-md text-center">
-              <div className="text-6xl mb-4">🔒</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Buyer Access Only</h2>
-              <p className="text-gray-600 mb-4">
-                This feature is only available for buyer accounts. Your current role: <span className="font-semibold">{user.role || 'Not set'}</span>
-              </p>
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          )
+        {currentView === 'shipment-tracking' && selectedPO && user && user.role === 'buyer' && (
+          <ShipmentTracking 
+            po={selectedPO}
+            user={user}
+            onBack={() => setCurrentView('dashboard')}
+          />
         )}
         
         {currentView === 'create-shipment' && selectedOrderId && user && user.role === 'seller' && (
@@ -740,7 +644,7 @@ function AppContent() {
               setCurrentView('dashboard');
               setSelectedOrderId(null);
             }}
-            onCancel={() => {
+            onBack={() => {
               setCurrentView('dashboard');
               setSelectedOrderId(null);
             }}
@@ -756,7 +660,7 @@ function AppContent() {
               setCurrentView('dashboard');
               setSelectedOrderId(null);
             }}
-            onCancel={() => {
+            onBack={() => {
               setCurrentView('dashboard');
               setSelectedOrderId(null);
             }}
@@ -779,50 +683,38 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'shipments' && user && (
-          user.role === 'buyer' ? (
-            <Shipments 
-              user={user}
-              onViewDetails={(shipmentId) => {
-                // TODO: Fetch PO by shipment ID
-                // For now, use selectedPO if available
-                if (selectedPO) {
-                  setCurrentView('shipment-tracking');
-                }
-              }}
-            />
-          ) : (
-            <div className="max-w-2xl mx-auto mt-20 p-8 bg-white rounded-lg shadow-md text-center">
-              <div className="text-6xl mb-4">🔒</div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Buyer Access Only</h2>
-              <p className="text-gray-600 mb-4">
-                This feature is only available for buyer accounts. Your current role: <span className="font-semibold">{user.role || 'Not set'}</span>
-              </p>
-              <button
-                onClick={() => setCurrentView('dashboard')}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                Go to Dashboard
-              </button>
-            </div>
-          )
+        {currentView === 'shipments' && user && user.role === 'buyer' && (
+          <Shipments 
+            user={user}
+            activeMode={user.role}
+            onViewDetails={() => {
+              // TODO: Fetch PO by shipment ID
+              // For now, use selectedPO if available
+              if (selectedPO) {
+                setCurrentView('shipment-tracking');
+              }
+            }}
+          />
         )}
         
         {currentView === 'settings' && user && (
           <Settings 
             user={user}
+            activeMode={user.role === 'seller' ? 'seller' : 'buyer'}
           />
         )}
         
         {currentView === 'help' && user && (
           <Help 
             user={user}
+            activeMode={user.role === 'seller' ? 'seller' : 'buyer'}
           />
         )}
         
         {currentView === 'add-product' && user && user.role === 'seller' && (
           <AddProduct 
             user={user}
+            activeMode={user.role}
             onBack={() => setCurrentView('catalog')}
             onSuccess={() => setCurrentView('catalog')}
           />
@@ -832,6 +724,7 @@ function AppContent() {
           <EditProduct 
             productId={selectedProductId}
             user={user}
+            activeMode={user.role}
             onBack={() => setCurrentView('dashboard')}
             onSuccess={() => {
               setSelectedProductId(null);
@@ -849,57 +742,57 @@ function AppContent() {
         )}
         
         {currentView === 'how-it-works' && (
-          <HowItWorks onNavigate={navigate} />
+          <HowItWorks onNavigate={(view: any) => navigate(view as View)} />
         )}
         
         {currentView === 'about' && (
-          <About onNavigate={navigate} />
+          <About onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'pricing' && (
-          <Pricing onNavigate={navigate} />
+          <Pricing onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'faq' && (
-          <FAQ onNavigate={navigate} />
+          <FAQ onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'privacy-policy' && (
-          <PrivacyPolicy onNavigate={navigate} />
+          <PrivacyPolicy onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'terms-of-service' && (
-          <TermsOfService onNavigate={navigate} />
+          <TermsOfService onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'cookie-policy' && (
-          <CookiePolicy onNavigate={navigate} />
+          <CookiePolicy onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'trade-assurance' && (
-          <TradeAssurance onNavigate={navigate} />
+          <TradeAssurance onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'logistics-solutions' && (
-          <LogisticsSolutions onNavigate={navigate} />
+          <LogisticsSolutions onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'quality-inspection' && (
-          <QualityInspection onNavigate={navigate} />
+          <QualityInspection onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'trade-financing' && (
-          <TradeFinancing onNavigate={navigate} />
+          <TradeFinancing onNavigate={(view: any) => navigate(view as View)} />
         )}
 
         {currentView === 'customs-clearance' && (
-          <CustomsClearance onNavigate={navigate} />
+          <CustomsClearance onNavigate={(view: any) => navigate(view as View)} />
         )}
           </main>
           
           {/* Footer - show only on public pages when not logged in */}
           {!user && ['catalog', 'how-it-works', 'about', 'pricing', 'faq', 'privacy-policy', 'terms-of-service', 'cookie-policy', 'trade-assurance', 'logistics-solutions', 'quality-inspection', 'trade-financing', 'customs-clearance'].includes(currentView) && (
-            <Footer onNavigate={navigate} />
+            <Footer onNavigate={(view: any) => navigate(view as View)} />
           )}
           
           <MobileBottomNav 
