@@ -3,7 +3,6 @@ import { Toaster, toast } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AuthModal } from './components/AuthModal';
 import { Login } from './components/Login';
-import { NotificationPanel, Notification } from './components/NotificationPanel';
 import { RoleSelection } from './components/RoleSelection';
 import { BuyerDashboard } from './components/BuyerDashboard';
 import { SellerDashboard } from './components/SellerDashboard';
@@ -29,7 +28,6 @@ import { Shipments } from './components/Shipments';
 import { Settings } from './components/Settings';
 import { Help } from './components/Help';
 import { AddProduct } from './components/AddProduct';
-import { SEO, getOrganizationSchema, getWebSiteSchema, getBreadcrumbSchema, getFAQSchema, getServiceSchema, getProductSchema, getProductListSchema } from './components/SEO';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -78,7 +76,6 @@ export interface Product {
   certifications: string[];
   image: string;
   description: string;
-  specifications?: Record<string, string>;
   variants: Array<{ name: string; value: string }>;
 }
 
@@ -189,28 +186,11 @@ type View =
   | 'forgot-password'
   | 'verify-otp'
   | 'reset-password'
-  | 'about'
-  | 'pricing'
-  | 'faq'
-  | 'privacy-policy'
-  | 'terms-of-service'
-  | 'cookie-policy'
-  | 'trade-assurance'
-  | 'logistics-solutions'
-  | 'quality-inspection'
-  | 'trade-financing'
-  | 'customs-clearance';
+  | 'about';
 
 function AppContent() {
   const { user, isLoading, requireAuth, logout, login, signup, selectRole, googleAuth, authStep } = useAuth();
-  
-  // Initialize currentView from URL search params or localStorage
   const [currentView, setCurrentView] = useState<View>(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const viewParam = searchParams.get('view');
-    if (viewParam) {
-      return viewParam as View;
-    }
     const saved = localStorage.getItem('currentView');
     return (saved as View) || 'catalog';
   });
@@ -225,98 +205,17 @@ function AppContent() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [selectedShipmentId, setSelectedShipmentId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
-
-  // Mark notification as read
-  const handleMarkAsRead = (id: string) => {
-    // Update local state
-    setNotifications(
-      notifications.map((n) =>
-        n.id === id ? { ...n, isRead: true } : n
-      )
-    );
-    
-    // Call API to mark as read
-    fetch(`${API_BASE_URL}/notifications/${id}/read`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    }).catch(err => console.error('Error marking notification as read:', err));
-  };
-
-  // Dismiss notification
-  const handleDismissNotification = (id: string) => {
-    // Update local state
-    setNotifications(notifications.filter((n) => n.id !== id));
-    
-    // Call API to dismiss
-    fetch(`${API_BASE_URL}/notifications/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`
-      }
-    }).catch(err => console.error('Error dismissing notification:', err));
-  };
-
-  // Fetch notifications from backend
-  const fetchNotifications = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      if (!token || !user) return;
-
-      const response = await fetch(`${API_BASE_URL}/notifications`, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setNotifications(data.data || []);
-      }
-    } catch (error) {
-      console.error('❌ Error fetching notifications:', error);
-    }
-  };
-
-  // Fetch notifications on component mount
-  useEffect(() => {
-    if (user) {
-      fetchNotifications();
-      // Poll for new notifications every 30 seconds
-      const interval = setInterval(fetchNotifications, 30000);
-      return () => clearInterval(interval);
-    }
-  }, [user]);
-
-  // Listen for URL changes (back/forward buttons)
-  useEffect(() => {
-    const handlePopState = () => {
-      const searchParams = new URLSearchParams(window.location.search);
-      const viewParam = searchParams.get('view');
-      if (viewParam) {
-        setCurrentView(viewParam as View);
-      }
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
 
   // Scroll to top when view changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // Close notification panel when navigating to a different page
-    setNotificationPanelOpen(false);
   }, [currentView]);
 
   // Save currentView to localStorage whenever it changes (only for public views)
   useEffect(() => {
-    const publicViews: View[] = ['catalog', 'how-it-works', 'about', 'mobile-preview', 'pricing', 'faq', 'privacy-policy', 'terms-of-service', 'cookie-policy', 'trade-assurance', 'logistics-solutions', 'quality-inspection', 'trade-financing', 'customs-clearance'];
+    const publicViews: View[] = ['catalog', 'how-it-works', 'about', 'mobile-preview'];
     
     if (publicViews.includes(currentView)) {
       localStorage.setItem('currentView', currentView);
@@ -475,8 +374,6 @@ function AppContent() {
       }
       
       setCurrentView(viewName);
-      // Update URL with new view
-      window.history.pushState(null, '', `?view=${viewName}`);
       return;
     }
     
@@ -489,254 +386,16 @@ function AppContent() {
     }
     
     setCurrentView(view);
-    // Update URL with new view
-    window.history.pushState(null, '', `?view=${view}`);
   };
 
-  // Get SEO metadata based on current view
-  const getSEOData = () => {
-    const baseUrl = 'https://eximpoglobal.net';
-    const canonicalUrl = `${baseUrl}?view=${currentView}`;
-
-    switch (currentView) {
-      case 'catalog':
-        return {
-          title: 'Browse Products - Global B2B Marketplace',
-          description: 'Discover thousands of quality products from verified suppliers worldwide. Browse our extensive catalog of wholesale products for international trade.',
-          keywords: 'B2B products, wholesale, suppliers, international trade, export products, import goods',
-          structuredData: {
-            '@context': 'https://schema.org',
-            '@graph': [getOrganizationSchema(), getWebSiteSchema()],
-          },
-        };
-
-      case 'product-detail':
-        if (selectedProduct) {
-          // Build description dynamically based on available data
-          const descParts = [selectedProduct.description.substring(0, 155) + '...'];
-          if (selectedProduct.moq) descParts.push(`MOQ: ${selectedProduct.moq} units`);
-          if (selectedProduct.origin) descParts.push(`Origin: ${selectedProduct.origin}`);
-          if (selectedProduct.price && selectedProduct.price > 0) {
-            descParts.push(`Price: ${selectedProduct.currency} ${selectedProduct.price}`);
-          } else {
-            descParts.push(`Contact for Best Quote`);
-          }
-          
-          return {
-            title: `${selectedProduct.name} - Buy Wholesale from Verified Supplier`,
-            description: descParts.join(' | '),
-            keywords: `${selectedProduct.name}, ${selectedProduct.category}, wholesale ${selectedProduct.category}, ${selectedProduct.origin} supplier, buy ${selectedProduct.name}`,
-            ogType: 'product' as const,
-            ogImage: selectedProduct.image,
-            structuredData: {
-              '@context': 'https://schema.org',
-              '@graph': [
-                getOrganizationSchema(),
-                getProductSchema({
-                  name: selectedProduct.name,
-                  description: selectedProduct.description,
-                  image: selectedProduct.image,
-                  price: selectedProduct.price,
-                  currency: selectedProduct.currency,
-                  availability: 'InStock',
-                  category: selectedProduct.category,
-                  brand: selectedProduct.supplierName,
-                  sku: selectedProduct.id,
-                  moq: selectedProduct.moq,
-                  rating: selectedProduct.supplierRating,
-                  reviewCount: 0, // You can add actual review count from your data
-                  supplierName: selectedProduct.supplierName,
-                  origin: selectedProduct.origin,
-                  certifications: selectedProduct.certifications,
-                }),
-                getBreadcrumbSchema([
-                  { name: 'Home', url: baseUrl },
-                  { name: 'Products', url: `${baseUrl}?view=catalog` },
-                  { name: selectedProduct.category, url: `${baseUrl}?view=catalog&category=${selectedProduct.category}` },
-                  { name: selectedProduct.name, url: window.location.href },
-                ]),
-              ],
-            },
-          };
-        }
-        return {
-          title: 'Product Details - EximpoGlobal',
-          description: 'View detailed product information from verified B2B suppliers.',
-          keywords: 'product details, B2B products, wholesale',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'supplier-profile':
-        if (selectedSupplier) {
-          return {
-            title: `Verified Supplier Profile - Global Trade Partner`,
-            description: 'Connect with verified B2B suppliers. View company profile, product range, certifications, and trade history. Safe and secure international trade partnerships.',
-            keywords: 'verified supplier, B2B supplier, manufacturer, exporter, international supplier',
-            structuredData: {
-              '@context': 'https://schema.org',
-              '@graph': [
-                getOrganizationSchema(),
-                getBreadcrumbSchema([
-                  { name: 'Home', url: baseUrl },
-                  { name: 'Suppliers', url: `${baseUrl}?view=catalog` },
-                  { name: 'Supplier Profile', url: window.location.href },
-                ]),
-              ],
-            },
-          };
-        }
-        return {
-          title: 'Supplier Profile - EximpoGlobal',
-          description: 'View verified supplier profiles and company information.',
-          keywords: 'supplier profile, B2B supplier, verified supplier',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'how-it-works':
-        return {
-          title: 'How It Works - Simple B2B Trade Process',
-          description: 'Learn how EximpoGlobal simplifies international B2B trade. From browsing products to secure delivery - we handle everything for seamless global commerce.',
-          keywords: 'B2B trade process, international trade guide, how to export, how to import',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'about':
-        return {
-          title: 'About Us - Your Trusted B2B Trade Partner',
-          description: 'EximpoGlobal connects buyers and suppliers worldwide. Learn about our mission to democratize international trade with secure, efficient B2B marketplace solutions.',
-          keywords: 'B2B marketplace, international trade platform, global trade network, export import company',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'pricing':
-        return {
-          title: 'Pricing Plans - Affordable B2B Trade Solutions',
-          description: 'Transparent pricing for buyers and sellers. Choose from our flexible plans designed to grow your international trade business. No hidden fees.',
-          keywords: 'B2B pricing, trade platform fees, marketplace costs, export import pricing',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'faq':
-        return {
-          title: 'FAQ - Frequently Asked Questions',
-          description: 'Get answers to common questions about using EximpoGlobal B2B marketplace, payments, shipping, trade regulations, and more.',
-          keywords: 'B2B marketplace FAQ, trade questions, import export help, platform support',
-          structuredData: {
-            '@context': 'https://schema.org',
-            '@graph': [
-              getOrganizationSchema(),
-              // Add FAQ structured data when FAQ component has the questions
-              getFAQSchema([
-                {
-                  question: 'What is EximpoGlobal?',
-                  answer: 'EximpoGlobal is a B2B marketplace connecting buyers and suppliers worldwide for seamless international trade.',
-                },
-                {
-                  question: 'How do I get started?',
-                  answer: 'Sign up for free, complete your profile, and start browsing products or listing your products for sale.',
-                },
-                {
-                  question: 'Is the platform secure?',
-                  answer: 'Yes, we use industry-standard encryption and offer trade assurance for secure transactions.',
-                },
-              ]),
-            ],
-          },
-        };
-
-      case 'privacy-policy':
-        return {
-          title: 'Privacy Policy - Data Protection & Security',
-          description: 'Learn how EximpoGlobal protects your personal data and privacy. Our commitment to secure, transparent data handling practices.',
-          keywords: 'privacy policy, data protection, GDPR compliance, user privacy',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'terms-of-service':
-        return {
-          title: 'Terms of Service - Platform Usage Guidelines',
-          description: 'Read our terms of service and user agreement. Understand your rights and responsibilities when using the EximpoGlobal B2B marketplace.',
-          keywords: 'terms of service, user agreement, platform rules, legal terms',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'cookie-policy':
-        return {
-          title: 'Cookie Policy - How We Use Cookies',
-          description: 'Learn about our cookie usage and how we use them to improve your experience on EximpoGlobal marketplace.',
-          keywords: 'cookie policy, website cookies, tracking, user experience',
-          structuredData: getOrganizationSchema(),
-        };
-
-      case 'trade-assurance':
-        return {
-          title: 'Trade Assurance - Secure Payment Protection',
-          description: 'Protect your international trade transactions with our Trade Assurance program. Secure payments, quality guarantees, and on-time delivery protection.',
-          keywords: 'trade assurance, payment protection, secure transactions, buyer protection',
-          structuredData: getServiceSchema(
-            'Trade Assurance',
-            'Secure payment protection service for international B2B transactions with quality guarantees and delivery protection.'
-          ),
-        };
-
-      case 'logistics-solutions':
-        return {
-          title: 'Logistics Solutions - Global Shipping & Freight',
-          description: 'Comprehensive logistics solutions for international trade. Sea freight, air cargo, customs clearance, and door-to-door delivery services.',
-          keywords: 'logistics solutions, international shipping, freight forwarding, customs clearance',
-          structuredData: getServiceSchema(
-            'Logistics Solutions',
-            'End-to-end logistics and shipping services for international B2B trade including freight forwarding and customs clearance.'
-          ),
-        };
-
-      case 'quality-inspection':
-        return {
-          title: 'Quality Inspection Services - Pre-Shipment Verification',
-          description: 'Professional quality inspection services to verify product standards before shipment. Ensure quality compliance and reduce trade risks.',
-          keywords: 'quality inspection, product verification, pre-shipment inspection, quality control',
-          structuredData: getServiceSchema(
-            'Quality Inspection',
-            'Professional third-party quality inspection services to verify product quality and compliance before international shipment.'
-          ),
-        };
-
-      case 'trade-financing':
-        return {
-          title: 'Trade Financing - Flexible Payment Solutions',
-          description: 'Access trade financing options to grow your business. Flexible payment terms, letters of credit, and working capital solutions for importers and exporters.',
-          keywords: 'trade financing, export financing, import financing, working capital, letters of credit',
-          structuredData: getServiceSchema(
-            'Trade Financing',
-            'Flexible trade financing solutions including letters of credit, payment terms, and working capital for international B2B trade.'
-          ),
-        };
-
-      case 'customs-clearance':
-        return {
-          title: 'Customs Clearance Services - Import/Export Documentation',
-          description: 'Expert customs clearance and documentation services. Navigate import/export regulations smoothly with our compliance expertise.',
-          keywords: 'customs clearance, import documentation, export compliance, trade regulations',
-          structuredData: getServiceSchema(
-            'Customs Clearance',
-            'Professional customs clearance and documentation services to ensure smooth import/export compliance with international trade regulations.'
-          ),
-        };
-
-      default:
-        return {
-          title: 'Global B2B Marketplace for International Trade',
-          description: 'EximpoGlobal is your trusted B2B marketplace connecting buyers and suppliers worldwide. Discover quality products, verified suppliers, and seamless international trade solutions.',
-          keywords: 'B2B marketplace, international trade, export, import, wholesale, suppliers, buyers, trade platform, global commerce',
-          structuredData: {
-            '@context': 'https://schema.org',
-            '@graph': [getOrganizationSchema(), getWebSiteSchema()],
-          },
-        };
-    }
+  // Notification handlers
+  const handleMarkNotificationAsRead = (id: string) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
   };
 
-  const seoData = getSEOData();
+  const handleDismissNotification = (id: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  };
 
   // Mobile Preview can be accessed without login
   if (currentView === 'mobile-preview') {
@@ -757,13 +416,6 @@ function AppContent() {
 
   return (
     <>
-      <SEO
-        title={seoData.title}
-        description={seoData.description}
-        keywords={seoData.keywords}
-        structuredData={seoData.structuredData}
-        canonical={`https://eximpoglobal.net?view=${currentView}`}
-      />
       {currentView === 'forgot-password' && (
         <ForgotPassword 
           onBack={() => setCurrentView('auth')} 
@@ -871,7 +523,7 @@ function AppContent() {
               notifications={notifications}
               notificationPanelOpen={notificationPanelOpen}
               onToggleNotificationPanel={setNotificationPanelOpen}
-              onMarkNotificationAsRead={handleMarkAsRead}
+              onMarkNotificationAsRead={handleMarkNotificationAsRead}
               onDismissNotification={handleDismissNotification}
             />
           )}
