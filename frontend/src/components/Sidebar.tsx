@@ -1,4 +1,4 @@
-import { Home, Search, FileText, MessageSquare, Package, BarChart3, User, Settings, HelpCircle, Globe, X, Menu, ChevronRight } from 'lucide-react';
+import { Home, Search, FileText, MessageSquare, Package, BarChart3, User, Settings, HelpCircle, Globe, X, Menu, ChevronRight, ShoppingCart } from 'lucide-react';
 import type { User as UserType } from '../App';
 
 interface SidebarProps {
@@ -16,6 +16,7 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'catalog', label: 'Browse Products', icon: Search },
     { id: 'rfq-builder', label: 'Create RFQ', icon: FileText },
+    { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'chat', label: 'Messages', icon: MessageSquare },
     { id: 'shipments', label: 'Shipments', icon: Package },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
@@ -24,6 +25,7 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
   const sellerLinks = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'catalog', label: 'My Products', icon: Package },
+    { id: 'orders', label: 'Orders', icon: ShoppingCart },
     { id: 'chat', label: 'Messages', icon: MessageSquare },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
   ];

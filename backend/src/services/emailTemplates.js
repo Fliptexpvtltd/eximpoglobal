@@ -534,6 +534,243 @@ export const emailTemplates = {
       </body>
       </html>
     `
+  }),
+
+  orderConfirmed: (data) => ({
+    subject: `✅ Order Confirmed - ${data.orderNumber}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="UTF-8"></head>
+      <body style="margin: 0; padding: 20px; background: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 650px; margin: 0 auto; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 40px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">✅ Order Confirmed!</h1>
+          </div>
+          <div style="padding: 40px 30px;">
+            <p style="font-size: 16px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+              Dear <strong>${data.buyerName}</strong>,
+            </p>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Thank you for your order! We're excited to confirm that your order has been placed successfully and is being processed.
+            </p>
+            
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2563eb;">
+              <h3 style="margin: 0 0 15px 0; color: #1e40af; font-size: 18px;">📦 Order Details</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Order Number:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.orderNumber}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Product:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.productName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Quantity:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.quantity} units</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Total Amount:</td>
+                  <td style="padding: 8px 0; color: #16a34a; font-weight: 700; font-size: 18px;">₹${data.totalAmount}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Order Date:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.orderDate}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Seller:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.sellerName}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #16a34a;">
+              <h3 style="margin: 0 0 15px 0; color: #15803d; font-size: 18px;">📍 Shipping Address</h3>
+              <p style="color: #15803d; font-size: 14px; line-height: 1.6; margin: 0;">
+                ${data.shippingAddress}
+              </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">Track Order</a>
+            </div>
+
+            <p style="font-size: 14px; color: #64748b; margin-top: 30px; line-height: 1.6;">
+              You will receive another email once your order is shipped with tracking details.
+            </p>
+          </div>
+          <div style="background: #f8fafc; padding: 30px 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 14px; margin: 10px 0;">
+              <strong style="color: #334155;">Eximpo Global</strong><br>
+              Connecting Buyers and Suppliers Worldwide
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }),
+
+  orderShipped: (data) => ({
+    subject: `🚚 Order Shipped - ${data.orderNumber} - Tracking: ${data.trackingNumber}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="UTF-8"></head>
+      <body style="margin: 0; padding: 20px; background: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 650px; margin: 0 auto; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); padding: 40px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🚚 Your Order is On the Way!</h1>
+          </div>
+          <div style="padding: 40px 30px;">
+            <p style="font-size: 16px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+              Dear <strong>${data.buyerName}</strong>,
+            </p>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Great news! Your order has been shipped and is on its way to you. 📦✨
+            </p>
+            
+            <div style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); padding: 25px; border-radius: 10px; margin: 30px 0; border-left:4px solid #8b5cf6;">
+              <h3 style="margin: 0 0 15px 0; color: #7c3aed; font-size: 18px;">📦 Order Information</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Order Number:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.orderNumber}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Product:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.productName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Quantity:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.quantity} units</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2563eb;">
+              <h3 style="margin: 0 0 15px 0; color: #1e40af; font-size: 18px;">🚚 Shipment Tracking</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Tracking Number:</td>
+                  <td style="padding: 8px 0; color: #2563eb; font-weight: 700; font-size: 16px;">${data.trackingNumber}</td>
+                </tr>
+                ${data.carrier ? `
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Courier:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.carrier}</td>
+                </tr>
+                ` : ''}
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Shipped Date:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.shippedDate}</td>
+                </tr>
+              </table>
+            </div>
+
+            ${data.sellerNotes ? `
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                <strong>📝 Seller Note:</strong><br>
+                ${data.sellerNotes}
+              </p>
+            </div>
+            ` : ''}
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">Track Your Shipment</a>
+            </div>
+
+            <p style="font-size: 14px; color: #64748b; margin-top: 30px; line-height: 1.6; text-align: center;">
+              We'll notify you once your order is delivered! 📬
+            </p>
+          </div>
+          <div style="background: #f8fafc; padding: 30px 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 14px; margin: 10px 0;">
+              <strong style="color: #334155;">Eximpo Global</strong><br>
+              Connecting Buyers and Suppliers Worldwide
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  }),
+
+  orderDelivered: (data) => ({
+    subject: `✅ Order Delivered - ${data.orderNumber}`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head><meta charset="UTF-8"></head>
+      <body style="margin: 0; padding: 20px; background: #f1f5f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <div style="max-width: 650px; margin: 0 auto; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.1); border-radius: 12px; overflow: hidden;">
+          <div style="background: linear-gradient(135deg, #16a34a 0%, #15803d 100%); padding: 40px 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 28px; font-weight: 600;">🎉 Order Delivered!</h1>
+          </div>
+          <div style="padding: 40px 30px;">
+            <p style="font-size: 16px; color: #334155; line-height: 1.6; margin-bottom: 20px;">
+              Dear <strong>${data.buyerName}</strong>,
+            </p>
+            <p style="font-size: 15px; color: #475569; line-height: 1.6;">
+              Congratulations! Your order has been successfully delivered. We hope you're satisfied with your purchase! 🎊
+            </p>
+            
+            <div style="background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); padding: 30px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #16a34a; text-align: center;">
+              <div style="font-size: 48px; margin-bottom: 15px;">✅</div>
+              <h3 style="margin: 0 0 10px 0; color: #15803d; font-size: 20px;">Successfully Delivered</h3>
+              <p style="color: #15803d; font-size: 14px; margin: 5px 0;">Order #${data.orderNumber}</p>
+              <p style="color: #15803d; font-size: 14px; margin: 5px 0;">Delivered on ${data.deliveredDate}</p>
+            </div>
+
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 10px; margin: 30px 0; border-left: 4px solid #2563eb;">
+              <h3 style="margin: 0 0 15px 0; color: #1e40af; font-size: 18px;">📦 Order Summary</h3>
+              <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Product:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.productName}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Quantity:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.quantity} units</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Total Amount:</td>
+                  <td style="padding: 8px 0; color: #16a34a; font-weight: 700; font-size: 16px;">₹${data.totalAmount}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Seller:</td>
+                  <td style="padding: 8px 0; color: #1e293b; font-weight: 600; font-size: 14px;">${data.sellerName}</td>
+                </tr>
+              </table>
+            </div>
+
+            <div style="background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; border-radius: 8px; margin: 30px 0;">
+              <p style="margin: 0; color: #92400e; font-size: 14px;">
+                <strong>💬 Share Your Experience:</strong><br>
+                We'd love to hear about your experience! Your feedback helps us improve and helps other buyers make informed decisions.
+              </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/orders" style="display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%); color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: 600; font-size: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">View Order Details</a>
+            </div>
+
+            <p style="font-size: 14px; color: #64748b; margin-top: 30px; line-height: 1.6; text-align: center;">
+              Thank you for choosing Eximpo Global! 🙏
+            </p>
+          </div>
+          <div style="background: #f8fafc; padding: 30px 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+            <p style="color: #64748b; font-size: 14px; margin: 10px 0;">
+              <strong style="color: #334155;">Eximpo Global</strong><br>
+              Connecting Buyers and Suppliers Worldwide
+            </p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
   })
 };
 

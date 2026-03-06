@@ -72,6 +72,7 @@ import reviewRoutes from './routes/reviewRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import notificationRoutes from './routes/notificationRoutes.js';
 import seoRoutes from './routes/seo.js';
+import paymentRoutes from './routes/payments.js';
 
 // API routes
 app.use('/api/seo', seoRoutes);
@@ -89,6 +90,7 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/payments', paymentRoutes);
 
 // API info endpoint
 app.get('/api', (req, res) => {

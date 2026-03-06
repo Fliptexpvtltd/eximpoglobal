@@ -5,6 +5,7 @@ import { ImageWithFallback } from './figma/ImageWithFallback';
 import { PublicNavigation } from './PublicNavigation';
 import { useAuth } from '../contexts/AuthContext';
 import { PageSEO } from './PageSEO';
+import { toast } from 'sonner';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -12,10 +13,13 @@ interface ProductDetailProps {
   product: Product;
   user?: any;
   activeMode?: 'buyer' | 'seller';
+  autoOpenCheckout?: boolean;
+  onAutoOpenCheckoutComplete?: () => void;
   onCreateRFQ: (product: Product) => void;
   onOrderSample: (product: Product) => void;
   onViewSupplier: (supplierId: string) => void;
   onContactSupplier: (supplierId: string) => void;
+  onNavigateToCheckout: () => void;
   onBack: () => void;
 }
 
@@ -32,7 +36,19 @@ const shippingOptions = [
   { incoterm: 'DDP', description: 'Delivered Duty Paid - Door to door', estimatedCost: 850 },
 ];
 
-export function ProductDetail({ product, user: propUser, activeMode = 'buyer', onCreateRFQ, onOrderSample, onViewSupplier, onContactSupplier, onBack }: ProductDetailProps) {
+export function ProductDetail({ 
+  product, 
+  user: propUser, 
+  activeMode = 'buyer', 
+  autoOpenCheckout = false,
+  onAutoOpenCheckoutComplete,
+  onCreateRFQ, 
+  onOrderSample, 
+  onViewSupplier, 
+  onContactSupplier,
+  onNavigateToCheckout, 
+  onBack 
+}: ProductDetailProps) {
   const { user: authUser } = useAuth();
   const user = propUser || authUser;
   const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
@@ -41,6 +57,14 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
   
   const [activeTab, setActiveTab] = useState<'description' | 'specifications'>('description');
   const [seoData, setSeoData] = useState<any>(null);
+
+  // Auto-open checkout if flag is set (after login redirect)
+  useEffect(() => {
+    if (autoOpenCheckout && user) {
+      onNavigateToCheckout();
+      onAutoOpenCheckoutComplete?.();
+    }
+  }, [autoOpenCheckout, user, onNavigateToCheckout, onAutoOpenCheckoutComplete]);
 
   // Fetch SEO data from backend
   useEffect(() => {
@@ -165,7 +189,16 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
                   <MessageSquare className="w-5 h-5" />
                   <span className="hidden sm:inline">Contact</span>
                 </button>
-                <button className="px-4 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 flex items-center justify-center gap-2">
+                <button 
+                  onClick={() => {
+                    if (!user) {
+                      onOrderSample(product); // This will call requireAuth in App.tsx
+                      return;
+                    }
+                    onNavigateToCheckout();
+                  }}
+                  className="px-4 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 flex items-center justify-center gap-2"
+                >
                   <Package className="w-5 h-5" />
                   <span className="hidden sm:inline">Sample</span>
                 </button>
@@ -237,7 +270,13 @@ export function ProductDetail({ product, user: propUser, activeMode = 'buyer', o
                   </div>
                 </div>
                 <button 
-                  onClick={() => onOrderSample(product)}
+                  onClick={() => {
+                    if (!user) {
+                      onOrderSample(product); // This will call requireAuth in App.tsx
+                      return;
+                    }
+                    onNavigateToCheckout();
+                  }}
                   className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                 >
                   Order Sample
