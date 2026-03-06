@@ -73,7 +73,12 @@ class ApiService {
 
   // Build URL with query parameters
   private buildURL(endpoint: string, params?: Record<string, any>): string {
-    const url = new URL(`${this.baseURL}${endpoint}`);
+    // Handle relative URLs by using window.location.origin as base
+    const baseUrl = this.baseURL.startsWith('http') 
+      ? this.baseURL 
+      : `${window.location.origin}${this.baseURL}`;
+    
+    const url = new URL(`${baseUrl}${endpoint}`);
     
     if (params) {
       Object.keys(params).forEach(key => {
