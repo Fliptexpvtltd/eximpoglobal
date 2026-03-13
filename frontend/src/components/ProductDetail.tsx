@@ -49,6 +49,9 @@ export function ProductDetail({
   onNavigateToCheckout, 
   onBack 
 }: ProductDetailProps) {
+  // Use full product price for sample order
+  const calculatedSamplePrice = product.price || 0;
+  
   const { user: authUser } = useAuth();
   const user = propUser || authUser;
   const effectiveRole = user?.role === 'both' ? activeMode : (user?.role || 'buyer');
@@ -262,7 +265,7 @@ export function ProductDetail({
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center justify-between pb-3 border-b border-gray-100">
                     <span className="text-gray-600">Sample Price</span>
-                    <span className="text-xl">₹{sampleOrdering.price}</span>
+                    <span className="text-xl">₹{calculatedSamplePrice}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span className="text-gray-600">Delivery</span>

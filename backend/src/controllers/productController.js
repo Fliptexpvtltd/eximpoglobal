@@ -26,7 +26,7 @@ export const getAllProducts = async (req, res) => {
       params.push(`%${search}%`);
     }
 
-    queryText += ` ORDER BY p.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
+    queryText += ` ORDER BY p.display_order ASC, p.created_at DESC LIMIT $${paramCount + 1} OFFSET $${paramCount + 2}`;
     params.push(limit, offset);
 
     const result = await query(queryText, params);
@@ -128,7 +128,7 @@ export const createProduct = async (req, res) => {
 export const updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications, available } = req.body;
+    const { name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications, available, display_order } = req.body;
 
     // Check ownership
     const checkResult = await query(
@@ -163,10 +163,11 @@ export const updateProduct = async (req, res) => {
            certifications = COALESCE($9, certifications),
            images = COALESCE($10, images),
            specifications = COALESCE($11, specifications),
-           available = COALESCE($12, available)
-       WHERE id = $13
+           available = COALESCE($12, available),
+           display_order = COALESCE($13, display_order)
+       WHERE id = $14
        RETURNING *`,
-      [name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications ? JSON.stringify(specifications) : null, available, id]
+      [name, category, subcategory, description, price, moq, unit, incoterms, certifications, images, specifications ? JSON.stringify(specifications) : null, available, display_order, id]
     );
 
     res.json({
@@ -336,10 +337,11 @@ export const getMyProducts = async (req, res) => {
       params.push(status);
     }
 
-    queryText += ` ORDER BY p.created_at DESC`;
+    queryText += ` ORDER BY p.display_order ASC, p.created_at DESC`;
 
     const result = await query(queryText, params);
-    console.log('Found products:', result.rows.length);
+    console.log('Found products:', result.rows.length, 'for seller:', sellerId);
+    console.log('Product IDs:', result.rows.map(p => ({ id: p.id, name: p.name, supplier_id: p.supplier_id })));
 
     res.json({
       success: true,
@@ -350,6 +352,55 @@ export const getMyProducts = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to fetch your products',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
+// Update product display order
+export const updateProductOrder = async (req, res) => {
+  try {
+    const sellerId = req.user.id;
+    const { products } = req.body; // Array of { id, order }
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid products array'
+      });
+    }
+
+    // Verify all products belong to the seller
+    const productIds = products.map(p => p.id);
+    const checkResult = await query(
+      'SELECT id FROM products WHERE id = ANY($1) AND supplier_id = $2',
+      [productIds, sellerId]
+    );
+
+    if (checkResult.rows.length !== productIds.length) {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to update some of these products'
+      });
+    }
+
+    // Update all product orders
+    for (const product of products) {
+      await query(
+        'UPDATE products SET display_order = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
+        [product.order || 0, product.id]
+      );
+    }
+
+    res.json({
+      success: true,
+      message: 'Product order updated successfully'
+    });
+  } catch (error) {
+    console.error('Update product order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update product order',
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }

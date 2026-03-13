@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS products (
     available BOOLEAN DEFAULT true,
     approval_status VARCHAR(50) DEFAULT 'pending' CHECK (approval_status IN ('pending', 'approved', 'rejected')),
     rejection_reason TEXT,
+    display_order INTEGER DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

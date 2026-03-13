@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 import { toast } from 'sonner';
-import { IndianRupee, Calendar, Package, Shield, FileText, CheckCircle } from 'lucide-react';
+import { IndianRupee, Calendar, Package, Shield, FileText, CheckCircle, Truck } from 'lucide-react';
 import type { User, PO, Quote } from '../App';
 
 interface PurchaseOrderProps {
@@ -28,6 +28,13 @@ export function PurchaseOrder({ user, activeMode = 'buyer', quote, orderId, onSu
   const [deliveryEnd, setDeliveryEnd] = useState('');
   const [specialInstructions, setSpecialInstructions] = useState('');
   const [qcCheckpoints, setQcCheckpoints] = useState<string[]>(['Pre-production sample approval', 'In-line inspection', 'Pre-shipment inspection']);
+  
+  // Status update state
+  const [newStatus, setNewStatus] = useState('');
+  const [sellerNotes, setSellerNotes] = useState('');
+  const [trackingNumber, setTrackingNumber] = useState('');
+  const [carrier, setCarrier] = useState('');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     if (orderId) {
@@ -37,19 +44,73 @@ export function PurchaseOrder({ user, activeMode = 'buyer', quote, orderId, onSu
 
   const fetchOrder = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/orders/${orderId}`, {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/payments/orders/${orderId}`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
       
       if (data.success) {
-        setOrder(data.data);
+        setOrder(data.order);
+        console.log('📦 Order Fetched:', data.order);
+      } else {
+        console.error('Error fetching order:', data.message);
       }
     } catch (error) {
       console.error('Error fetching order:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const updateOrderStatus = async () => {
+    if (!newStatus) {
+      toast.error('Please select a status');
+      return;
+    }
+
+    // Validate tracking number for shipped status
+    if (newStatus === 'shipped' && !trackingNumber.trim()) {
+      toast.error('Tracking number is required when marking as shipped');
+      return;
+    }
+
+    setIsUpdating(true);
+    try {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      
+      const response = await fetch(`${API_BASE_URL}/payments/orders/${orderId}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          status: newStatus,
+          notes: sellerNotes,
+          tracking_number: trackingNumber,
+          carrier: carrier
+        })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast.success('Order status updated successfully!');
+        setNewStatus('');
+        setSellerNotes('');
+        setTrackingNumber('');
+        setCarrier('');
+        // Refresh order data
+        await fetchOrder();
+      } else {
+        toast.error(data.message || 'Failed to update order status');
+      }
+    } catch (error) {
+      console.error('Error updating order status:', error);
+      toast.error('Failed to update order status');
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -146,7 +207,7 @@ export function PurchaseOrder({ user, activeMode = 'buyer', quote, orderId, onSu
           <div className="grid md:grid-cols-2 gap-6">
             <div>
               <div className="text-sm text-gray-600 mb-1">Status</div>
-              <div className="text-xl capitalize">{order.order_status}</div>
+              <div className="text-xl capitalize">{order.status?.replace('_', ' ') || 'Pending'}</div>
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">Total Amount</div>
@@ -154,14 +215,111 @@ export function PurchaseOrder({ user, activeMode = 'buyer', quote, orderId, onSu
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">Payment Status</div>
-              <div className="text-xl capitalize">{order.payment_status}</div>
+              <div className="text-xl capitalize">{order.payment_status?.replace('_', ' ') || 'Pending'}</div>
             </div>
             <div>
               <div className="text-sm text-gray-600 mb-1">Created</div>
               <div className="text-xl">{new Date(order.created_at).toLocaleDateString()}</div>
             </div>
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Product</div>
+              <div className="text-xl">{order.product_name}</div>
+            </div>
+            <div>
+              <div className="text-sm text-gray-600 mb-1">Quantity</div>
+              <div className="text-xl">{order.quantity}</div>
+            </div>
           </div>
         </div>
+
+        {order.product_images && order.product_images.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold mb-4">Product Image</h2>
+            <img 
+              src={order.product_images[0]} 
+              alt={order.product_name}
+              className="w-48 h-48 object-cover rounded-lg"
+            />
+          </div>
+        )}
+
+        {isSeller && orderId && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Truck className="w-5 h-5 text-green-600" />
+              Update Order Status
+            </h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  New Status
+                </label>
+                <select
+                  value={newStatus}
+                  onChange={(e) => setNewStatus(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                >
+                  <option value="">Select status...</option>
+                  <option value="processing">Processing</option>
+                  <option value="shipped">Shipped</option>
+                  <option value="delivered">Delivered</option>
+                  <option value="cancelled">Cancelled</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Seller Notes
+                </label>
+                <textarea
+                  value={sellerNotes}
+                  onChange={(e) => setSellerNotes(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="Add any notes about this order"
+                  rows={3}
+                />
+              </div>
+
+              {newStatus === 'shipped' && (
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Tracking Number
+                    </label>
+                    <input
+                      type="text"
+                      value={trackingNumber}
+                      onChange={(e) => setTrackingNumber(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Enter tracking number"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Courier / Carrier
+                    </label>
+                    <input
+                      type="text"
+                      value={carrier}
+                      onChange={(e) => setCarrier(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="e.g., FedEx, DHL, Blue Dart"
+                    />
+                  </div>
+                </div>
+              )}
+
+              <button
+                onClick={updateOrderStatus}
+                disabled={isUpdating || !newStatus}
+                className="w-full bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isUpdating ? 'Updating...' : 'Update Status'}
+              </button>
+            </div>
+          </div>
+        )}
         
         <button
           onClick={onCancel}

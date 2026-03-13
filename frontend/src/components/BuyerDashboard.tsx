@@ -21,17 +21,55 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
   const [rfqs, setRfqs] = useState<RFQ[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+  const [unreadMessageCount, setUnreadMessageCount] = useState(0);
+  const [quoteCounts, setQuoteCounts] = useState<{ [key: string]: number }>({});
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
+    fetchUnreadMessageCount();
     // Set greeting based on time of day
     const hour = new Date().getHours();
     if (hour < 12) setGreeting('Good Morning');
     else if (hour < 18) setGreeting('Good Afternoon');
     else setGreeting('Good Evening');
   }, []);
+
+  const fetchUnreadMessageCount = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/messages/unread-count`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      if (data.success && data.data) {
+        setUnreadMessageCount(data.data.count || 0);
+      }
+    } catch (error) {
+      console.error('Error fetching unread message count:', error);
+    }
+  };
+
+  const fetchQuoteCounts = async (rfqList: any[]) => {
+    try {
+      const token = localStorage.getItem('token');
+      const counts: { [key: string]: number } = {};
+      
+      for (const rfq of rfqList) {
+        const response = await fetch(`${API_BASE_URL}/quotes?rfq_id=${rfq.id}`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const data = await response.json();
+        if (data.success && Array.isArray(data.data)) {
+          counts[rfq.id] = data.data.length;
+        }
+      }
+      setQuoteCounts(counts);
+    } catch (error) {
+      console.error('Error fetching quote counts:', error);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -73,6 +111,8 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
           targetPrice: r.target_price
         }));
         setRfqs(mappedRfqs);
+        // Fetch quote counts for each RFQ
+        fetchQuoteCounts(rfqData.data);
       }
 
       if (productsData.success && productsData.data) {
@@ -129,7 +169,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
     },
     { 
       label: 'Total Spend', 
-      value: `$${(analytics.overview.total_spent / 1000).toFixed(1)}K`, 
+      value: `₹${(analytics.overview.total_spent).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`, 
       change: 'All time', 
       icon: IndianRupee, 
       color: 'purple' 
@@ -138,7 +178,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
     { label: 'Active RFQs', value: '0', change: 'Loading...', icon: FileText, color: 'blue' },
     { label: 'Pending Quotes', value: '0', change: 'Loading...', icon: Clock, color: 'orange' },
     { label: 'Active Orders', value: '0', change: 'Loading...', icon: Package, color: 'green' },
-    { label: 'Total Spend', value: '$0', change: 'Loading...', icon: IndianRupee, color: 'purple' },
+    { label: 'Total Spend', value: '₹0', change: 'Loading...', icon: IndianRupee, color: 'purple' },
   ];
 
   if (loading) {
@@ -252,7 +292,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
                   </div>
                   {rfq.status === 'quoted' && (
                     <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                      5 Quotes
+                      {quoteCounts[rfq.id] || 0} Quotes
                     </span>
                   )}
                   {rfq.status === 'sent' && (
@@ -313,7 +353,9 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
             >
               <MessageSquare className="w-6 h-6 text-purple-600 mb-2" />
               <div className="text-sm">Messages</div>
-              <span className="inline-block mt-1 px-2 py-0.5 bg-red-500 text-white rounded-full text-xs">3</span>
+              {unreadMessageCount > 0 && (
+                <span className="inline-block mt-1 px-2 py-0.5 bg-red-500 text-white rounded-full text-xs">{unreadMessageCount}</span>
+              )}
             </button>
           </div>
         </div>

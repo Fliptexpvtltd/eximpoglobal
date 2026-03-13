@@ -27,6 +27,8 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
+      console.log('📊 Analytics API Response:', data);
+      console.log('📊 Overview data:', data.data?.overview);
       
       if (data.success) {
         setAnalytics(data.data);
@@ -50,24 +52,14 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
     );
   }
 
-  // Use real analytics data or show placeholder
+  // Use real analytics data from API
   const overview = analytics?.overview || {};
   const monthlyData = analytics?.monthly_trends || [];
   const categoryData = analytics?.category_breakdown || [];
   const topSuppliers = analytics?.top_suppliers || [];
-  const countryDistribution = analytics?.country_distribution || [
-    { name: 'India', value: 45, color: '#3b82f6' },
-    { name: 'China', value: 30, color: '#10b981' },
-    { name: 'USA', value: 15, color: '#f59e0b' },
-    { name: 'Others', value: 10, color: '#6b7280' }
-  ];
+  const countryDistribution = analytics?.country_distribution || [];
   const supplierPerformance = analytics?.supplier_performance || topSuppliers || [];
-  const deliveryMetrics = analytics?.delivery_metrics || [
-    { metric: 'On-Time Delivery', value: '94%', trend: 'up', change: '+2%' },
-    { metric: 'Quality Score', value: '4.8/5', trend: 'up', change: '+0.2' },
-    { metric: 'Lead Time', value: '12 days', trend: 'down', change: '-1 day' },
-    { metric: 'Defect Rate', value: '1.2%', trend: 'down', change: '-0.3%' }
-  ];
+  const deliveryMetrics = analytics?.delivery_metrics || [];
   
   const totalSpend = isSeller ? overview.total_revenue : overview.total_spent;
   const totalOrders = overview.total_orders || 0;
@@ -81,7 +73,7 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
         style={{ background: `linear-gradient(to right, ${isSeller ? '#059669' : '#2563eb'}, ${isSeller ? '#047857' : '#1e40af'})` }}
       >
         <div>
-          <h1 className="text-2xl md:text-3xl mb-2">{isSeller ? '📊 Sales Analytics' : '📈 Analytics & Insights'}</h1>
+          <h1 className="text-2xl md:text-3xl mb-2">{isSeller ? 'Sales Analytics' : 'Analytics & Insights'}</h1>
           <p className="text-base md:text-xl opacity-90">{isSeller ? 'Track your business performance and revenue' : 'Track your trade performance and metrics'}</p>
         </div>
         
@@ -98,7 +90,7 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
               <IndianRupee className="w-6 h-6 text-blue-600" />
             </div>
           </div>
-          <div className="text-3xl mb-1">${totalSpend ? (totalSpend / 1000).toFixed(1) : 0}K</div>
+          <div className="text-3xl mb-1">{totalSpend ? `$${(totalSpend / 1000).toFixed(1)}K` : 'N/A'}</div>
           <div className="text-sm text-gray-600">{isSeller ? 'Total Revenue' : 'Total Spend'}</div>
         </div>
         
@@ -168,95 +160,105 @@ export function Analytics({ user, activeMode = 'buyer' }: AnalyticsProps) {
       </div>
       
       <div className="grid lg:grid-cols-3 gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-xl mb-6">Sourcing by Country</h2>
-          <ResponsiveContainer width="100%" height={250}>
-            <PieChart>
-              <Pie
-                data={countryDistribution}
-                cx="50%"
-                cy="50%"
-                innerRadius={60}
-                outerRadius={90}
-                paddingAngle={2}
-                dataKey="value"
-              >
-                {countryDistribution.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value: number) => [`${value}%`, 'Share']} />
-            </PieChart>
-          </ResponsiveContainer>
-          <div className="mt-4 space-y-2">
-            {countryDistribution.map((country) => (
-              <div key={country.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full" style={{ backgroundColor: country.color }}></div>
-                  <span className="text-sm text-gray-700">{country.name}</span>
+        {countryDistribution.length > 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="text-xl mb-6">Sourcing by Country</h2>
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={countryDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={90}
+                  paddingAngle={2}
+                  dataKey="value"
+                >
+                  {countryDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip formatter={(value: number) => [`${value}%`, 'Share']} />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {countryDistribution.map((country) => (
+                <div key={country.name} className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: country.color }}></div>
+                    <span className="text-sm text-gray-700">{country.name}</span>
+                  </div>
+                  <span className="text-sm text-gray-900">{country.value}%</span>
                 </div>
-                <span className="text-sm text-gray-900">{country.value}%</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         
         <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-xl mb-6">Top Suppliers Performance</h2>
-          <div className="space-y-4">
-            {supplierPerformance.map((supplier, index) => (
-              <div key={supplier.name} className="flex items-center gap-4">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-                  {index + 1}
-                </div>
-                <div className="flex-1">
-                  <div className="mb-1">{supplier.name}</div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                      {supplier.rating}
+          {supplierPerformance.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p>No supplier data available</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {supplierPerformance.map((supplier, index) => (
+                <div key={supplier.name} className="flex items-center gap-4">
+                  <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
+                    {index + 1}
+                  </div>
+                  <div className="flex-1">
+                    <div className="mb-1">{supplier.name}</div>
+                    <div className="flex items-center gap-4 text-sm text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                        {supplier.rating}
+                      </div>
+                      <span>•</span>
+                      <span>{supplier.orders} orders</span>
+                      <span>•</span>
+                      <span className={supplier.onTime >= 95 ? 'text-green-600' : 'text-yellow-600'}>
+                        {supplier.onTime}% on-time
+                      </span>
                     </div>
-                    <span>•</span>
-                    <span>{supplier.orders} orders</span>
-                    <span>•</span>
-                    <span className={supplier.onTime >= 95 ? 'text-green-600' : 'text-yellow-600'}>
-                      {supplier.onTime}% on-time
-                    </span>
+                  </div>
+                  <div className="w-24 bg-gray-200 rounded-full h-2">
+                    <div
+                      className={`h-2 rounded-full ${supplier.onTime >= 95 ? 'bg-green-500' : 'bg-yellow-500'}`}
+                      style={{ width: `${supplier.onTime}%` }}
+                    />
                   </div>
                 </div>
-                <div className="w-24 bg-gray-200 rounded-full h-2">
-                  <div
-                    className={`h-2 rounded-full ${supplier.onTime >= 95 ? 'bg-green-500' : 'bg-yellow-500'}`}
-                    style={{ width: `${supplier.onTime}%` }}
-                  />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+      
+      {deliveryMetrics.length > 0 && (
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h2 className="text-xl mb-6">Key Performance Indicators</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            {deliveryMetrics.map((metric) => (
+              <div key={metric.metric} className="text-center">
+                <div className="text-3xl mb-2">{metric.value}</div>
+                <div className="text-sm text-gray-600 mb-2">{metric.metric}</div>
+                <div className={`flex items-center justify-center gap-1 text-sm ${
+                  metric.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                }`}>
+                  {metric.trend === 'up' ? (
+                    <TrendingUp className="w-4 h-4" />
+                  ) : (
+                    <TrendingDown className="w-4 h-4" />
+                  )}
+                  {metric.change}
                 </div>
               </div>
             ))}
           </div>
         </div>
-      </div>
-      
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="text-xl mb-6">Key Performance Indicators</h2>
-        <div className="grid md:grid-cols-4 gap-6">
-          {deliveryMetrics.map((metric) => (
-            <div key={metric.metric} className="text-center">
-              <div className="text-3xl mb-2">{metric.value}</div>
-              <div className="text-sm text-gray-600 mb-2">{metric.metric}</div>
-              <div className={`flex items-center justify-center gap-1 text-sm ${
-                metric.trend === 'up' ? 'text-green-600' : 'text-red-600'
-              }`}>
-                {metric.trend === 'up' ? (
-                  <TrendingUp className="w-4 h-4" />
-                ) : (
-                  <TrendingDown className="w-4 h-4" />
-                )}
-                {metric.change}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+      )}
       
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
         <h3 className="text-blue-900 mb-3">Insights & Recommendations</h3>

@@ -71,11 +71,19 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
 
   useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [isSeller]);
 
   const fetchProducts = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/products`);
+      // For sellers, show only their products. For buyers, show all approved products
+      const endpoint = isSeller ? `${API_BASE_URL}/products/my/products` : `${API_BASE_URL}/products`;
+      const options: RequestInit = isSeller ? {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`
+        }
+      } : {};
+      
+      const response = await fetch(endpoint, options);
       const data = await response.json();
       
       if (data.success) {

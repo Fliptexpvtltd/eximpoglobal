@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Globe, Home, Search, FileText, MessageSquare, Package, BarChart3, LogOut, Bell, User, Menu, X } from 'lucide-react';
+import { Globe, Home, Search, FileText, MessageSquare, Package, BarChart3, LogOut, Bell, User, Menu, X, Edit2 } from 'lucide-react';
 import type { User } from '../App';
 import { NotificationPanel, Notification } from './NotificationPanel';
 
@@ -30,6 +30,7 @@ export function Navigation({ user, currentView, onNavigate, onLogout, notificati
   const sellerLinks = [
     { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'catalog', label: 'My Products', icon: Package },
+    { id: 'manage-products', label: 'Manage Products', icon: Edit2 },
     { id: 'incoming-rfqs', label: 'RFQ Requests', icon: FileText },
     { id: 'chat', label: 'Messages', icon: MessageSquare },
     { id: 'analytics', label: 'Performance', icon: BarChart3 },

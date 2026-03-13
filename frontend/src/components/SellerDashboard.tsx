@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
-import { IndianRupee, Package, Eye, MessageSquare, TrendingUp, Star, Plus, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { IndianRupee, Package, Eye, MessageSquare, TrendingUp, Star, Plus, CheckCircle, AlertTriangle, XCircle, ArrowDownUp } from 'lucide-react';
 import type { User } from '../App';
 
 interface SellerDashboardProps {
@@ -49,7 +49,9 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
+      console.log('📊 Seller Analytics API Response:', data);
       if (data.success) {
+        console.log('📊 Overview data:', data.data.overview);
         setAnalytics(data.data);
       }
     } catch (error) {
@@ -108,16 +110,17 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
 
   const fetchSellerOrders = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/orders`, {
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const response = await fetch(`${API_BASE_URL}/orders?role=seller`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
-      if (data.success) {
-        setOrders(data.data || []);
+      console.log('📦 Seller Orders Fetched:', data);
+      if (data.success || data.orders) {
+        setOrders(data.orders || data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching orders:', error);
+      console.error('Error fetching seller orders:', error);
     }
   };
 
@@ -131,7 +134,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
   const stats = analytics ? [
     { 
       label: 'Total Revenue', 
-      value: `$${(analytics.overview.total_revenue / 1000).toFixed(1)}K`, 
+      value: `₹${(analytics.overview.total_revenue).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`, 
       change: `${analytics.overview.total_orders} orders`, 
       icon: IndianRupee, 
       color: 'green' 
@@ -158,7 +161,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
       color: 'yellow' 
     },
   ] : [
-    { label: 'Total Revenue', value: '$0', change: 'Loading...', icon: IndianRupee, color: 'green' },
+    { label: 'Total Revenue', value: '₹0', change: 'Loading...', icon: IndianRupee, color: 'green' },
     { label: 'Active Products', value: productStats.approved.toString(), change: `${productStats.pending} pending`, icon: Package, color: 'blue' },
     { label: 'Quote Conversion', value: '0%', change: 'Loading...', icon: TrendingUp, color: 'purple' },
     { label: 'Active Orders', value: '0', change: 'Loading...', icon: Star, color: 'yellow' },
@@ -190,13 +193,22 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
           <h1 className="text-2xl md:text-3xl text-gray-900 mb-2 font-bold">{greeting()}, {user.name}</h1>
           <p className="text-base md:text-xl text-gray-600">Grow your business and reach global buyers</p>
         </div>
-        <button 
-          onClick={() => onNavigate('add-product')}
-          className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors"
-        >
-          <Plus className="w-5 h-5" />
-          Add Product
-        </button>
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <button 
+            onClick={() => onNavigate('manage-products')}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+          >
+            <Package className="w-5 h-5" />
+            Manage Products
+          </button>
+          <button 
+            onClick={() => onNavigate('add-product')}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors"
+          >
+            <Plus className="w-5 h-5" />
+            Add Product
+          </button>
+        </div>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -232,13 +244,22 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-900">My Products</h2>
-          <button 
-            onClick={() => onNavigate('add-product')}
-            className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Add Product
-          </button>
+          <div className="flex gap-2">
+            <button 
+              onClick={() => onNavigate('manage-product-order')}
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors"
+            >
+              <ArrowDownUp className="w-4 h-4" />
+              Reorder
+            </button>
+            <button 
+              onClick={() => onNavigate('add-product')}
+              className="flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 text-sm font-medium transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Add Product
+            </button>
+          </div>
         </div>
 
         {productsLoading ? (
@@ -328,10 +349,10 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
             {myProducts.length > 5 && (
               <div className="mt-4 text-center">
                 <button 
-                  onClick={() => onNavigate('catalog')}
+                  onClick={() => onNavigate('manage-products')}
                   className="text-sm text-blue-600 hover:text-blue-700 font-medium"
                 >
-                  View All {myProducts.length} Products →
+                  Manage All {myProducts.length} Products →
                 </button>
               </div>
             )}

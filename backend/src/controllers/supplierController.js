@@ -150,7 +150,7 @@ export const getSupplierProducts = async (req, res) => {
       paramCount++;
     }
 
-    query += ' ORDER BY created_at DESC';
+    query += ' ORDER BY display_order ASC, created_at DESC';
 
     const result = await pool.query(query, params);
 
