@@ -1,4 +1,4 @@
-import { Home, ShoppingBag, MessageCircle, BarChart2, User, Info, HelpCircle, LogIn } from 'lucide-react';
+import { Home, ShoppingBag, MessageCircle, BarChart2, User, Info, HelpCircle, LogIn, FileText } from 'lucide-react';
 import type { User as UserType } from '../App';
 
 interface MobileBottomNavProps {
@@ -19,9 +19,9 @@ export function MobileBottomNav({ user, currentView, onNavigate, activeMode = 'b
 
   const buyerLinks = [
     { id: 'catalog', label: 'Browse', icon: ShoppingBag },
-    { id: 'dashboard', label: 'Orders', icon: Home },
+    { id: 'orders', label: 'Orders', icon: Home },
     { id: 'chat', label: 'Messages', icon: MessageCircle },
-    { id: 'analytics', label: 'Analytics', icon: BarChart2 },
+    { id: 'my-rfqs', label: 'RFQ', icon: FileText },
     { id: 'profile', label: 'Profile', icon: User },
   ];
 
