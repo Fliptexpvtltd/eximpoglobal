@@ -30,6 +30,7 @@ import { AddProduct } from './components/AddProduct';
 import { ProductOrderManager } from './components/ProductOrderManager';
 import { ProductManagement } from './components/ProductManagement';
 import { OrdersList } from './components/OrdersList';
+import { OrderDetails } from './components/OrderDetails';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -52,6 +53,7 @@ import { TradeFinancing } from './components/TradeFinancing';
 import { CustomsClearance } from './components/CustomsClearance';
 import { SubmitQuote } from './components/SubmitQuote';
 import { AllRFQs } from './components/AllRFQs';
+import { Checkout } from './components/Checkout';
 
 export type UserRole = 'buyer' | 'seller' | 'ops' | 'finance' | 'admin';
 
@@ -205,7 +207,9 @@ type View =
   | 'logistics-solutions'
   | 'quality-inspection'
   | 'trade-financing'
-  | 'customs-clearance';
+  | 'customs-clearance'
+  | 'checkout'
+  | 'order-details';
 
 function AppContent() {
   const { user, isLoading, requireAuth, logout, login, signup, selectRole, googleAuth, authStep } = useAuth();
@@ -581,7 +585,7 @@ function AppContent() {
             onOrderSample={handleOrderSample}
             onViewSupplier={handleViewSupplier}
             onContactSupplier={handleContactSupplier}
-            onNavigateToCheckout={() => setCurrentView('purchase-order')}
+            onNavigateToCheckout={() => setCurrentView('checkout')}
             onBack={() => setCurrentView('catalog')}
           />
         )}        {currentView === 'supplier-profile' && selectedSupplier && (
@@ -632,6 +636,18 @@ function AppContent() {
           />
         )}
         
+        {currentView === 'checkout' && selectedProduct && user && (
+          <Checkout
+            product={selectedProduct}
+            user={user}
+            onBack={() => setCurrentView('product-detail')}
+            onSuccess={(order) => {
+              setSelectedOrderId(order.id);
+              setCurrentView('orders');
+            }}
+          />
+        )}
+
         {currentView === 'purchase-order' && user && (user.role === 'buyer' || user.role === 'seller') && (
           <PurchaseOrder 
             user={user}
@@ -684,6 +700,13 @@ function AppContent() {
           />
         )}
         
+        {currentView === 'order-details' && selectedOrderId && user && (
+          <OrderDetails
+            orderId={selectedOrderId}
+            onBack={() => setCurrentView('orders')}
+          />
+        )}
+
         {currentView === 'analytics' && user && (
           <Analytics 
             user={user}
@@ -694,7 +717,7 @@ function AppContent() {
           <OrdersList 
             onViewOrder={(orderId) => {
               setSelectedOrderId(orderId);
-              setCurrentView('purchase-order');
+              setCurrentView('order-details');
             }}
           />
         )}

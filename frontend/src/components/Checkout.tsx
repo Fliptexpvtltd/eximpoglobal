@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, MapPin, CreditCard, Shield, AlertCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, CreditCard, Shield } from 'lucide-react';
 import { toast } from 'sonner';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -15,7 +15,7 @@ export function Checkout({ product, user, onBack, onSuccess }: CheckoutProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   
   const [orderDetails, setOrderDetails] = useState({
-    quantity: product.moq || 1,
+    quantity: 1,
     shipping_address: {
       name: user?.name || user?.fullName || '',
       phone: user?.phone || '',
@@ -124,7 +124,6 @@ export function Checkout({ product, user, onBack, onSuccess }: CheckoutProps) {
             if (verifyData.success) {
               toast.success('Payment successful! Order placed.');
               onSuccess(verifyData.order);
-              onBack();
             } else {
               toast.error('Payment verification failed');
             }
@@ -186,81 +185,64 @@ export function Checkout({ product, user, onBack, onSuccess }: CheckoutProps) {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24">
         <div className="grid lg:grid-cols-2 gap-8">
             {/* Left: Product Summary */}
-            <div className="space-y-4">
-              <div className="bg-blue-50 rounded-lg p-4">
-                <div className="flex items-start gap-4">
-                  <img
-                    src={product.image || product.images?.[0] || 'https://via.placeholder.com/100'}
-                    alt={product.name}
-                    className="w-20 h-20 object-cover rounded-lg"
-                  />
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                    <p className="text-sm text-gray-600 mt-1">{product.category}</p>
-                    <div className="mt-2 flex items-baseline gap-2">
-                      <span className="text-xl font-bold text-blue-600">₹{unitPrice.toLocaleString()}</span>
-                      <span className="text-sm text-gray-500">per unit</span>
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                <div className="bg-blue-50 p-4">
+                  <div className="flex items-start gap-4">
+                    <img
+                      src={product.image || product.images?.[0] || 'https://via.placeholder.com/100'}
+                      alt={product.name}
+                      className="w-20 h-20 object-cover rounded-lg border-2 border-white shadow-sm"
+                    />
+                    <div className="flex-1">
+                      <h3 className="font-semibold text-gray-900">{product.name}</h3>
+                      <p className="text-sm text-gray-600 mt-1">{product.category}</p>
+                      <div className="mt-2 flex items-baseline gap-2">
+                        <span className="text-xl font-bold text-blue-600">₹{unitPrice.toLocaleString()}</span>
+                        <span className="text-sm text-gray-500">per unit</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-600">Unit Price</span>
-                  <span className="font-semibold">₹{unitPrice.toLocaleString()}</span>
-                </div>
-                <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-600">Quantity</span>
-                  <input
-                    type="number"
-                    min={product.moq || 1}
-                    value={orderDetails.quantity}
-                    onChange={(e) => setOrderDetails({
-                      ...orderDetails,
-                      quantity: Math.max(product.moq || 1, parseInt(e.target.value) || 1)
-                    })}
-                    className="w-24 px-3 py-1 border rounded-lg text-right"
-                  />
-                </div>
-                <div className="flex items-center justify-between py-2 border-b">
-                  <span className="text-gray-600">Incoterms</span>
-                  <select
-                    value={orderDetails.incoterms}
-                    onChange={(e) => setOrderDetails({ ...orderDetails, incoterms: e.target.value })}
-                    className="px-3 py-1 border rounded-lg"
-                  >
-                    <option value="EXW">EXW - Ex Works</option>
-                    <option value="FOB">FOB - Free On Board</option>
-                    <option value="CIF">CIF - Cost, Insurance & Freight</option>
-                    <option value="DDP">DDP - Delivered Duty Paid</option>
-                  </select>
-                </div>
-                <div className="flex items-center justify-between py-3 bg-blue-50 rounded-lg px-4">
-                  <span className="font-semibold text-lg">Total Amount</span>
-                  <span className="text-2xl font-bold text-blue-600">₹{totalAmount.toLocaleString()}</span>
+                <div className="p-4 space-y-3">
+                  <div className="flex items-center justify-between py-2 border-b">
+                    <span className="text-gray-600">Unit Price</span>
+                    <span className="font-semibold">₹{unitPrice.toLocaleString()}</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b">
+                    <span className="text-gray-600">Quantity</span>
+                    <input
+                      type="number"
+                      min={1}
+                      value={orderDetails.quantity}
+                      onChange={(e) => setOrderDetails({
+                        ...orderDetails,
+                        quantity: Math.max(1, parseInt(e.target.value) || 1)
+                      })}
+                      className="w-24 px-3 py-1 border rounded-lg text-right"
+                    />
+                  </div>
+                  <div className="flex items-center justify-between py-3 bg-blue-50 rounded-lg px-4 mt-4">
+                    <span className="font-semibold text-lg">Total Amount</span>
+                    <span className="text-2xl font-bold text-blue-600">₹{totalAmount.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
-
-              {product.moq && (
-                <div className="flex items-start gap-2 text-sm text-amber-600 bg-amber-50 p-3 rounded-lg">
-                  <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>Minimum order quantity: {product.moq} units</span>
-                </div>
-              )}
             </div>
 
             {/* Right: Shipping Details */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 mb-4">
-                <MapPin className="w-5 h-5 text-blue-600" />
-                <h3 className="font-semibold text-lg">Shipping Address</h3>
-              </div>
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center gap-2 mb-4">
+                  <MapPin className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-semibold text-lg">Shipping Address</h3>
+                </div>
 
-              <div className="space-y-4">
+                <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label>
                   <input
@@ -401,6 +383,7 @@ export function Checkout({ product, user, onBack, onSuccess }: CheckoutProps) {
             </div>
           </div>
         </div>
+      </div>
 
       {/* Footer */}
       <div className="bg-white border-t sticky bottom-0">
