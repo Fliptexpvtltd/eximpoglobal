@@ -16,6 +16,13 @@ export default function BuyerDashboardScreen({ navigation }: Props) {
   const activeRFQs = mockRFQs.filter(rfq => rfq.status !== 'draft');
   const recentOrders = mockPOs.slice(0, 3);
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    else if (hour < 18) return 'Good Afternoon';
+    else return 'Good Evening';
+  };
+
   const stats = [
     { label: 'Active RFQs', value: activeRFQs.length, icon: 'file-text', color: '#2563eb' },
     { label: 'Orders', value: mockPOs.length, icon: 'package', color: '#10b981' },
@@ -45,7 +52,7 @@ export default function BuyerDashboardScreen({ navigation }: Props) {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text h4>Welcome back,</Text>
+          <Text h4>{getGreeting()},</Text>
           <Text h3>{user?.companyName}</Text>
         </View>
         <Badge
