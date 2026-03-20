@@ -2,7 +2,7 @@ import { query } from '../config/database.js';
 
 export const getAllProducts = async (req, res) => {
   try {
-    const { category, search, page = 1, limit = 20 } = req.query;
+    const { category, search, page = 1, limit = 200 } = req.query;
     const offset = (page - 1) * limit;
 
     let queryText = `
@@ -255,10 +255,12 @@ export const approveProduct = async (req, res) => {
 
     const product = productResult.rows[0];
 
-    // Update approval status and rejection reason
+    // Update approval status, rejection reason, and ensure available=true on approval
     const result = await query(
       `UPDATE products 
-       SET approval_status = $1, rejection_reason = $2, updated_at = CURRENT_TIMESTAMP
+       SET approval_status = $1, rejection_reason = $2,
+           available = CASE WHEN $1 = 'approved' THEN true ELSE available END,
+           updated_at = CURRENT_TIMESTAMP
        WHERE id = $3
        RETURNING *`,
       [status, status === 'rejected' ? rejectionReason : null, id]

@@ -2,6 +2,11 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Upload, X, Save, AlertCircle } from 'lucide-react';
 import type { User } from '../App';
+import { CarSpecsForm, defaultCarSpecs } from './CarSpecsForm';
+import type { CarSpecs } from './CarSpecsForm';
+
+// API Configuration
+const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 interface EditProductProps {
   productId: string;
@@ -41,6 +46,9 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
 
   const [newCertification, setNewCertification] = useState('');
   const [images, setImages] = useState<string[]>([]);
+  const [carSpecs, setCarSpecs] = useState<CarSpecs>(defaultCarSpecs);
+
+  const isAutomotive = formData.category === 'Automotive';
 
   const categories = [
     'Electronics',
@@ -97,6 +105,23 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
           shippingWeight: specs.shippingWeight || '',
           dimensions: specs.dimensions || { length: '', width: '', height: '' },
         });
+
+        // Load car specs if Automotive
+        if (product.category === 'Automotive') {
+          setCarSpecs({
+            make: specs.make || '',
+            model: specs.model || '',
+            year: specs.year || '',
+            mileage: specs.mileage || '',
+            engineCC: specs.engineCC || '',
+            transmission: specs.transmission || '',
+            fuelType: specs.fuelType || '',
+            bodyType: specs.bodyType || '',
+            condition: specs.condition || 'used',
+            exteriorColor: specs.exteriorColor || '',
+            vin: specs.vin || '',
+          });
+        }
         
         setImages(product.images || []);
       } else {
@@ -200,14 +225,15 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
         return;
       }
 
+      const isAutomotiveSubmit = formData.category === 'Automotive';
       const productData = {
         name: formData.name,
         category: formData.category,
         description: formData.description || null,
         price: formData.price ? parseFloat(formData.price) : null,
-        moq: formData.moq ? parseInt(formData.moq) : null,
-        unit: formData.unit,
-        incoterms: ['FOB', 'CIF', 'EXW'],
+        moq: isAutomotiveSubmit ? 1 : (formData.moq ? parseInt(formData.moq) : null),
+        unit: isAutomotiveSubmit ? 'unit' : formData.unit,
+        incoterms: isAutomotiveSubmit ? [] : ['FOB', 'CIF', 'EXW'],
         certifications: formData.certifications,
         images: images,
         specifications: {
@@ -217,11 +243,24 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
           features: formData.features,
           specifications: formData.specifications,
           customization: formData.customization,
-          sampleAvailable: formData.sampleAvailable,
+          sampleAvailable: isAutomotiveSubmit ? false : formData.sampleAvailable,
           samplePrice: formData.samplePrice ? parseFloat(formData.samplePrice) : null,
           packaging: formData.packagingDetails,
           shippingWeight: formData.shippingWeight,
           dimensions: formData.dimensions,
+          ...(isAutomotiveSubmit ? {
+            make: carSpecs.make,
+            model: carSpecs.model,
+            year: carSpecs.year,
+            mileage: carSpecs.mileage,
+            engineCC: carSpecs.engineCC,
+            transmission: carSpecs.transmission,
+            fuelType: carSpecs.fuelType,
+            bodyType: carSpecs.bodyType,
+            condition: carSpecs.condition,
+            exteriorColor: carSpecs.exteriorColor,
+            vin: carSpecs.vin,
+          } : {}),
         },
       };
 
@@ -343,13 +382,20 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
             </div>
           </div>
 
+          {/* Vehicle Details (Automotive only) */}
+          {isAutomotive && (
+            <CarSpecsForm specs={carSpecs} onChange={setCarSpecs} />
+          )}
+
           {/* Pricing & MOQ */}
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Pricing & Quantity</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              {isAutomotive ? 'Asking Price' : 'Pricing & Quantity'}
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Price per Unit
+                  {isAutomotive ? 'Asking Price' : 'Price per Unit'}
                 </label>
                 <input
                   type="number"
@@ -361,6 +407,7 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
                 />
               </div>
 
+              {!isAutomotive && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   MOQ (Minimum Order Quantity)
@@ -373,7 +420,9 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
                   placeholder="100"
                 />
               </div>
+              )}
 
+              {!isAutomotive && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Unit
@@ -388,6 +437,7 @@ export function EditProduct({ productId, user, activeMode, onBack, onSuccess }: 
                   ))}
                 </select>
               </div>
+              )}
             </div>
           </div>
 

@@ -16,8 +16,8 @@ router.use(authMiddleware);
 // Get all conversations for the logged-in user
 router.get('/conversations', getConversations);
 
-// Get messages with a specific partner
-router.get('/:partnerId', getMessages);
+// Get unread message count (must be before /:partnerId wildcard)
+router.get('/unread/count', getUnreadCount);
 
 // Send a new message
 router.post('/', sendMessage);
@@ -25,7 +25,7 @@ router.post('/', sendMessage);
 // Mark messages as read
 router.patch('/:partnerId/read', markAsRead);
 
-// Get unread message count
-router.get('/unread/count', getUnreadCount);
+// Get messages with a specific partner
+router.get('/:partnerId', getMessages);
 
 export default router;

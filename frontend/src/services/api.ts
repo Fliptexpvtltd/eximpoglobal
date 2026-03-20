@@ -40,18 +40,18 @@ class ApiService {
 
   // Get auth token from storage
   private getAuthToken(): string | null {
-    return localStorage.getItem(STORAGE_KEYS.TOKEN);
+    return localStorage.getItem('token') || sessionStorage.getItem('token');
   }
 
   // Set auth token in storage
   public setAuthToken(token: string): void {
-    localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+    localStorage.setItem('token', token);
   }
 
   // Remove auth token from storage
   public removeAuthToken(): void {
-    localStorage.removeItem(STORAGE_KEYS.TOKEN);
-    localStorage.removeItem(STORAGE_KEYS.REFRESH_TOKEN);
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('token');
     localStorage.removeItem(STORAGE_KEYS.USER);
   }
 
@@ -73,7 +73,10 @@ class ApiService {
 
   // Build URL with query parameters
   private buildURL(endpoint: string, params?: Record<string, any>): string {
-    const url = new URL(`${this.baseURL}${endpoint}`);
+    const base = this.baseURL.startsWith('http')
+      ? this.baseURL
+      : `${window.location.origin}${this.baseURL}`;
+    const url = new URL(`${base}${endpoint}`);
     
     if (params) {
       Object.keys(params).forEach(key => {

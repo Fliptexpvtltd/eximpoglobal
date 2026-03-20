@@ -36,8 +36,8 @@ export function Navigation({ user, currentView, onNavigate, onLogout, notificati
     { id: 'analytics', label: 'Performance', icon: BarChart3 },
   ];
 
-  const isSeller = user.role === 'seller';
-  const links = user.role === 'seller' ? sellerLinks : buyerLinks;
+  const isSeller = user.role === 'seller' || user.role === 'both';
+  const links = isSeller ? sellerLinks : buyerLinks;
   
   // Theme colors based on role - using full class names for Tailwind
   const bgColor = isSeller ? 'bg-emerald-600' : 'bg-blue-600';

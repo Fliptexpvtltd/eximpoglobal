@@ -66,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role: data.data.role as UserRole,
             companyName: data.data.companyName,
             kycStatus: data.data.verified ? 'approved' : 'pending',
+            phone: data.data.phone || '',
           };
           setUser(loadedUser);
           console.log('✅ User loaded from token:', loadedUser.email);
@@ -120,6 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: data.data.user.role as UserRole,
           companyName: data.data.user.companyName,
           kycStatus: data.data.user.verified ? 'approved' : 'pending',
+          phone: data.data.user.phone || '',
         };
                 setUser(newUser);
         setIsAuthModalOpen(false);
@@ -199,6 +201,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           role: data.data.user.role as UserRole,
           companyName: data.data.user.companyName,
           kycStatus: data.data.user.verified ? 'approved' : 'pending',
+          phone: data.data.user.phone || '',
         };
         
         setUser(newUser);
@@ -263,6 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role: data.data.user.role as UserRole,
             companyName: data.data.user.companyName,
             kycStatus: data.data.user.verified ? 'approved' : 'pending',
+            phone: data.data.user.phone || '',
           };
           
           setUser(newUser);

@@ -246,12 +246,12 @@ export function SupplierProfile({ supplierId, user: propUser, activeMode = 'buye
               {products.slice(0, 6).map((product: any, index: number) => (
                 <div key={index} className="rounded-lg overflow-hidden border border-gray-200 p-4">
                   <ImageWithFallback
-                    src={product.image_url}
+                    src={product.images?.[0] || ''}
                     alt={product.name}
                     className="w-full h-32 object-cover rounded mb-2"
                   />
                   <div className="text-sm text-gray-900 mb-1">{product.name}</div>
-                  <div className="text-sm text-blue-600">₹{parseFloat(product.unit_price).toFixed(2)}</div>
+                  <div className="text-sm text-blue-600">{product.price ? `₹${parseFloat(product.price).toLocaleString()}` : 'Contact Supplier'}</div>
                 </div>
               ))}
             </div>
@@ -310,7 +310,7 @@ export function SupplierProfile({ supplierId, user: propUser, activeMode = 'buye
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h3 className="mb-4">Certifications</h3>
             <div className="space-y-3">
-              {supplier.certifications.map((cert) => (
+              {(supplier.certifications || []).map((cert) => (
                 <div key={cert} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg border border-green-200">
                   <Award className="w-5 h-5 text-green-600" />
                   <span className="text-green-900">{cert}</span>
@@ -331,7 +331,7 @@ export function SupplierProfile({ supplierId, user: propUser, activeMode = 'buye
                 </div>
               ))}
             </div>
-            <button className="w-full mt-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button onClick={onBack} className="w-full mt-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               View All Products
             </button>
           </div>

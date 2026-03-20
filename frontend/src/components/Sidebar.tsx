@@ -37,7 +37,7 @@ export function Sidebar({ user, currentView, onNavigate, sidebarOpen, onToggleSi
     { id: 'help', label: 'Help & Support', icon: HelpCircle },
   ];
 
-  const isSeller = user.role === 'seller';
+  const isSeller = user.role === 'seller' || user.role === 'both';
   const links = isSeller ? sellerLinks : buyerLinks;
 
   return (

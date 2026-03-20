@@ -39,7 +39,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
   const fetchUnreadMessageCount = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`${API_BASE_URL}/messages/unread-count`, {
+      const response = await fetch(`${API_BASE_URL}/messages/unread/count`, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const data = await response.json();
@@ -131,6 +131,7 @@ export function BuyerDashboard({ user, onNavigate, onViewProduct, onViewQuotes }
           origin: p.specifications?.originCountry || p.supplier_country || 'Unknown',
           certifications: p.certifications || [],
           image: p.images?.[0] || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770',
+          images: p.images || [],
           description: p.description,
           specifications: p.specifications || {},
           variants: [],

@@ -6,6 +6,8 @@ import { PublicNavigation } from './PublicNavigation';
 import { useAuth } from '../contexts/AuthContext';
 import { PageSEO } from './PageSEO';
 import { toast } from 'sonner';
+import { CarSpecsPanel } from './CarSpecsPanel';
+import { CarInquiryForm } from './CarInquiryForm';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -60,6 +62,15 @@ export function ProductDetail({
   
   const [activeTab, setActiveTab] = useState<'description' | 'specifications'>('description');
   const [seoData, setSeoData] = useState<any>(null);
+  const [showInquiryForm, setShowInquiryForm] = useState(false);
+  
+  const productImages: string[] = (product as any).images?.length
+    ? (product as any).images
+    : product.image ? [product.image] : [];
+  const [selectedImage, setSelectedImage] = useState<string>(productImages[0] || product.image);
+
+  const isAutomotive = product.category === 'Automotive';
+  const carSpecs = (product as any).specifications || {};
 
   // Auto-open checkout if flag is set (after login redirect)
   useEffect(() => {
@@ -91,6 +102,14 @@ export function ProductDetail({
   return (
     <PageSEO seoData={seoData}>
       <>
+        {showInquiryForm && (
+          <CarInquiryForm
+            product={{ id: product.id, name: product.name, supplierId: product.supplierId, price: product.price, currency: product.currency }}
+            user={user}
+            onClose={() => setShowInquiryForm(false)}
+            onLoginRequired={() => { setShowInquiryForm(false); onOrderSample(product); }}
+          />
+        )}
         {!user && <PublicNavigation />}
         
         <div className={user ? "space-y-6 pb-20 lg:pb-6" : "max-w-7xl mx-auto px-4 py-6 pb-20 lg:pb-6 space-y-6"}>
@@ -110,23 +129,31 @@ export function ProductDetail({
             <div className="sticky top-6 space-y-4">
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                 <ImageWithFallback
-                  src={product.image}
+                  src={selectedImage || product.image}
                   alt={product.name}
                   className="w-full h-80 lg:h-96 object-cover"
                 />
               </div>
               
-              <div className="grid grid-cols-4 gap-2">
-                {[1, 2, 3, 4].map((i) => (
-                  <button key={i} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:border-blue-500 transition-colors">
-                    <ImageWithFallback
-                      src={product.image}
-                      alt={`${product.name} ${i}`}
-                      className="w-full h-16 lg:h-20 object-cover"
-                    />
-                  </button>
-                ))}
-              </div>
+              {productImages.length > 1 && (
+                <div className="grid grid-cols-4 gap-2">
+                  {productImages.map((img, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedImage(img)}
+                      className={`bg-white rounded-lg border overflow-hidden transition-colors ${
+                        selectedImage === img ? 'border-blue-500 ring-2 ring-blue-300' : 'border-gray-200 hover:border-blue-400'
+                      }`}
+                    >
+                      <ImageWithFallback
+                        src={img}
+                        alt={`${product.name} ${i + 1}`}
+                        className="w-full h-16 lg:h-20 object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
           
@@ -136,8 +163,12 @@ export function ProductDetail({
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center gap-2 text-sm text-gray-600 mb-2">
                 <span>{product.category}</span>
-                <span>•</span>
-                <span>HS: {product.hsCode}</span>
+                {product.category !== 'Automotive' && (
+                  <>
+                    <span>•</span>
+                    <span>HS: {product.hsCode}</span>
+                  </>
+                )}
               </div>
               <h1 className="text-2xl md:text-3xl mb-3">{product.name}</h1>
               <p className="text-gray-600 mb-4">{product.description}</p>
@@ -153,6 +184,26 @@ export function ProductDetail({
               </div>
 
               {/* Price Info */}
+              {isAutomotive ? (
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200">
+                  <div className="mb-3">
+                    <div className="text-sm text-blue-600 mb-1">Asking Price</div>
+                    {product.price ? (
+                      <div className="text-3xl text-blue-900">₹{product.price.toLocaleString()}</div>
+                    ) : (
+                      <div className="text-xl text-blue-700">Price on Request</div>
+                    )}
+                  </div>
+                  {carSpecs.condition && (
+                    <div className="flex items-center gap-2 text-blue-700 text-sm">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="capitalize">
+                        {carSpecs.condition === 'certified' ? 'Certified Pre-Owned' : carSpecs.condition}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              ) : (
               <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-200">
                 <div className="grid grid-cols-2 gap-4 mb-4">
                   <div>
@@ -175,8 +226,30 @@ export function ProductDetail({
                   <span className="text-blue-900">{product.leadTime}</span>
                 </div>
               </div>
+              )}
               
               {/* Action Buttons */}
+              {isAutomotive ? (
+                <div className="grid grid-cols-2 gap-3 mt-4">
+                  <button
+                    onClick={() => {
+                      if (!user) { onOrderSample(product); return; }
+                      setShowInquiryForm(true);
+                    }}
+                    className="col-span-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    Request Information
+                  </button>
+                  <button
+                    onClick={() => onContactSupplier(product.supplierId)}
+                    className="col-span-2 px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center justify-center gap-2"
+                  >
+                    <MessageSquare className="w-5 h-5" />
+                    Contact Seller
+                  </button>
+                </div>
+              ) : (
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <button
                   onClick={() => onCreateRFQ(product)}
@@ -206,6 +279,7 @@ export function ProductDetail({
                   <span className="hidden sm:inline">Sample</span>
                 </button>
               </div>
+              )}
             </div>
 
             {/* Supplier Card */}
@@ -256,7 +330,8 @@ export function ProductDetail({
           {/* Right Column - Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-6 space-y-4">
-              {/* Sample Order */}
+              {/* Sample Order — hidden for Automotive */}
+              {!isAutomotive && (
               <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <h3 className="mb-4 flex items-center gap-2">
                   <Package className="w-5 h-5 text-blue-600" />
@@ -288,7 +363,13 @@ export function ProductDetail({
                   Shipping calculated at checkout
                 </p>
               </div>
+              )}
               
+              {/* Vehicle Specs (Automotive only) */}
+              {isAutomotive && carSpecs.make && (
+                <CarSpecsPanel specifications={carSpecs} />
+              )}
+
               {/* Trade Assurance */}
               <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200 p-5">
                 <div className="flex items-start gap-3 mb-4">
@@ -317,7 +398,7 @@ export function ProductDetail({
               </div>
 
               {/* Quick Stats */}
-              <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-5">
+              {!isAutomotive && <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border border-purple-200 p-5">
                 <h3 className="text-purple-900 mb-3 flex items-center gap-2">
                   <TrendingUp className="w-5 h-5" />
                   Product Insights
@@ -336,7 +417,7 @@ export function ProductDetail({
                     <span className="text-purple-900">4.8/5 (120)</span>
                   </div>
                 </div>
-              </div>
+              </div>}
             </div>
           </div>
         </div>
@@ -387,14 +468,35 @@ export function ProductDetail({
                 <h2 className="text-lg md:text-xl font-bold mb-4 md:mb-6 text-gray-900">Technical Specifications</h2>
                 {product.specifications && Object.keys(product.specifications).length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                    {Object.entries(product.specifications).map(([key, value]) => (
-                      <div key={key} className="bg-gray-50 rounded-lg p-3 md:p-4 border border-gray-200">
-                        <div className="text-xs md:text-sm font-medium text-gray-600 mb-1 capitalize">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
-                        </div>
-                        <div className="text-sm md:text-base text-gray-900 font-medium break-words">{String(value)}</div>
-                      </div>
-                    ))}
+                    {Object.entries(product.specifications)
+                      .filter(([, value]) => {
+                        if (value === null || value === undefined || value === false || value === '') return false;
+                        if (typeof value === 'object' && !Array.isArray(value)) {
+                          return Object.values(value as object).some(v => v !== '' && v !== null && v !== undefined);
+                        }
+                        return true;
+                      })
+                      .map(([key, value]) => {
+                        let display: string;
+                        if (value === true) {
+                          display = 'Yes';
+                        } else if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+                          const parts = Object.entries(value as Record<string, any>)
+                            .filter(([, v]) => v !== '' && v !== null && v !== undefined)
+                            .map(([k, v]) => `${k}: ${v}`);
+                          display = parts.join(', ');
+                        } else {
+                          display = String(value);
+                        }
+                        return (
+                          <div key={key} className="bg-gray-50 rounded-lg p-3 md:p-4 border border-gray-200">
+                            <div className="text-xs md:text-sm font-medium text-gray-600 mb-1 capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').trim()}
+                            </div>
+                            <div className="text-sm md:text-base text-gray-900 font-medium break-words">{display}</div>
+                          </div>
+                        );
+                      })}
                   </div>
                 ) : (
                   <p className="text-gray-600">No specifications available.</p>

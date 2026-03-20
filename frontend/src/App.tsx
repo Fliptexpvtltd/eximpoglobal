@@ -55,7 +55,7 @@ import { SubmitQuote } from './components/SubmitQuote';
 import { AllRFQs } from './components/AllRFQs';
 import { Checkout } from './components/Checkout';
 
-export type UserRole = 'buyer' | 'seller' | 'ops' | 'finance' | 'admin';
+export type UserRole = 'buyer' | 'seller' | 'both' | 'ops' | 'finance' | 'admin';
 
 export interface User {
   id: string;
@@ -64,6 +64,7 @@ export interface User {
   role: UserRole;
   companyName: string;
   kycStatus: 'pending' | 'approved' | 'rejected';
+  phone?: string;
 }
 
 export interface Product {
@@ -81,8 +82,10 @@ export interface Product {
   origin: string;
   certifications: string[];
   image: string;
+  images?: string[];
   description: string;
   variants: Array<{ name: string; value: string }>;
+  specifications?: Record<string, any>;
 }
 
 export interface RFQ {
@@ -215,6 +218,16 @@ function AppContent() {
   const { user, isLoading, requireAuth, logout, login, signup, selectRole, googleAuth, authStep } = useAuth();
   const [currentView, setCurrentView] = useState<View>(() => {
     const saved = localStorage.getItem('currentView');
+    // These views require in-memory state (selectedProduct, selectedOrderId, etc.)
+    // that is lost on page refresh — fall back to 'dashboard' so the page isn't blank
+    const statefulViews = [
+      'product-detail', 'supplier-profile', 'quote-comparison', 'checkout',
+      'shipment-tracking', 'create-shipment', 'update-tracking', 'order-details',
+      'edit-product', 'submit-quote',
+    ];
+    if (saved && statefulViews.includes(saved)) {
+      return 'dashboard';
+    }
     return (saved as View) || 'catalog';
   });
   const [resetEmail, setResetEmail] = useState('');
@@ -266,7 +279,9 @@ function AppContent() {
     if (protectedViews.includes(currentView) && !user) {
       console.log('🔒 Protected view without auth, redirecting to catalog');
       setCurrentView('catalog');
+      return;
     }
+
   }, [user, currentView, isLoading]);
 
   // Listen for pending action execution
@@ -561,7 +576,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'dashboard' && user && user.role === 'seller' && (
+        {currentView === 'dashboard' && user && (user.role === 'seller' || user.role === 'both') && (
           <SellerDashboard 
             user={user} 
             onNavigate={(view: any) => navigate(view as View)}
@@ -596,7 +611,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'rfq-builder' && user && user.role === 'buyer' && (
+        {currentView === 'rfq-builder' && user && (user.role === 'buyer' || user.role === 'both') && (
           <RFQBuilder 
             initialProduct={selectedProduct}
             user={user}
@@ -608,14 +623,14 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'my-rfqs' && user && user.role === 'buyer' && (
+        {currentView === 'my-rfqs' && user && (user.role === 'buyer' || user.role === 'both') && (
           <MyRFQs
             onBack={() => setCurrentView('dashboard')}
             onViewQuotes={handleViewQuotes}
           />
         )}
         
-        {currentView === 'quote-comparison' && selectedRFQ && user && user.role === 'buyer' && (
+        {currentView === 'quote-comparison' && selectedRFQ && user && (user.role === 'buyer' || user.role === 'both') && (
           <QuoteComparison 
             rfq={selectedRFQ}
             user={user}
@@ -648,7 +663,7 @@ function AppContent() {
           />
         )}
 
-        {currentView === 'purchase-order' && user && (user.role === 'buyer' || user.role === 'seller') && (
+        {currentView === 'purchase-order' && user && (user.role === 'buyer' || user.role === 'seller' || user.role === 'both') && (
           <PurchaseOrder 
             user={user}
             orderId={selectedOrderId || undefined}
@@ -661,7 +676,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'shipment-tracking' && selectedPO && user && user.role === 'buyer' && (
+        {currentView === 'shipment-tracking' && selectedPO && user && (user.role === 'buyer' || user.role === 'both') && (
           <ShipmentTracking 
             po={selectedPO}
             user={user}
@@ -669,7 +684,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'create-shipment' && selectedOrderId && user && user.role === 'seller' && (
+        {currentView === 'create-shipment' && selectedOrderId && user && (user.role === 'seller' || user.role === 'both') && (
           <CreateShipment 
             orderId={selectedOrderId}
             orderNumber={`ORD-${selectedOrderId}`}
@@ -684,7 +699,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'update-tracking' && selectedOrderId && user && user.role === 'seller' && (
+        {currentView === 'update-tracking' && selectedOrderId && user && (user.role === 'seller' || user.role === 'both') && (
           <UpdateShipmentTracking 
             shipmentId={selectedOrderId}
             orderNumber={`ORD-${selectedOrderId}`}
@@ -732,10 +747,10 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'shipments' && user && user.role === 'buyer' && (
+        {currentView === 'shipments' && user && (user.role === 'buyer' || user.role === 'both') && (
           <Shipments 
             user={user}
-            activeMode={user.role}
+            activeMode={(user.role === 'buyer' || user.role === 'both') ? 'buyer' : 'buyer'}
             onViewDetails={() => {
               // TODO: Fetch PO by shipment ID
               // For now, use selectedPO if available
@@ -760,20 +775,20 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'add-product' && user && user.role === 'seller' && (
+        {currentView === 'add-product' && user && (user.role === 'seller' || user.role === 'both') && (
           <AddProduct 
             user={user}
-            activeMode={user.role}
+            activeMode={(user.role === 'seller' || user.role === 'both') ? 'seller' : 'buyer'}
             onBack={() => setCurrentView('catalog')}
             onSuccess={() => setCurrentView('catalog')}
           />
         )}
         
-        {currentView === 'edit-product' && user && selectedProductId && user.role === 'seller' && (
+        {currentView === 'edit-product' && user && selectedProductId && (user.role === 'seller' || user.role === 'both') && (
           <EditProduct 
             productId={selectedProductId}
             user={user}
-            activeMode={user.role}
+            activeMode={(user.role === 'seller' || user.role === 'both') ? 'seller' : 'buyer'}
             onBack={() => setCurrentView('dashboard')}
             onSuccess={() => {
               setSelectedProductId(null);
@@ -782,14 +797,14 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'manage-product-order' && user && user.role === 'seller' && (
+        {currentView === 'manage-product-order' && user && (user.role === 'seller' || user.role === 'both') && (
           <ProductOrderManager 
             user={user}
             onBack={() => setCurrentView('dashboard')}
           />
         )}
         
-        {currentView === 'manage-products' && user && user.role === 'seller' && (
+        {currentView === 'manage-products' && user && (user.role === 'seller' || user.role === 'both') && (
           <ProductManagement 
             user={user}
             onNavigate={(view: any, data?: any) => {
@@ -801,7 +816,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'all-rfqs' && user && user.role === 'seller' && (
+        {currentView === 'all-rfqs' && user && (user.role === 'seller' || user.role === 'both') && (
           <AllRFQs 
             user={user}
             onNavigate={(view: any) => navigate(view as View)}
@@ -809,7 +824,7 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'submit-quote' && user && selectedRfqId && user.role === 'seller' && (
+        {currentView === 'submit-quote' && user && selectedRfqId && (user.role === 'seller' || user.role === 'both') && (
           <SubmitQuote 
             user={user}
             rfqId={selectedRfqId}

@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { ArrowLeft, Upload, Plus, X, Save, AlertCircle } from 'lucide-react';
 import type { User } from '../App';
+import { CarSpecsForm, defaultCarSpecs } from './CarSpecsForm';
+import type { CarSpecs } from './CarSpecsForm';
 
 // API Configuration
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
@@ -40,6 +42,9 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
 
   const [newCertification, setNewCertification] = useState('');
   const [images, setImages] = useState<string[]>([]);
+  const [carSpecs, setCarSpecs] = useState<CarSpecs>(defaultCarSpecs);
+
+  const isAutomotive = formData.category === 'Automotive';
 
   const categories = [
     'Electronics',
@@ -164,14 +169,15 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
       }
 
       // Prepare product data for API
+      const isAutomotiveSubmit = formData.category === 'Automotive';
       const productData = {
         name: formData.name,
         category: formData.category,
         description: formData.description || null,
         price: formData.price ? parseFloat(formData.price) : null,
-        moq: formData.moq ? parseInt(formData.moq) : null,
-        unit: formData.unit,
-        incoterms: formData.incoterms,
+        moq: isAutomotiveSubmit ? 1 : (formData.moq ? parseInt(formData.moq) : null),
+        unit: isAutomotiveSubmit ? 'unit' : formData.unit,
+        incoterms: isAutomotiveSubmit ? [] : formData.incoterms,
         certifications: formData.certifications,
         images: images,
         specifications: {
@@ -181,11 +187,25 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
           features: formData.features,
           specifications: formData.specifications,
           customization: formData.customization,
-          sampleAvailable: formData.sampleAvailable,
+          sampleAvailable: isAutomotiveSubmit ? false : formData.sampleAvailable,
           samplePrice: formData.samplePrice ? parseFloat(formData.samplePrice) : null,
           packaging: formData.packagingDetails,
           shippingWeight: formData.shippingWeight,
           dimensions: formData.dimensions,
+          // Car-specific fields (only populated for Automotive)
+          ...(isAutomotiveSubmit ? {
+            make: carSpecs.make,
+            model: carSpecs.model,
+            year: carSpecs.year,
+            mileage: carSpecs.mileage,
+            engineCC: carSpecs.engineCC,
+            transmission: carSpecs.transmission,
+            fuelType: carSpecs.fuelType,
+            bodyType: carSpecs.bodyType,
+            condition: carSpecs.condition,
+            exteriorColor: carSpecs.exteriorColor,
+            vin: carSpecs.vin,
+          } : {}),
         },
       };
 
@@ -340,7 +360,13 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
               />
             </div>
 
-            <div>
+            {isAutomotive && (
+            <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">
+              You are listing an <strong>Automotive</strong> product. Fill in the Vehicle Details section below. Buyers will contact you to inquire — no MOQ or sample ordering applies.
+            </p>
+          )}
+
+          <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Technical Specifications
               </label>
@@ -358,9 +384,16 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
           </div>
         </div>
 
+        {/* Vehicle Details (Automotive only) */}
+        {isAutomotive && (
+          <CarSpecsForm specs={carSpecs} onChange={setCarSpecs} />
+        )}
+
         {/* Pricing & Order Details */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Pricing & Order Details</h2>
+          <h2 className="text-xl font-bold text-gray-900 mb-6">
+            {isAutomotive ? 'Asking Price' : 'Pricing & Order Details'}
+          </h2>
           
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -395,6 +428,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
               </div>
             </div>
 
+            {!isAutomotive && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -414,7 +448,6 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
                   Unit <span className="text-red-500">*</span>
                 </label>
                 <select
-                  required
                   value={formData.unit}
                   onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -425,7 +458,9 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
                 </select>
               </div>
             </div>
+            )}
 
+            {!isAutomotive && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -456,6 +491,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
                 </select>
               </div>
             </div>
+            )}
           </div>
         </div>
 
@@ -556,8 +592,8 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
           </div>
         </div>
 
-        {/* Additional Options */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        {/* Additional Options — hidden for Automotive */}
+        {!isAutomotive && <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Additional Options</h2>
           
           <div className="space-y-4">
@@ -593,7 +629,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
               </label>
             </div>
 
-            {formData.sampleAvailable && (
+            {!isAutomotive && formData.sampleAvailable && (
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Sample Price ({formData.currency})
@@ -609,9 +645,10 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
               </div>
             )}
           </div>
-        </div>
+        </div>}
 
-        {/* Shipping Details */}
+        {/* Shipping Details — hidden for Automotive */}
+        {!isAutomotive && (
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="text-xl font-bold text-gray-900 mb-6">Shipping & Incoterms</h2>
           
@@ -702,6 +739,7 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
             </div>
           </div>
         </div>
+        )}
 
         {/* Important Note */}
         <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 flex gap-3">

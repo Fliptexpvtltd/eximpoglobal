@@ -500,7 +500,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
                       ${Number(order.total_amount || 0).toLocaleString()}
                     </div>
                     <button
-                      onClick={() => onNavigate('create-shipment', order.id)}
+                      onClick={() => onNavigate({ view: 'create-shipment', orderId: order.id })}
                       className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                     >
                       Create Shipment
@@ -528,7 +528,7 @@ export function SellerDashboard({ user, onNavigate }: SellerDashboardProps) {
                       Shipment in transit
                     </div>
                     <button
-                      onClick={() => onNavigate('update-tracking', order.id)}
+                      onClick={() => onNavigate({ view: 'update-tracking', orderId: order.id })}
                       className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       Update Tracking

@@ -25,7 +25,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All Categories');
-  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [priceRange, setPriceRange] = useState([0, 10000000]);
   const [showFilters, setShowFilters] = useState(false);
   const [currency, setCurrency] = useState('INR');
 
@@ -76,7 +76,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
   const fetchProducts = async () => {
     try {
       // For sellers, show only their products. For buyers, show all approved products
-      const endpoint = isSeller ? `${API_BASE_URL}/products/my/products` : `${API_BASE_URL}/products`;
+      const endpoint = isSeller ? `${API_BASE_URL}/products/my/products` : `${API_BASE_URL}/products?limit=200`;
       const options: RequestInit = isSeller ? {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('token') || sessionStorage.getItem('token')}`
@@ -103,6 +103,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
           origin: p.specifications?.originCountry || p.supplier_country || 'Unknown',
           certifications: p.certifications || [],
           image: p.images?.[0] || 'https://images.unsplash.com/photo-1560393464-5c69a73c5770',
+          images: p.images || [],
           description: p.description,
           specifications: p.specifications || {},
           variants: [],
@@ -120,12 +121,12 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
 
   // Calculate active filter count
   const activeFilterCount = (selectedCategory !== 'All Categories' ? 1 : 0) + 
-    ((priceRange[0] !== 0 || priceRange[1] !== 100000) ? 1 : 0);
+    ((priceRange[0] !== 0 || priceRange[1] !== 10000000) ? 1 : 0);
 
   // Clear all filters
   const clearAllFilters = () => {
     setSelectedCategory('All Categories');
-    setPriceRange([0, 100000]);
+    setPriceRange([0, 10000000]);
   };
 
   // Filter products
@@ -328,7 +329,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                 <input
                   type="number"
                   value={priceRange[1]}
-                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 100000])}
+                  onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value) || 10000000])}
                   placeholder="Max"
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
                 />
@@ -380,27 +381,87 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                   <CheckCircle className="w-3.5 h-3.5 text-green-600" />
                 </button>
                 
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                  <MapPin className="w-4 h-4" />
-                  {product.origin}
-                  <span className="text-gray-400">•</span>
-                  <span>HS: {product.hsCode}</span>
-                </div>
-                
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {product.certifications.slice(0, 3).map(cert => (
-                    <span key={cert} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                      {cert}
-                    </span>
-                  ))}
-                  {product.certifications.length > 3 && (
-                    <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
-                      +{product.certifications.length - 3}
-                    </span>
-                  )}
-                </div>
+                {product.category === 'Automotive' ? (
+                  <div className="flex items-center gap-1.5 text-sm text-gray-600 mb-4 flex-wrap">
+                    {(product as any).specifications?.year && (
+                      <span className="font-medium text-gray-800">{(product as any).specifications.year}</span>
+                    )}
+                    {(product as any).specifications?.make && (
+                      <><span className="text-gray-400">•</span><span>{(product as any).specifications.make}</span></>
+                    )}
+                    {(product as any).specifications?.model && (
+                      <><span className="text-gray-400">•</span><span>{(product as any).specifications.model}</span></>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+                    <MapPin className="w-4 h-4" />
+                    {product.origin}
+                    <span className="text-gray-400">•</span>
+                    <span>HS: {product.hsCode}</span>
+                  </div>
+                )}
+
+                {product.category === 'Automotive' ? (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {(product as any).specifications?.bodyType && (
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">{(product as any).specifications.bodyType.charAt(0).toUpperCase() + (product as any).specifications.bodyType.slice(1)}</span>
+                    )}
+                    {(product as any).specifications?.fuelType && (
+                      <span className="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">{(product as any).specifications.fuelType.charAt(0).toUpperCase() + (product as any).specifications.fuelType.slice(1)}</span>
+                    )}
+                    {(product as any).specifications?.transmission && (
+                      <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">{(product as any).specifications.transmission.charAt(0).toUpperCase() + (product as any).specifications.transmission.slice(1)}</span>
+                    )}
+                    {(product as any).specifications?.engineCC && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">{Number((product as any).specifications.engineCC).toLocaleString()} cc</span>
+                    )}
+                    {(product as any).specifications?.exteriorColor && (
+                      <span className="px-2 py-1 bg-orange-100 text-orange-800 rounded text-xs">{(product as any).specifications.exteriorColor}</span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {product.certifications.slice(0, 3).map(cert => (
+                      <span key={cert} className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                        {cert}
+                      </span>
+                    ))}
+                    {product.certifications.length > 3 && (
+                      <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">
+                        +{product.certifications.length - 3}
+                      </span>
+                    )}
+                  </div>
+                )}
                 
                 <div className="border-t border-gray-100 pt-4 flex items-center justify-between">
+                  {product.category === 'Automotive' ? (
+                    <>
+                      <div>
+                        <div className="text-sm text-gray-600">
+                          {(product as any).specifications?.condition
+                            ? ((product as any).specifications.condition === 'certified'
+                              ? 'Certified Pre-Owned'
+                              : (product as any).specifications.condition.charAt(0).toUpperCase() +
+                                (product as any).specifications.condition.slice(1))
+                            : 'Vehicle'}
+                        </div>
+                        <div className="text-2xl text-blue-600">
+                          {product.price ? formatPrice(product.price) : 'On Request'}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm text-gray-600">Mileage</div>
+                        <div className="text-gray-900">
+                          {(product as any).specifications?.mileage
+                            ? `${Number((product as any).specifications.mileage).toLocaleString()} km`
+                            : 'N/A'}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
                   <div>
                     <div className="text-sm text-gray-600">From</div>
                     <div className="text-2xl text-blue-600">
@@ -413,10 +474,18 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                       {product.moq ? `${product.moq} units` : 'Flexible'}
                     </div>
                   </div>
+                    </>
+                  )}
                 </div>
                 
                 <div className="mt-3 text-sm text-gray-600">
-                  Lead time: {product.leadTime}
+                  {product.category === 'Automotive'
+                    ? ((product as any).specifications?.transmission
+                      ? (product as any).specifications.transmission.charAt(0).toUpperCase() +
+                        (product as any).specifications.transmission.slice(1) + ' · ' +
+                        ((product as any).specifications?.fuelType || '')
+                      : 'Contact seller for details')
+                    : `Lead time: ${product.leadTime}`}
                 </div>
               </div>
             </div>

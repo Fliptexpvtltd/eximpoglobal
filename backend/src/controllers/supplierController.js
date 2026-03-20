@@ -93,7 +93,7 @@ export const getSupplierById = async (req, res) => {
               sp.about, sp.logo_url, sp.banner_url, sp.verified as profile_verified
        FROM users u
        LEFT JOIN supplier_profiles sp ON u.id = sp.user_id
-       WHERE u.id = $1 AND u.role = 'seller'`,
+       WHERE u.id = $1 AND u.role IN ('seller', 'both')`,
       [id]
     );
 
@@ -125,7 +125,7 @@ export const getSupplierProducts = async (req, res) => {
 
     // Verify supplier exists
     const supplierCheck = await pool.query(
-      "SELECT id FROM users WHERE id = $1 AND role = 'seller'",
+      "SELECT id FROM users WHERE id = $1 AND role IN ('seller', 'both')",
       [id]
     );
 
@@ -307,7 +307,7 @@ export const getSupplierStats = async (req, res) => {
 
     // Verify supplier exists
     const supplierCheck = await pool.query(
-      "SELECT id FROM users WHERE id = $1 AND role = 'seller'",
+      "SELECT id FROM users WHERE id = $1 AND role IN ('seller', 'both')",
       [id]
     );
 
@@ -354,7 +354,7 @@ export const getSupplierProductCategories = async (req, res) => {
 
     // Verify supplier exists
     const supplierCheck = await pool.query(
-      "SELECT id FROM users WHERE id = $1 AND role = 'seller'",
+      "SELECT id FROM users WHERE id = $1 AND role IN ('seller', 'both')",
       [id]
     );
 
