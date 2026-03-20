@@ -4,27 +4,16 @@ import multerS3 from 'multer-s3';
 import path from 'path';
 import mime from 'mime-types';
 
-// Configure AWS SDK to use proper endpoint
-AWS.config.update({
-  accessKeyId: process.env.CONTABO_ACCESS_KEY || '98d59d8c643a4403a2dc26a27b37b922',
-  secretAccessKey: process.env.CONTABO_SECRET_KEY || 'DFFRGjxnKy1qygDs7W5iobjqMmyq11lZ',
-  region: 'us-east-1', // Use standard region for S3-compatible storage
-  s3ForcePathStyle: true,
-  signatureVersion: 'v4'
-});
-
 // Configure Contabo Object Storage (S3-compatible)
 const s3 = new AWS.S3({
   endpoint: process.env.CONTABO_ENDPOINT || 'https://sin1.contabostorage.com',
   accessKeyId: process.env.CONTABO_ACCESS_KEY || '98d59d8c643a4403a2dc26a27b37b922',
   secretAccessKey: process.env.CONTABO_SECRET_KEY || 'DFFRGjxnKy1qygDs7W5iobjqMmyq11lZ',
+  region: process.env.CONTABO_REGION || 'sin1',
   s3ForcePathStyle: true,
   signatureVersion: 'v4',
   sslEnabled: true,
-  s3BucketEndpoint: false,
-  // Fix for XML parsing error with Contabo
-  s3DisableBodySigning: true,
-  computeChecksums: false
+  s3BucketEndpoint: false
 });
 
 // Use just the base bucket name for S3 operations
