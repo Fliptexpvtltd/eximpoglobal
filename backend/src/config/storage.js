@@ -95,10 +95,7 @@ export const createUploadMiddleware = (type = 'image', fieldName = 'file', maxCo
         const filename = generateFileName(file.originalname);
         cb(null, `${folder}/${filename}`);
       },
-      contentType: multerS3.AUTO_CONTENT_TYPE,
-      acl: 'public-read',
-      // Handle Contabo response format
-      shouldTransformResponse: false
+      contentType: multerS3.AUTO_CONTENT_TYPE
     }),
     fileFilter: fileFilter(allowedTypes),
     limits: {
@@ -124,7 +121,6 @@ export const uploadToStorage = async (buffer, filename, contentType, folder = 'u
       Key: key,
       Body: buffer,
       ContentType: contentType,
-      ACL: 'public-read',
       Metadata: {
         uploadedAt: new Date().toISOString()
       }
