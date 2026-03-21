@@ -123,6 +123,8 @@ export function ApplicationsSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const dragStartX = useRef<number | null>(null);
+  const isDragging = useRef(false);
 
   // Auto-slide functionality
   useEffect(() => {
@@ -141,23 +143,53 @@ export function ApplicationsSlider() {
   // Get number of visible slides based on screen width
   const getVisibleSlides = () => {
     if (typeof window === 'undefined') return 5;
-    if (window.innerWidth >= 1280) return 5; // xl - 5 slides
-    if (window.innerWidth >= 1024) return 4; // lg - 4 slides
-    if (window.innerWidth >= 768) return 3;  // md - 3 slides
-    return 2; // sm - 2 slides
+    if (window.innerWidth >= 1280) return 5;
+    if (window.innerWidth >= 1024) return 4;
+    if (window.innerWidth >= 768) return 3;
+    return 2;
   };
 
   const handlePrevious = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? 0 : prevIndex - 1
-    );
+    setCurrentIndex((prevIndex) => prevIndex === 0 ? 0 : prevIndex - 1);
   };
 
   const handleNext = () => {
     const maxIndex = applications.length - getVisibleSlides();
-    setCurrentIndex((prevIndex) => 
-      prevIndex >= maxIndex ? maxIndex : prevIndex + 1
-    );
+    setCurrentIndex((prevIndex) => prevIndex >= maxIndex ? maxIndex : prevIndex + 1);
+  };
+
+  // Mouse drag handlers
+  const onMouseDown = (e: React.MouseEvent) => {
+    dragStartX.current = e.clientX;
+    isDragging.current = false;
+  };
+
+  const onMouseMove = (e: React.MouseEvent) => {
+    if (dragStartX.current === null) return;
+    if (Math.abs(e.clientX - dragStartX.current) > 5) isDragging.current = true;
+  };
+
+  const onMouseUp = (e: React.MouseEvent) => {
+    if (dragStartX.current === null) return;
+    const delta = dragStartX.current - e.clientX;
+    if (Math.abs(delta) > 50) {
+      delta > 0 ? handleNext() : handlePrevious();
+    }
+    dragStartX.current = null;
+  };
+
+  // Touch handlers
+  const onTouchStart = (e: React.TouchEvent) => {
+    dragStartX.current = e.touches[0].clientX;
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (dragStartX.current === null) return;
+    const delta = dragStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(delta) > 50) {
+      delta > 0 ? handleNext() : handlePrevious();
+    }
+    dragStartX.current = null;
   };
 
   return (
@@ -202,10 +234,16 @@ export function ApplicationsSlider() {
           <div className="overflow-hidden group">
             <div
               ref={sliderRef}
-              className="flex transition-transform duration-500 ease-in-out gap-3 md:gap-4"
+              className="flex transition-transform duration-500 ease-in-out gap-3 md:gap-4 cursor-grab active:cursor-grabbing select-none"
               style={{
                 transform: `translateX(-${currentIndex * (100 / getVisibleSlides())}%)`
               }}
+              onMouseDown={onMouseDown}
+              onMouseMove={onMouseMove}
+              onMouseUp={onMouseUp}
+              onMouseLeave={() => { dragStartX.current = null; }}
+              onTouchStart={onTouchStart}
+              onTouchEnd={onTouchEnd}
             >
               {applications.map((app) => (
                 <div
@@ -254,7 +292,13 @@ export function ApplicationsSlider() {
           <p className="text-gray-600 mb-4 text-sm md:text-base">
             Looking for products for your industry?
           </p>
-          <button className="px-6 md:px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+          <button
+            className="px-6 md:px-8 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg"
+            onClick={() => {
+              const el = document.getElementById('shop-by-category');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
             Explore All Products
           </button>
         </div>

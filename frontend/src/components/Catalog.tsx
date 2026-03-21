@@ -157,24 +157,20 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
     <>
       {!user && <PublicNavigation onNavigate={onNavigate} />}
       
-      {!user && (
+      {!user && selectedCategory === 'All Categories' && !searchTerm && (
         <div className="bg-white border-b border-gray-100">
           <div className="max-w-7xl mx-auto px-4 py-10 md:py-16">
-            <div className="grid md:grid-cols-2 gap-10 items-center">
-              {/* Left: Text + CTAs */}
+            <div className="text-center max-w-3xl mx-auto">
+              {/* Text + CTAs */}
               <div className="space-y-5">
-                <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1.5 rounded-full">
-                  <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse inline-block"></span>
-                  Trusted Global Trade Platform
-                </div>
                 <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
-                  Global Trade<br />
-                  <span className="text-blue-600">Made Simple</span>
+                  Trusted Global<br />
+                  <span className="text-blue-600">Trade Platform</span>
                 </h1>
                 <p className="text-base md:text-lg text-gray-500 max-w-lg">
                   Connect with verified buyers and sellers worldwide. Source products, request quotes, and manage international shipments — all in one platform.
                 </p>
-                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row gap-3 pt-2 justify-center">
                   <button
                     type="button"
                     onClick={() => requireAuth({ type: 'browse-catalog' })}
@@ -191,7 +187,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                   </button>
                 </div>
                 {/* Trust stats */}
-                <div className="flex gap-6 pt-2">
+                <div className="flex gap-6 pt-2 justify-center">
                   <div>
                     <div className="text-xl font-bold text-gray-900">500+</div>
                     <div className="text-xs text-gray-500">Verified Suppliers</div>
@@ -204,25 +200,6 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                     <div className="text-xl font-bold text-gray-900">10K+</div>
                     <div className="text-xs text-gray-500">Products Listed</div>
                   </div>
-                </div>
-              </div>
-              {/* Right: Feature cards */}
-              <div className="relative hidden md:flex items-center justify-center">
-                <div className="w-full h-80 rounded-3xl bg-gray-50 border border-gray-100 p-6 flex flex-col justify-center gap-3 shadow-sm">
-                  {[
-                    { icon: '🛡️', title: 'Verified Suppliers', desc: 'Every seller is KYC approved', color: 'bg-blue-50' },
-                    { icon: '💳', title: 'Secure Payments', desc: 'Escrow-protected transactions', color: 'bg-green-50' },
-                    { icon: '🚢', title: 'Global Shipping', desc: 'Freight support to 50+ countries', color: 'bg-indigo-50' },
-                    { icon: '📦', title: 'Real-time Tracking', desc: 'Monitor your shipments live', color: 'bg-orange-50' },
-                  ].map((item) => (
-                    <div key={item.title} className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                      <div className={`text-xl w-10 h-10 flex items-center justify-center rounded-xl ${item.color}`}>{item.icon}</div>
-                      <div>
-                        <div className="text-gray-800 font-semibold text-sm">{item.title}</div>
-                        <div className="text-gray-500 text-xs">{item.desc}</div>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               </div>
             </div>
@@ -255,7 +232,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
         
         {/* Homepage: 3 Big Category Cards */}
         {selectedCategory === 'All Categories' && !searchTerm && !isSeller && (
-          <div className="py-6">
+          <div id="shop-by-category" className="py-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 mt-2">Shop by Category</h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
@@ -267,18 +244,18 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
                 count: products.filter(p => p.category === 'Automotive').length,
               },
               {
-                label: 'Spices',
-                displayLabel: 'Spices',
-                desc: 'Premium Spices & Agri Commodities',
-                img: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
-                count: products.filter(p => p.category === 'Spices').length,
-              },
-              {
                 label: 'Polymers',
                 displayLabel: 'Polymers',
                 desc: 'Plastics, Resins & Raw Materials',
                 img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
                 count: products.filter(p => p.category === 'Polymers').length,
+              },
+              {
+                label: 'Spices',
+                displayLabel: 'Spices',
+                desc: 'Premium Spices & Agri Commodities',
+                img: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
+                count: products.filter(p => p.category === 'Spices').length,
               },
             ].map(card => (
               <button
