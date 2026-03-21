@@ -19,6 +19,7 @@ interface ProductDetailProps {
   onAutoOpenCheckoutComplete?: () => void;
   onCreateRFQ: (product: Product) => void;
   onOrderSample: (product: Product) => void;
+  onRequestInformation?: (product: Product) => void;
   onViewSupplier: (supplierId: string) => void;
   onContactSupplier: (supplierId: string) => void;
   onNavigateToCheckout: () => void;
@@ -45,7 +46,8 @@ export function ProductDetail({
   autoOpenCheckout = false,
   onAutoOpenCheckoutComplete,
   onCreateRFQ, 
-  onOrderSample, 
+  onOrderSample,
+  onRequestInformation,
   onViewSupplier, 
   onContactSupplier,
   onNavigateToCheckout, 
@@ -63,6 +65,13 @@ export function ProductDetail({
   const [activeTab, setActiveTab] = useState<'description' | 'specifications'>('description');
   const [seoData, setSeoData] = useState<any>(null);
   const [showInquiryForm, setShowInquiryForm] = useState(false);
+
+  // Listen for post-login inquiry form open trigger
+  useEffect(() => {
+    const handler = () => setShowInquiryForm(true);
+    window.addEventListener('open-inquiry-form', handler);
+    return () => window.removeEventListener('open-inquiry-form', handler);
+  }, []);
   
   const productImages: string[] = (product as any).images?.length
     ? (product as any).images
@@ -233,7 +242,7 @@ export function ProductDetail({
                 <div className="grid grid-cols-2 gap-3 mt-4">
                   <button
                     onClick={() => {
-                      if (!user) { onOrderSample(product); return; }
+                      if (!user) { onRequestInformation ? onRequestInformation(product) : onOrderSample(product); return; }
                       setShowInquiryForm(true);
                     }}
                     className="col-span-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2"

@@ -304,6 +304,16 @@ function AppContent() {
           // Navigate to RFQ builder with sample order flag
           setCurrentView('rfq-builder');
           break;
+        case 'request-information':
+          if (action.data?.product) {
+            setSelectedProduct(action.data.product);
+          }
+          setCurrentView('product-detail');
+          // Small delay to let product-detail render, then open form
+          setTimeout(() => {
+            window.dispatchEvent(new CustomEvent('open-inquiry-form'));
+          }, 100);
+          break;
         case 'view-quotes':
           if (action.data?.rfq) {
             setSelectedRFQ(action.data.rfq);
@@ -598,6 +608,7 @@ function AppContent() {
             user={user}
             onCreateRFQ={handleCreateRFQ}
             onOrderSample={handleOrderSample}
+            onRequestInformation={(product) => requireAuth({ type: 'request-information', data: { product } })}
             onViewSupplier={handleViewSupplier}
             onContactSupplier={handleContactSupplier}
             onNavigateToCheckout={() => setCurrentView('checkout')}
