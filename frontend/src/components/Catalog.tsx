@@ -158,28 +158,72 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
       {!user && <PublicNavigation onNavigate={onNavigate} />}
       
       {!user && (
-        <div className="bg-gradient-to-br from-blue-600 to-blue-800 text-white">
-          <div className="max-w-7xl mx-auto px-4 py-6 md:py-20">
-            <div className="text-center space-y-3 md:space-y-4">
-              <h1 className="text-2xl md:text-5xl">Global Trade Made Simple</h1>
-              <p className="text-base md:text-xl text-blue-100 max-w-3xl mx-auto">
-                Connect with verified buyers and sellers worldwide. Source products, request quotes, and manage international shipments all in one platform.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center pt-2 md:pt-4">
-                <button 
-                  type="button"
-                  onClick={() => requireAuth({ type: 'browse-catalog' })}
-                  className="bg-white text-blue-600 px-8 py-3 rounded-lg hover:bg-blue-50 transition-colors"
-                >
-                  Start Buying
-                </button>
-                <button 
-                  type="button"
-                  onClick={() => requireAuth({ type: 'browse-catalog' })}
-                  className="bg-blue-700 text-white px-8 py-3 rounded-lg hover:bg-blue-800 transition-colors border border-blue-500"
-                >
-                  Start Selling
-                </button>
+        <div className="bg-white border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 py-10 md:py-16">
+            <div className="grid md:grid-cols-2 gap-10 items-center">
+              {/* Left: Text + CTAs */}
+              <div className="space-y-5">
+                <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-sm font-medium px-3 py-1.5 rounded-full">
+                  <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse inline-block"></span>
+                  Trusted Global Trade Platform
+                </div>
+                <h1 className="text-3xl md:text-5xl font-bold text-gray-900 leading-tight">
+                  Global Trade<br />
+                  <span className="text-blue-600">Made Simple</span>
+                </h1>
+                <p className="text-base md:text-lg text-gray-500 max-w-lg">
+                  Connect with verified buyers and sellers worldwide. Source products, request quotes, and manage international shipments — all in one platform.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => requireAuth({ type: 'browse-catalog' })}
+                    className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-md shadow-blue-100"
+                  >
+                    Start Buying
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => requireAuth({ type: 'browse-catalog' })}
+                    className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors border-2 border-blue-200"
+                  >
+                    Start Selling
+                  </button>
+                </div>
+                {/* Trust stats */}
+                <div className="flex gap-6 pt-2">
+                  <div>
+                    <div className="text-xl font-bold text-gray-900">500+</div>
+                    <div className="text-xs text-gray-500">Verified Suppliers</div>
+                  </div>
+                  <div className="border-l border-gray-200 pl-6">
+                    <div className="text-xl font-bold text-gray-900">50+</div>
+                    <div className="text-xs text-gray-500">Countries</div>
+                  </div>
+                  <div className="border-l border-gray-200 pl-6">
+                    <div className="text-xl font-bold text-gray-900">10K+</div>
+                    <div className="text-xs text-gray-500">Products Listed</div>
+                  </div>
+                </div>
+              </div>
+              {/* Right: Feature cards */}
+              <div className="relative hidden md:flex items-center justify-center">
+                <div className="w-full h-80 rounded-3xl bg-gray-50 border border-gray-100 p-6 flex flex-col justify-center gap-3 shadow-sm">
+                  {[
+                    { icon: '🛡️', title: 'Verified Suppliers', desc: 'Every seller is KYC approved', color: 'bg-blue-50' },
+                    { icon: '💳', title: 'Secure Payments', desc: 'Escrow-protected transactions', color: 'bg-green-50' },
+                    { icon: '🚢', title: 'Global Shipping', desc: 'Freight support to 50+ countries', color: 'bg-indigo-50' },
+                    { icon: '📦', title: 'Real-time Tracking', desc: 'Monitor your shipments live', color: 'bg-orange-50' },
+                  ].map((item) => (
+                    <div key={item.title} className="flex items-center gap-4 bg-white rounded-2xl px-4 py-3 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                      <div className={`text-xl w-10 h-10 flex items-center justify-center rounded-xl ${item.color}`}>{item.icon}</div>
+                      <div>
+                        <div className="text-gray-800 font-semibold text-sm">{item.title}</div>
+                        <div className="text-gray-500 text-xs">{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
@@ -209,13 +253,71 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
           </div>
         )}
         
-        {!user && (
-          <div>
-            <h2 className="text-xl md:text-2xl mb-2">Featured Products</h2>
-            <p className="text-gray-600">Browse our curated selection of products from verified suppliers</p>
+        {/* Homepage: 3 Big Category Cards */}
+        {selectedCategory === 'All Categories' && !searchTerm && !isSeller && (
+          <div className="py-6">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6 mt-2">Shop by Category</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              {
+                label: 'Automotive',
+                displayLabel: 'Cars',
+                desc: 'Cars, SUVs & Commercial Vehicles',
+                img: 'https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800&q=80',
+                count: products.filter(p => p.category === 'Automotive').length,
+              },
+              {
+                label: 'Spices',
+                displayLabel: 'Spices',
+                desc: 'Premium Spices & Agri Commodities',
+                img: 'https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80',
+                count: products.filter(p => p.category === 'Spices').length,
+              },
+              {
+                label: 'Polymers',
+                displayLabel: 'Polymers',
+                desc: 'Plastics, Resins & Raw Materials',
+                img: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80',
+                count: products.filter(p => p.category === 'Polymers').length,
+              },
+            ].map(card => (
+              <button
+                key={card.label}
+                onClick={() => setSelectedCategory(card.label)}
+                className="relative h-64 rounded-2xl overflow-hidden group text-left shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-1"
+              >
+                <img
+                  src={card.img}
+                  alt={card.displayLabel}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.1) 100%)' }} />
+                <div className="absolute inset-0 p-6 flex flex-col justify-end">
+                  <div className="text-white text-2xl font-bold mb-1 drop-shadow-lg">{card.displayLabel}</div>
+                  <div className="text-white text-sm mb-3 opacity-90 drop-shadow">{card.desc}</div>
+                  {card.count > 0 && (
+                    <div className="text-white text-xs mb-3 opacity-75">{card.count} products available</div>
+                  )}
+                  <div className="inline-flex items-center gap-1.5 text-white text-sm font-semibold px-4 py-2 rounded-full w-fit transition-colors" style={{ background: 'rgba(255,255,255,0.25)' }}>
+                    Explore {card.displayLabel} →
+                  </div>
+                </div>
+              </button>
+            ))}
+          </div>
           </div>
         )}
-      
+
+      {(isSeller || selectedCategory !== 'All Categories' || !!searchTerm) && (<>
+        {!isSeller && selectedCategory !== 'All Categories' && (
+          <button
+            onClick={() => setSelectedCategory('All Categories')}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-gray-200 shadow-sm text-blue-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-700 font-medium text-sm transition-all duration-200"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            All Categories
+          </button>
+        )}
       <div className="flex flex-col md:flex-row gap-3 md:gap-4">
         <div className="flex-1 relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -492,6 +594,7 @@ export function Catalog({ onViewProduct, onViewSupplier, onNavigate, user, activ
           ))}
         </div>
       </div>
+      </>)}
       </div>
       
       {/* Applications Slider Section */}
