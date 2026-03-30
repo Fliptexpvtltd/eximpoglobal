@@ -104,11 +104,11 @@ export const getProductPageSEO = (product, supplier, baseUrl = process.env.FRONT
 
   return {
     title: `${product.name} | Buy Wholesale from ${supplier?.name || 'Verified Supplier'} | Eximpo Global`,
-    description: `${product.name}. Price: ${product.currency} ${product.price}. MOQ: ${product.moq} units. Buy directly from ${supplier?.name}. ${product.description?.substring(0, 100)}...`,
+    description: `${product.name}. ${product.price ? `Price: ${product.currency || 'USD'} ${product.price}.` : ''} ${product.moq ? `MOQ: ${product.moq} units.` : ''} Buy directly from ${supplier?.name || 'verified supplier'}. ${product.description?.substring(0, 100) || ''}`,
     keywords: `${product.name}, wholesale ${product.name}, ${product.category}, bulk purchase, supplier`,
     canonical: productUrl,
     ogTitle: `${product.name} - Buy Wholesale`,
-    ogDescription: `${product.name} at ${product.currency}${product.price}. MOQ: ${product.moq} units.`,
+    ogDescription: `${product.name}${product.price ? ` at ${product.currency || 'USD'} ${product.price}` : ''}${product.moq ? `. MOQ: ${product.moq} units` : ''}.`,
     ogImage: product.image || `${baseUrl}/images/og-product.jpg`,
     ogUrl: productUrl,
     ogType: 'product',
