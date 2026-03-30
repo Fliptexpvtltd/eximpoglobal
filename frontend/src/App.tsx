@@ -55,6 +55,7 @@ import { CustomsClearance } from './components/CustomsClearance';
 import { SubmitQuote } from './components/SubmitQuote';
 import { AllRFQs } from './components/AllRFQs';
 import { Checkout } from './components/Checkout';
+import { productService } from './services/productService';
 
 export type UserRole = 'buyer' | 'seller' | 'both' | 'ops' | 'finance' | 'admin';
 
@@ -373,6 +374,19 @@ function AppContent() {
   // Extract rich objects passed via router state (set during internal navigation)
   const selectedProduct: Product | null = location.state?.product ?? null;
   const selectedProductId: string | null = location.state?.productId ?? pathParams.productId;
+
+  // Fetch product from API when arriving via deep link (no state)
+  const [fetchedProduct, setFetchedProduct] = useState<Product | null>(null);
+  useEffect(() => {
+    if (currentView === 'product-detail' && !selectedProduct && selectedProductId) {
+      setFetchedProduct(null);
+      productService.getProductById(selectedProductId).then(res => {
+        if (res.success && res.data) setFetchedProduct(res.data);
+      }).catch(() => {});
+    } else {
+      setFetchedProduct(null);
+    }
+  }, [currentView, selectedProductId, selectedProduct]);
   const selectedSupplier: string | null = location.state?.supplierId ?? pathParams.supplierId;
   const selectedRFQ: RFQ | null = location.state?.rfq ?? null;
   const selectedQuote: Quote | null = location.state?.quote ?? null;
@@ -686,16 +700,16 @@ function AppContent() {
           />
         )}
         
-        {currentView === 'product-detail' && selectedProduct && (
+        {currentView === 'product-detail' && (selectedProduct || fetchedProduct) && (
           <ProductDetail
-            product={selectedProduct}
+            product={(selectedProduct || fetchedProduct)!}
             user={user}
             onCreateRFQ={handleCreateRFQ}
             onOrderSample={handleOrderSample}
             onRequestInformation={(product) => requireAuth({ type: 'request-information', data: { product } })}
             onViewSupplier={handleViewSupplier}
             onContactSupplier={handleContactSupplier}
-            onNavigateToCheckout={() => rnNavigate('/checkout', { state: { product: selectedProduct } })}
+            onNavigateToCheckout={() => rnNavigate('/checkout', { state: { product: selectedProduct || fetchedProduct } })}
             onBack={() => rnNavigate('/')}
           />
         )}

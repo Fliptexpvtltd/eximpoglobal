@@ -104,7 +104,7 @@ app.get('/.well-known/assetlinks.json', (req, res) => {
       // keytool -list -v -keystore your-release-key.jks -alias your-alias
       // or from Google Play Console > App signing > App signing key certificate
       sha256_cert_fingerprints: [
-        process.env.ANDROID_SHA256_FINGERPRINT || '61:D5:34:15:6F:20:12:13:28:6D:28:09:1B:47:EA:58:15:9E:7A:1F:21:EE:72:62:3A:1F:76:CB:F6:EC:A6:D3'
+        process.env.ANDROID_SHA256_FINGERPRINT || 'C0:CB:55:16:33:D9:9D:35:01:F6:F1:C9:25:6E:8D:00:66:D1:8E:3F:70:9C:3D:7C:F7:85:0F:0F:D2:C4:B4:5B'
       ]
     }
   }]);
