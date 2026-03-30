@@ -2,9 +2,12 @@
  * SEO Service - Generates structured data and SEO metadata for products and content
  */
 
+// Helper to convert product name to URL slug
+const toSlug = (name) => (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 // Generate Product Schema (JSON-LD)
 export const generateProductSchema = (product, supplierInfo, baseUrl = process.env.FRONTEND_URL || 'https://app.eximpoglobal.net') => {
-  const productUrl = `${baseUrl}/products/${product.id}`;
+  const productUrl = `${baseUrl}/products/${toSlug(product.name)}/${product.id}`;
   
   return {
     '@context': 'https://schema.org',
@@ -138,7 +141,7 @@ export const generateProductListSchema = (products, baseUrl = process.env.FRONTE
     itemListElement: products.slice(0, 100).map((product, index) => ({
       '@type': 'ListItem',
       position: (index + 1).toString(),
-      url: `${baseUrl}/products/${product.id}`,
+      url: `${baseUrl}/products/${toSlug(product.name)}/${product.id}`,
       name: product.name,
       image: product.image,
       description: product.description

@@ -4,12 +4,13 @@
  */
 
 export const generateProductSitemap = (products, baseUrl = process.env.FRONTEND_URL || 'https://app.eximpoglobal.net') => {
+  const toSlug = (name) => (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const xmlHeader = '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n';
 
   const urls = products.map(product => {
     return `
   <url>
-    <loc>${baseUrl}/products/${product.id}</loc>
+    <loc>${baseUrl}/products/${toSlug(product.name)}/${product.id}</loc>
     <lastmod>${product.updatedAt || product.createdAt || new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>

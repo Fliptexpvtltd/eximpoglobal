@@ -95,8 +95,10 @@ export const getCatalogPageSEO = (category = null, page = 1, baseUrl = process.e
 /**
  * Product Detail Page SEO
  */
+const toSlug = (name) => (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
 export const getProductPageSEO = (product, supplier, baseUrl = process.env.FRONTEND_URL || 'https://app.eximpoglobal.net') => {
-  const productUrl = `${baseUrl}/products/${product.id}`;
+  const productUrl = `${baseUrl}/products/${toSlug(product.name)}/${product.id}`;
   const rating = product.averageRating || 0;
   const reviewCount = product.reviewCount || 0;
 

@@ -18,6 +18,7 @@ import { generateMerchantFeed, generateMerchantCSV } from '../services/merchantF
 import { getPageSEO } from '../services/onPageSeoService.js';
 
 const BASE_URL = process.env.FRONTEND_URL || 'https://app.eximpoglobal.net';
+const toSlug = (name) => (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
 // Get product with SEO metadata and structured data
 export const getProductSEO = async (req, res) => {
@@ -52,7 +53,7 @@ export const getProductSEO = async (req, res) => {
       { name: 'Home', url: '/' },
       { name: 'Products', url: '/products' },
       { name: product.category, url: `/products?category=${product.category}` },
-      { name: product.name, url: `/products/${id}` }
+      { name: product.name, url: `/products/${toSlug(product.name)}/${id}` }
     ];
 
     res.json({
@@ -63,13 +64,13 @@ export const getProductSEO = async (req, res) => {
           metadata,
           structuredData: productSchema,
           breadcrumbs,
-          canonical: getCanonicalUrl(`/products/${id}`, BASE_URL),
+          canonical: getCanonicalUrl(`/products/${toSlug(product.name)}/${id}`, BASE_URL),
           openGraph: {
             title: metadata.ogTitle,
             description: metadata.ogDescription,
             type: metadata.ogType,
             image: product.image || `${BASE_URL}/default-product.jpg`,
-            url: getCanonicalUrl(`/products/${id}`, BASE_URL)
+            url: getCanonicalUrl(`/products/${toSlug(product.name)}/${id}`, BASE_URL)
           }
         }
       }
