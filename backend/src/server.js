@@ -92,6 +92,24 @@ app.use('/api/users', userRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/payments', paymentRoutes);
 
+// Android App Links verification
+app.get('/.well-known/assetlinks.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.json([{
+    relation: ['delegate_permission/common.handle_all_urls'],
+    target: {
+      namespace: 'android_app',
+      package_name: 'net.eximpoglobal.app',
+      // Replace with your actual SHA-256 certificate fingerprint from:
+      // keytool -list -v -keystore your-release-key.jks -alias your-alias
+      // or from Google Play Console > App signing > App signing key certificate
+      sha256_cert_fingerprints: [
+        process.env.ANDROID_SHA256_FINGERPRINT || '61:D5:34:15:6F:20:12:13:28:6D:28:09:1B:47:EA:58:15:9E:7A:1F:21:EE:72:62:3A:1F:76:CB:F6:EC:A6:D3'
+      ]
+    }
+  }]);
+});
+
 // API info endpoint
 app.get('/api', (req, res) => {
   res.json({

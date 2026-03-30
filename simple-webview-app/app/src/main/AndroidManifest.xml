@@ -25,8 +25,21 @@
         
         <activity
             android:name=".MainActivity"
-            android:exported="false"
-            android:configChanges="orientation|keyboardHidden|screenSize" />
+            android:exported="true"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:launchMode="singleTask">
+
+            <!-- Android App Links for https://app.eximpoglobal.net -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="app.eximpoglobal.net" />
+            </intent-filter>
+
+        </activity>
     </application>
 
 </manifest>

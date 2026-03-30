@@ -175,8 +175,34 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         
-        // Load the website
-        loadWebsite();
+        // Load deep link URL if launched via App Link, otherwise load home
+        android.net.Uri deepLinkUri = getIntent().getData();
+        if (deepLinkUri != null) {
+            loadDeepLink(deepLinkUri);
+        } else {
+            loadWebsite();
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        android.net.Uri deepLinkUri = intent.getData();
+        if (deepLinkUri != null) {
+            loadDeepLink(deepLinkUri);
+        }
+    }
+
+    private void loadDeepLink(android.net.Uri uri) {
+        if (!isNetworkAvailable()) {
+            showNoNetwork();
+            return;
+        }
+        hideNoNetwork();
+        String url = uri.toString();
+        Log.d(TAG, "Loading deep link: " + url);
+        webView.loadUrl(url);
     }
     
     private void loadWebsite() {

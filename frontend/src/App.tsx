@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter, useNavigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { Login } from './components/Login';
@@ -214,74 +215,199 @@ type View =
   | 'checkout'
   | 'order-details';
 
+// --- URL <-> View helpers ---
+
+function toSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+function pathToView(pathname: string): View {
+  if (pathname === '/' || pathname === '/catalog') return 'catalog';
+  if (pathname === '/products/new') return 'add-product';
+  if (pathname === '/products/manage') return 'manage-products';
+  if (pathname === '/products/order') return 'manage-product-order';
+  if (/^\/products\/[^/]+\/[^/]+\/edit$/.test(pathname)) return 'edit-product';
+  if (/^\/products\/[^/]+\/[^/]+$/.test(pathname)) return 'product-detail';
+  if (/^\/suppliers\/[^/]+$/.test(pathname)) return 'supplier-profile';
+  if (pathname === '/dashboard') return 'dashboard';
+  if (pathname === '/login') return 'auth';
+  if (pathname === '/forgot-password') return 'forgot-password';
+  if (pathname === '/verify-otp') return 'verify-otp';
+  if (pathname === '/reset-password') return 'reset-password';
+  if (pathname === '/rfq/new') return 'rfq-builder';
+  if (pathname === '/rfqs') return 'my-rfqs';
+  if (pathname === '/rfqs/all') return 'all-rfqs';
+  if (/^\/rfqs\/[^/]+\/quote$/.test(pathname)) return 'submit-quote';
+  if (/^\/rfqs\/[^/]+\/quotes$/.test(pathname)) return 'quote-comparison';
+  if (pathname === '/chat') return 'chat';
+  if (pathname === '/checkout') return 'checkout';
+  if (pathname === '/purchase-order') return 'purchase-order';
+  if (pathname === '/orders') return 'orders';
+  if (/^\/orders\/[^/]+\/purchase$/.test(pathname)) return 'purchase-order';
+  if (/^\/orders\/[^/]+$/.test(pathname)) return 'order-details';
+  if (pathname === '/shipments') return 'shipments';
+  if (/^\/shipments\/create\/[^/]+$/.test(pathname)) return 'create-shipment';
+  if (/^\/shipments\/[^/]+\/tracking$/.test(pathname)) return 'update-tracking';
+  if (/^\/shipments\/[^/]+$/.test(pathname)) return 'shipment-tracking';
+  if (pathname === '/analytics') return 'analytics';
+  if (pathname === '/profile') return 'profile';
+  if (pathname === '/settings') return 'settings';
+  if (pathname === '/help') return 'help';
+  if (pathname === '/verification') return 'verification';
+  if (pathname === '/mobile-preview') return 'mobile-preview';
+  if (pathname === '/how-it-works') return 'how-it-works';
+  if (pathname === '/about') return 'about';
+  if (pathname === '/pricing') return 'pricing';
+  if (pathname === '/faq') return 'faq';
+  if (pathname === '/privacy-policy') return 'privacy-policy';
+  if (pathname === '/terms-of-service') return 'terms-of-service';
+  if (pathname === '/cookie-policy') return 'cookie-policy';
+  if (pathname === '/trade-assurance') return 'trade-assurance';
+  if (pathname === '/logistics-solutions') return 'logistics-solutions';
+  if (pathname === '/quality-inspection') return 'quality-inspection';
+  if (pathname === '/trade-financing') return 'trade-financing';
+  if (pathname === '/customs-clearance') return 'customs-clearance';
+  return 'catalog';
+}
+
+function getPathParams(pathname: string) {
+  const productEditMatch = pathname.match(/^\/products\/[^/]+\/([^/]+)\/edit$/);
+  const productMatch = pathname.match(/^\/products\/[^/]+\/([^/]+)$/);
+  const supplierMatch = pathname.match(/^\/suppliers\/([^/]+)$/);
+  const orderPurchaseMatch = pathname.match(/^\/orders\/([^/]+)\/purchase$/);
+  const orderMatch = pathname.match(/^\/orders\/([^/]+)$/);
+  const rfqMatch = pathname.match(/^\/rfqs\/([^/]+)\//);
+  const shipmentCreateMatch = pathname.match(/^\/shipments\/create\/([^/]+)$/);
+  const shipmentTrackingMatch = pathname.match(/^\/shipments\/([^/]+)\/tracking$/);
+  const shipmentMatch = pathname.match(/^\/shipments\/([^/]+)$/);
+  return {
+    productId: productEditMatch?.[1] || productMatch?.[1] || null,
+    supplierId: supplierMatch?.[1] || null,
+    orderId: orderPurchaseMatch?.[1] || orderMatch?.[1] || shipmentCreateMatch?.[1] || shipmentTrackingMatch?.[1] || shipmentMatch?.[1] || null,
+    rfqId: rfqMatch?.[1] || null,
+  };
+}
+
+const VIEW_PATHS: Record<View, string> = {
+  'catalog': '/',
+  'dashboard': '/dashboard',
+  'auth': '/login',
+  'forgot-password': '/forgot-password',
+  'verify-otp': '/verify-otp',
+  'reset-password': '/reset-password',
+  'rfq-builder': '/rfq/new',
+  'my-rfqs': '/rfqs',
+  'all-rfqs': '/rfqs/all',
+  'chat': '/chat',
+  'checkout': '/checkout',
+  'purchase-order': '/purchase-order',
+  'orders': '/orders',
+  'shipments': '/shipments',
+  'analytics': '/analytics',
+  'profile': '/profile',
+  'settings': '/settings',
+  'help': '/help',
+  'add-product': '/products/new',
+  'manage-products': '/products/manage',
+  'manage-product-order': '/products/order',
+  'verification': '/verification',
+  'mobile-preview': '/mobile-preview',
+  'how-it-works': '/how-it-works',
+  'about': '/about',
+  'pricing': '/pricing',
+  'faq': '/faq',
+  'privacy-policy': '/privacy-policy',
+  'terms-of-service': '/terms-of-service',
+  'cookie-policy': '/cookie-policy',
+  'trade-assurance': '/trade-assurance',
+  'logistics-solutions': '/logistics-solutions',
+  'quality-inspection': '/quality-inspection',
+  'trade-financing': '/trade-financing',
+  'customs-clearance': '/customs-clearance',
+  // ID-based routes — resolved at call site
+  'product-detail': '/products',
+  'supplier-profile': '/suppliers',
+  'order-details': '/orders',
+  'edit-product': '/products',
+  'submit-quote': '/rfqs',
+  'quote-comparison': '/rfqs',
+  'shipment-tracking': '/shipments',
+  'create-shipment': '/shipments',
+  'update-tracking': '/shipments',
+};
+
+type NavigateArg =
+  | View
+  | { view: View; productId?: string; productName?: string; orderId?: string; rfqId?: string; supplierId?: string };
+
+function buildPath(arg: NavigateArg): string {
+  if (typeof arg === 'string') return VIEW_PATHS[arg] || '/';
+  const { view: v, productId, productName, orderId, rfqId, supplierId } = arg;
+  const slug = productName ? toSlug(productName) : 'product';
+  switch (v) {
+    case 'product-detail': return `/products/${slug}/${productId}`;
+    case 'supplier-profile': return `/suppliers/${supplierId}`;
+    case 'order-details': return `/orders/${orderId}`;
+    case 'edit-product': return `/products/${slug}/${productId}/edit`;
+    case 'submit-quote': return `/rfqs/${rfqId}/quote`;
+    case 'quote-comparison': return `/rfqs/${rfqId}/quotes`;
+    case 'create-shipment': return `/shipments/create/${orderId}`;
+    case 'update-tracking': return `/shipments/${orderId}/tracking`;
+    case 'shipment-tracking': return `/shipments/${orderId}`;
+    default: return VIEW_PATHS[v] || '/';
+  }
+}
+
 function AppContent() {
   const { user, isLoading, requireAuth, logout, login, signup, selectRole, googleAuth, authStep } = useAuth();
-  const [currentView, setCurrentView] = useState<View>(() => {
-    const saved = localStorage.getItem('currentView');
-    // These views require in-memory state (selectedProduct, selectedOrderId, etc.)
-    // that is lost on page refresh — fall back to 'dashboard' so the page isn't blank
-    const statefulViews = [
-      'product-detail', 'supplier-profile', 'quote-comparison', 'checkout',
-      'shipment-tracking', 'create-shipment', 'update-tracking', 'order-details',
-      'edit-product', 'submit-quote',
-    ];
-    if (saved && statefulViews.includes(saved)) {
-      return 'dashboard';
-    }
-    return (saved as View) || 'catalog';
-  });
+  const rnNavigate = useNavigate();
+  const location = useLocation();
+
+  // Derive currentView from URL
+  const currentView = pathToView(location.pathname);
+  const pathParams = getPathParams(location.pathname);
+
+  // Extract rich objects passed via router state (set during internal navigation)
+  const selectedProduct: Product | null = location.state?.product ?? null;
+  const selectedProductId: string | null = location.state?.productId ?? pathParams.productId;
+  const selectedSupplier: string | null = location.state?.supplierId ?? pathParams.supplierId;
+  const selectedRFQ: RFQ | null = location.state?.rfq ?? null;
+  const selectedQuote: Quote | null = location.state?.quote ?? null;
+  const selectedPO: PO | null = location.state?.po ?? null;
+  const selectedOrderId: string | null = location.state?.orderId ?? pathParams.orderId;
+  const selectedRfqId: string | null = location.state?.rfqId ?? pathParams.rfqId;
+
+  // Transient state not tied to URL
   const [resetEmail, setResetEmail] = useState('');
   const [resetOTP, setResetOTP] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
-  const [selectedSupplier, setSelectedSupplier] = useState<string | null>(null);
-  const [selectedRFQ, setSelectedRFQ] = useState<RFQ | null>(null);
-  const [selectedQuote, setSelectedQuote] = useState<Quote | null>(null);
-  const [selectedPO, setSelectedPO] = useState<PO | null>(null);
-  const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
-  const [selectedRfqId, setSelectedRfqId] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [notificationPanelOpen, setNotificationPanelOpen] = useState(false);
 
-  // Scroll to top when view changes
+  // Scroll to top when route changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentView]);
+  }, [location.pathname]);
 
-  // Save currentView to localStorage whenever it changes (only for public views)
-  useEffect(() => {
-    const publicViews: View[] = ['catalog', 'how-it-works', 'about', 'mobile-preview'];
-    
-    if (publicViews.includes(currentView)) {
-      localStorage.setItem('currentView', currentView);
-    } else if (user) {
-      // Only save protected views if user is authenticated
-      localStorage.setItem('currentView', currentView);
-    }
-  }, [currentView, user]);
-
-  // Redirect from auth page to dashboard after successful login
+  // Redirect from /login to /dashboard after successful login
   useEffect(() => {
     if (currentView === 'auth' && user && !isLoading) {
       console.log('✅ User logged in, redirecting to dashboard');
-      setCurrentView('dashboard');
+      rnNavigate('/dashboard', { replace: true });
     }
   }, [user, currentView, isLoading]);
 
-  // Check if user is on a protected view without authentication (after loading completes)
+  // Redirect unauthenticated users away from protected routes
   useEffect(() => {
-    if (isLoading) return; // Don't redirect while still loading
-    
+    if (isLoading) return;
     const protectedViews: View[] = ['dashboard', 'rfq-builder', 'my-rfqs', 'quote-comparison', 'chat', 'purchase-order', 'shipments', 'shipment-tracking', 'analytics', 'profile', 'settings', 'help', 'orders'];
-    
-    // If on protected view and no user (and done loading), redirect to catalog
     if (protectedViews.includes(currentView) && !user) {
       console.log('🔒 Protected view without auth, redirecting to catalog');
-      setCurrentView('catalog');
-      return;
+      rnNavigate('/', { replace: true });
     }
-
   }, [user, currentView, isLoading]);
 
   // Listen for pending action execution
@@ -292,147 +418,105 @@ function AppContent() {
 
       switch (action.type) {
         case 'create-rfq':
-          if (action.data?.product) {
-            setSelectedProduct(action.data.product);
-          }
-          setCurrentView('rfq-builder');
+          rnNavigate('/rfq/new', { state: { product: action.data?.product } });
           break;
         case 'order-sample':
-          if (action.data?.product) {
-            setSelectedProduct(action.data.product);
-          }
-          // Navigate to RFQ builder with sample order flag
-          setCurrentView('rfq-builder');
+          rnNavigate('/rfq/new', { state: { product: action.data?.product } });
           break;
         case 'request-information':
           if (action.data?.product) {
-            setSelectedProduct(action.data.product);
+            rnNavigate(`/products/${action.data.product.id}`, { state: { product: action.data.product } });
+            setTimeout(() => {
+              window.dispatchEvent(new CustomEvent('open-inquiry-form'));
+            }, 100);
           }
-          setCurrentView('product-detail');
-          // Small delay to let product-detail render, then open form
-          setTimeout(() => {
-            window.dispatchEvent(new CustomEvent('open-inquiry-form'));
-          }, 100);
           break;
         case 'view-quotes':
           if (action.data?.rfq) {
-            setSelectedRFQ(action.data.rfq);
+            rnNavigate(`/rfqs/${action.data.rfq.id}/quotes`, { state: { rfq: action.data.rfq } });
           }
-          setCurrentView('quote-comparison');
           break;
         case 'view-dashboard':
-          setCurrentView('dashboard');
+          rnNavigate('/dashboard');
           break;
         case 'browse-catalog':
-          setCurrentView('catalog');
+          rnNavigate('/');
           break;
         case 'my-rfqs':
-          setCurrentView('my-rfqs');
+          rnNavigate('/rfqs');
           break;
         case 'chat':
-          setCurrentView('chat');
+          rnNavigate('/chat');
           break;
         case 'create-po':
-          setCurrentView('purchase-order');
+          rnNavigate('/purchase-order');
           break;
       }
     };
 
     window.addEventListener('execute-pending-action', handlePendingAction);
     return () => window.removeEventListener('execute-pending-action', handlePendingAction);
-  }, []);
+  }, [rnNavigate]);
 
   // Listen for navigate to auth event
   useEffect(() => {
     const handleNavigateToAuth = () => {
-      setCurrentView('auth');
+      rnNavigate('/login');
     };
 
     window.addEventListener('navigate-to-auth', handleNavigateToAuth);
     return () => window.removeEventListener('navigate-to-auth', handleNavigateToAuth);
-  }, []);
+  }, [rnNavigate]);
 
   const handleViewProduct = (product: Product) => {
-    setSelectedProduct(product);
-    setCurrentView('product-detail');
+    rnNavigate(`/products/${toSlug(product.name)}/${product.id}`, { state: { product } });
   };
 
   const handleViewSupplier = (supplierId: string) => {
-    setSelectedSupplier(supplierId);
-    setCurrentView('supplier-profile');
+    rnNavigate(`/suppliers/${supplierId}`, { state: { supplierId } });
   };
 
   const handleContactSupplier = (supplierId: string) => {
-    setSelectedSupplier(supplierId);
-    setCurrentView('chat');
+    rnNavigate('/chat', { state: { supplierId } });
   };
 
   const handleCreateRFQ = (product: Product) => {
-    // Require authentication before creating RFQ
-    requireAuth({
-      type: 'create-rfq',
-      data: { product }
-    });
+    requireAuth({ type: 'create-rfq', data: { product } });
   };
 
   const handleOrderSample = (product: Product) => {
-    // Require authentication before ordering sample
-    requireAuth({
-      type: 'order-sample',
-      data: { product }
-    });
+    requireAuth({ type: 'order-sample', data: { product } });
   };
 
   const handleViewQuotes = (rfq: RFQ) => {
-    // Require authentication before viewing quotes
-    requireAuth({
-      type: 'view-quotes',
-      data: { rfq }
-    });
+    requireAuth({ type: 'view-quotes', data: { rfq } });
   };
 
   const handleCreatePO = (quote: Quote) => {
-    setSelectedQuote(quote);
-    setCurrentView('purchase-order');
+    rnNavigate('/purchase-order', { state: { quote } });
   };
 
-  const navigate = (view: View | { view: View; productId?: string; orderId?: string; rfqId?: string }) => {
-    // Handle object parameter for views that need additional data
-    if (typeof view === 'object') {
-      const { view: viewName, productId, orderId, rfqId } = view;
-      
-      if (productId) {
-        setSelectedProductId(productId);
-      }
-      
-      if (orderId) {
-        setSelectedOrderId(orderId);
-      }
-      
-      if (rfqId) {
-        setSelectedRfqId(rfqId);
-      }
-      
+  const navigate = (arg: NavigateArg | { view: View; productId?: string; orderId?: string; rfqId?: string; supplierId?: string }, data?: any) => {
+    // Handle 2-argument form: navigate('edit-product', { productId })
+    if (typeof arg === 'string' && data) {
+      const path = buildPath({ view: arg as View, ...data });
       const protectedViews: View[] = ['dashboard', 'rfq-builder', 'quote-comparison', 'chat', 'purchase-order', 'shipment-tracking', 'analytics', 'profile', 'edit-product', 'create-shipment', 'update-tracking', 'submit-quote', 'all-rfqs', 'manage-products', 'orders'];
-      
-      if (protectedViews.includes(viewName) && !user) {
-        requireAuth({ type: 'view-dashboard' });
-        return;
-      }
-      
-      setCurrentView(viewName);
+      if (protectedViews.includes(arg as View) && !user) { requireAuth({ type: 'view-dashboard' }); return; }
+      rnNavigate(path, { state: data });
       return;
     }
-    
-    // Require auth for protected views
+
+    const viewName = typeof arg === 'string' ? arg : (arg as any).view;
     const protectedViews: View[] = ['dashboard', 'rfq-builder', 'quote-comparison', 'chat', 'purchase-order', 'shipment-tracking', 'analytics', 'profile', 'edit-product', 'create-shipment', 'update-tracking', 'submit-quote', 'all-rfqs', 'manage-products', 'orders'];
-    
-    if (protectedViews.includes(view) && !user) {
+
+    if (protectedViews.includes(viewName) && !user) {
       requireAuth({ type: 'view-dashboard' });
       return;
     }
-    
-    setCurrentView(view);
+
+    const path = buildPath(arg as NavigateArg);
+    const state = typeof arg === 'object' ? arg : undefined;
+    rnNavigate(path, state ? { state } : undefined);
   };
 
   // Notification handlers
@@ -465,10 +549,10 @@ function AppContent() {
     <>
       {currentView === 'forgot-password' && (
         <ForgotPassword 
-          onBack={() => setCurrentView('auth')} 
+          onBack={() => rnNavigate('/login')} 
           onSuccess={(email) => {
             setResetEmail(email);
-            setCurrentView('verify-otp');
+            rnNavigate('/verify-otp');
           }}
         />
       )}
@@ -478,11 +562,11 @@ function AppContent() {
           email={resetEmail}
           onSuccess={(otp) => {
             setResetOTP(otp);
-            setCurrentView('reset-password');
+            rnNavigate('/reset-password');
           }}
           onBack={() => {
             setResetEmail('');
-            setCurrentView('forgot-password');
+            rnNavigate('/forgot-password');
           }}
           onResend={async () => {
             try {
@@ -505,9 +589,9 @@ function AppContent() {
           onSuccess={() => {
             setResetEmail('');
             setResetOTP('');
-            setCurrentView('auth');
+            rnNavigate('/login');
           }}
-          onBack={() => setCurrentView('verify-otp')}
+          onBack={() => rnNavigate('/verify-otp')}
         />
       )}
 
@@ -528,7 +612,7 @@ function AppContent() {
                 onLogin={login}
                 onSignup={signup}
                 onGoogleAuth={googleAuth}
-                onForgotPassword={() => setCurrentView('forgot-password')}
+                onForgotPassword={() => rnNavigate('/forgot-password')}
                 isModal={false}
               />
             ) : (
@@ -565,7 +649,7 @@ function AppContent() {
               onNavigate={(view: any) => navigate(view as View)}
               onLogout={() => {
                 logout();
-                setCurrentView('catalog');
+                rnNavigate('/');
               }}
               notifications={notifications}
               notificationPanelOpen={notificationPanelOpen}
@@ -611,14 +695,16 @@ function AppContent() {
             onRequestInformation={(product) => requireAuth({ type: 'request-information', data: { product } })}
             onViewSupplier={handleViewSupplier}
             onContactSupplier={handleContactSupplier}
-            onNavigateToCheckout={() => setCurrentView('checkout')}
-            onBack={() => setCurrentView('catalog')}
+            onNavigateToCheckout={() => rnNavigate('/checkout', { state: { product: selectedProduct } })}
+            onBack={() => rnNavigate('/')}
           />
-        )}        {currentView === 'supplier-profile' && selectedSupplier && (
+        )}
+
+        {currentView === 'supplier-profile' && selectedSupplier && (
           <SupplierProfile 
             supplierId={selectedSupplier}
             user={user}
-            onBack={() => setCurrentView('catalog')}
+            onBack={() => rnNavigate('/')}
           />
         )}
         
@@ -627,16 +713,15 @@ function AppContent() {
             initialProduct={selectedProduct}
             user={user}
             onSubmit={(rfq) => {
-              setSelectedRFQ(rfq);
-              setCurrentView('quote-comparison');
+              rnNavigate(`/rfqs/${rfq.id}/quotes`, { state: { rfq } });
             }}
-            onCancel={() => setCurrentView('dashboard')}
+            onCancel={() => rnNavigate('/dashboard')}
           />
         )}
         
         {currentView === 'my-rfqs' && user && (user.role === 'buyer' || user.role === 'both') && (
           <MyRFQs
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => rnNavigate('/dashboard')}
             onViewQuotes={handleViewQuotes}
           />
         )}
@@ -646,8 +731,8 @@ function AppContent() {
             rfq={selectedRFQ}
             user={user}
             onAcceptQuote={handleCreatePO}
-            onChat={() => setCurrentView('chat')}
-            onBack={() => setCurrentView('dashboard')}
+            onChat={() => rnNavigate('/chat')}
+            onBack={() => rnNavigate('/dashboard')}
           />
         )}
         
@@ -656,8 +741,7 @@ function AppContent() {
             user={user}
             partnerId={selectedSupplier || undefined}
             onBack={() => {
-              setSelectedSupplier(null);
-              setCurrentView('catalog');
+              rnNavigate('/');
             }}
           />
         )}
@@ -666,10 +750,9 @@ function AppContent() {
           <Checkout
             product={selectedProduct}
             user={user}
-            onBack={() => setCurrentView('product-detail')}
+            onBack={() => rnNavigate(`/products/${toSlug(selectedProduct.name)}/${selectedProduct.id}`, { state: { product: selectedProduct } })}
             onSuccess={(order) => {
-              setSelectedOrderId(order.id);
-              setCurrentView('orders');
+              rnNavigate('/orders', { state: { orderId: order.id } });
             }}
           />
         )}
@@ -680,10 +763,9 @@ function AppContent() {
             orderId={selectedOrderId || undefined}
             quote={selectedQuote || undefined}
             onSubmit={(po) => {
-              setSelectedPO(po);
-              setCurrentView('dashboard');
+              rnNavigate('/dashboard', { state: { po } });
             }}
-            onCancel={() => setCurrentView('dashboard')}
+            onCancel={() => rnNavigate('/dashboard')}
           />
         )}
         
@@ -691,7 +773,7 @@ function AppContent() {
           <ShipmentTracking 
             po={selectedPO}
             user={user}
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => rnNavigate('/dashboard')}
           />
         )}
         
@@ -699,14 +781,8 @@ function AppContent() {
           <CreateShipment 
             orderId={selectedOrderId}
             orderNumber={`ORD-${selectedOrderId}`}
-            onSuccess={() => {
-              setCurrentView('dashboard');
-              setSelectedOrderId(null);
-            }}
-            onBack={() => {
-              setCurrentView('dashboard');
-              setSelectedOrderId(null);
-            }}
+            onSuccess={() => rnNavigate('/dashboard')}
+            onBack={() => rnNavigate('/dashboard')}
           />
         )}
         
@@ -715,21 +791,15 @@ function AppContent() {
             shipmentId={selectedOrderId}
             orderNumber={`ORD-${selectedOrderId}`}
             currentStatus="in_transit"
-            onSuccess={() => {
-              setCurrentView('dashboard');
-              setSelectedOrderId(null);
-            }}
-            onBack={() => {
-              setCurrentView('dashboard');
-              setSelectedOrderId(null);
-            }}
+            onSuccess={() => rnNavigate('/dashboard')}
+            onBack={() => rnNavigate('/dashboard')}
           />
         )}
         
         {currentView === 'order-details' && selectedOrderId && user && (
           <OrderDetails
             orderId={selectedOrderId}
-            onBack={() => setCurrentView('orders')}
+            onBack={() => rnNavigate('/orders')}
           />
         )}
 
@@ -742,8 +812,7 @@ function AppContent() {
         {currentView === 'orders' && user && (
           <OrdersList 
             onViewOrder={(orderId) => {
-              setSelectedOrderId(orderId);
-              setCurrentView('order-details');
+              rnNavigate(`/orders/${orderId}`, { state: { orderId } });
             }}
           />
         )}
@@ -753,7 +822,7 @@ function AppContent() {
             user={user}
             onLogout={() => {
               logout();
-              setCurrentView('catalog');
+              rnNavigate('/');
             }}
           />
         )}
@@ -763,10 +832,8 @@ function AppContent() {
             user={user}
             activeMode={(user.role === 'buyer' || user.role === 'both') ? 'buyer' : 'buyer'}
             onViewDetails={() => {
-              // TODO: Fetch PO by shipment ID
-              // For now, use selectedPO if available
               if (selectedPO) {
-                setCurrentView('shipment-tracking');
+                rnNavigate(`/shipments/${selectedPO.id}`, { state: { po: selectedPO } });
               }
             }}
           />
@@ -790,8 +857,8 @@ function AppContent() {
           <AddProduct 
             user={user}
             activeMode={(user.role === 'seller' || user.role === 'both') ? 'seller' : 'buyer'}
-            onBack={() => setCurrentView('catalog')}
-            onSuccess={() => setCurrentView('catalog')}
+            onBack={() => rnNavigate('/')}
+            onSuccess={() => rnNavigate('/')}
           />
         )}
         
@@ -800,18 +867,15 @@ function AppContent() {
             productId={selectedProductId}
             user={user}
             activeMode={(user.role === 'seller' || user.role === 'both') ? 'seller' : 'buyer'}
-            onBack={() => setCurrentView('dashboard')}
-            onSuccess={() => {
-              setSelectedProductId(null);
-              setCurrentView('dashboard');
-            }}
+            onBack={() => rnNavigate('/dashboard')}
+            onSuccess={() => rnNavigate('/dashboard')}
           />
         )}
         
         {currentView === 'manage-product-order' && user && (user.role === 'seller' || user.role === 'both') && (
           <ProductOrderManager 
             user={user}
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => rnNavigate('/dashboard')}
           />
         )}
         
@@ -819,10 +883,7 @@ function AppContent() {
           <ProductManagement 
             user={user}
             onNavigate={(view: any, data?: any) => {
-              if (data?.productId) {
-                setSelectedProductId(data.productId);
-              }
-              setCurrentView(view as View);
+              navigate(view as View, data);
             }}
           />
         )}
@@ -831,7 +892,7 @@ function AppContent() {
           <AllRFQs 
             user={user}
             onNavigate={(view: any) => navigate(view as View)}
-            onBack={() => setCurrentView('dashboard')}
+            onBack={() => rnNavigate('/dashboard')}
           />
         )}
         
@@ -839,22 +900,16 @@ function AppContent() {
           <SubmitQuote 
             user={user}
             rfqId={selectedRfqId}
-            onBack={() => {
-              setSelectedRfqId(null);
-              setCurrentView('dashboard');
-            }}
-            onSuccess={() => {
-              setSelectedRfqId(null);
-              setCurrentView('dashboard');
-            }}
+            onBack={() => rnNavigate('/dashboard')}
+            onSuccess={() => rnNavigate('/dashboard')}
           />
         )}
         
         {currentView === 'verification' && user && (
           <VerificationPage 
             user={user}
-            onBack={() => setCurrentView('dashboard')}
-            onComplete={() => setCurrentView('dashboard')}
+            onBack={() => rnNavigate('/dashboard')}
+            onComplete={() => rnNavigate('/dashboard')}
           />
         )}
         
@@ -926,9 +981,11 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Toaster position="top-right" richColors />
-      <AppContent />
-    </AuthProvider>
+    <BrowserRouter>
+      <AuthProvider>
+        <Toaster position="top-right" richColors />
+        <AppContent />
+      </AuthProvider>
+    </BrowserRouter>
   );
 }

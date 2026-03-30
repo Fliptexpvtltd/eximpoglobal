@@ -39,11 +39,16 @@ public class SplashActivity extends AppCompatActivity {
             }
         }).start();
 
-        // Navigate to MainActivity after splash duration
+        // Navigate to MainActivity after splash duration, forwarding any deep link intent
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                // Forward the deep link URI if this activity was opened via App Link
+                android.net.Uri deepLinkUri = getIntent().getData();
+                if (deepLinkUri != null) {
+                    intent.setData(deepLinkUri);
+                }
                 startActivity(intent);
                 finish();
             }
