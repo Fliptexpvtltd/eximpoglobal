@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Paperclip, Phone, Video, MoreVertical, Search, ArrowLeft, Plus, X } from 'lucide-react';
+import { Send, MoreVertical, Search, ArrowLeft, Plus, X } from 'lucide-react';
 import type { User } from '../App';
 
 // API Configuration
@@ -425,12 +425,6 @@ export function ChatInterface({ user, activeMode = 'buyer', partnerId, onBack }:
               
               <div className="flex items-center gap-2">
                 <button className="p-2 hover:bg-gray-100 rounded-lg">
-                  <Phone className="w-5 h-5 text-gray-600" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg">
-                  <Video className="w-5 h-5 text-gray-600" />
-                </button>
-                <button className="p-2 hover:bg-gray-100 rounded-lg">
                   <MoreVertical className="w-5 h-5 text-gray-600" />
                 </button>
               </div>
@@ -519,30 +513,12 @@ export function ChatInterface({ user, activeMode = 'buyer', partnerId, onBack }:
               <div ref={messagesEndRef} />
             </div>
             
-            {/* Quick Actions - Only show when conversation is selected */}
+            {/* Message Input - Only show when conversation is selected */}
             {selectedConversation && (
               <>
-                <div className="px-4 py-2 border-t border-gray-100 bg-gray-50">
-                  <div className="flex items-center gap-2">
-                    <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-white text-gray-700">
-                      Request Sample
-                    </button>
-                    <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-white text-gray-700">
-                      Propose Change
-                    </button>
-                    <button className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-white text-gray-700">
-                      View RFQ
-                    </button>
-                  </div>
-                </div>
-                
                 {/* Message Input */}
                 <div className="p-4 border-t border-gray-200">
                   <div className="flex items-end gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-lg">
-                      <Paperclip className="w-5 h-5 text-gray-600" />
-                    </button>
-                    
                     <div className="flex-1">
                       <textarea
                         value={messageInput}
