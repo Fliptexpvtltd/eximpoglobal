@@ -39,8 +39,10 @@ export function Login({ onLogin, onSignup, onGoogleAuth, onMobilePreview, onForg
   const [rememberMe, setRememberMe] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
 
-  // Check if running on iOS (iPhone/iPad) — hide Google Sign-In on iOS per App Store guideline 4.8
-  const isIOS = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  // Check if running inside the native iOS WKWebView app — hide Google Sign-In per App Store guideline 4.8
+  // Swift injects window.isNativeIOSApp = true via WKUserScript at document start
+  const isIOS = typeof (window as any).isNativeIOSApp !== 'undefined'
+    || /iPhone|iPad|iPod/i.test(navigator.userAgent);
 
   // Check if native Android Google Sign-In is available
   const hasNativeGoogleAuth = typeof (window as any).AndroidGoogleAuth !== 'undefined';
