@@ -19,6 +19,7 @@
   "dependencies": {
     "@bull-board/api": "^5.23.0",
     "@bull-board/express": "^5.23.0",
+    "apple-signin-auth": "^2.0.0",
     "aws-sdk": "^2.1693.0",
     "bcryptjs": "^2.4.3",
     "bullmq": "^5.34.3",

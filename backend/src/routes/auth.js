@@ -2,6 +2,7 @@ import express from 'express';
 import { register, login, getProfile, updateProfile } from '../controllers/authController.js';
 import { checkEmail } from '../controllers/emailCheckController.js';
 import { googleSignIn, completeGoogleRegistration } from '../controllers/googleAuthController.js';
+import { appleSignIn, completeAppleRegistration } from '../controllers/appleAuthController.js';
 import { requestPasswordReset, resetPassword, verifyOTP } from '../controllers/passwordResetController.js';
 import { 
   getUserStats, 
@@ -28,6 +29,10 @@ router.post('/reset-password', resetPassword);
 // Google OAuth routes
 router.post('/google/signin', googleSignIn);
 router.post('/google/complete-registration', completeGoogleRegistration);
+
+// Apple Sign In routes
+router.post('/apple/signin', appleSignIn);
+router.post('/apple/complete-registration', completeAppleRegistration);
 
 // Protected routes
 router.get('/profile', authMiddleware, getProfile);
