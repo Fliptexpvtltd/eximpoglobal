@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { User, Building2, Mail, Phone, MapPin, Shield, Settings, LogOut, Upload, Check, X, FileText, Calendar, Globe, Briefcase, Hash, AlertCircle, Save, Camera } from 'lucide-react';
+import { User, Building2, Mail, Phone, MapPin, Shield, Settings, LogOut, Upload, Check, X, FileText, Calendar, Globe, Briefcase, Hash, AlertCircle, Save, Camera, Trash2 } from 'lucide-react';
 import type { User as UserType } from '../App';
 import api from '../services/api';
 import { toast } from 'sonner';
@@ -20,6 +20,7 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
   const [showSuccess, setShowSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<any>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   
   // Profile form data
   const [profileData, setProfileData] = useState({
@@ -84,6 +85,26 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
       }
     } catch (error) {
       console.error('Failed to fetch user stats:', error);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    try {
+      setLoading(true);
+      const response = await api.delete('/auth/account');
+      if (response.success) {
+        toast.success('Account deleted successfully');
+        // Clear auth and logout
+        setTimeout(() => {
+          onLogout();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Failed to delete account:', error);
+      toast.error('Failed to delete account. Please try again.');
+    } finally {
+      setLoading(false);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -914,14 +935,63 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
       {/* Content Area */}
       {renderContent()}
 
-      {/* Logout */}
-      <button 
-        onClick={onLogout}
-        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors border border-red-200"
-      >
-        <LogOut className="w-5 h-5" />
-        Logout
-      </button>
+      {/* Logout & Delete Account */}
+      <div className="space-y-2">
+        <button 
+          onClick={onLogout}
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors border border-red-200"
+        >
+          <LogOut className="w-5 h-5" />
+          Logout
+        </button>
+        
+        <button 
+          onClick={() => setShowDeleteConfirm(true)}
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        >
+          <Trash2 className="w-5 h-5" />
+          Delete Account
+        </button>
+      </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <AlertCircle className="w-6 h-6 text-red-600" />
+              <h3 className="text-lg font-semibold text-gray-900">Delete Account?</h3>
+            </div>
+            
+            <p className="text-gray-600 mb-4">
+              This action cannot be undone. All your data including orders, products, messages, and profile information will be permanently deleted.
+            </p>
+            
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-6">
+              <p className="text-sm text-red-800">
+                <strong>Email:</strong> {user?.email}
+              </p>
+            </div>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                disabled={loading}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={loading}
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {loading ? 'Deleting...' : 'Delete Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
