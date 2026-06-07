@@ -1,6 +1,7 @@
 import express from 'express';
 import { register, login, getProfile, updateProfile } from '../controllers/authController.js';
 import { checkEmail } from '../controllers/emailCheckController.js';
+import { deleteAccount } from '../controllers/accountController.js';
 import { googleSignIn, completeGoogleRegistration } from '../controllers/googleAuthController.js';
 import { appleSignIn, completeAppleRegistration } from '../controllers/appleAuthController.js';
 import { requestPasswordReset, resetPassword, verifyOTP } from '../controllers/passwordResetController.js';
@@ -43,5 +44,8 @@ router.put('/profile/company', authMiddleware, updateCompanyDetails);
 
 router.get('/profile/preferences', authMiddleware, getUserPreferences);
 router.put('/profile/preferences', authMiddleware, updateUserPreferences);
+
+// Account deletion
+router.delete('/account', authMiddleware, deleteAccount);
 
 export default router;

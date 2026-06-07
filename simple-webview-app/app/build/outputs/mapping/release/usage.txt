@@ -20030,17 +20030,17 @@ kotlinx.coroutines.scheduling.WorkQueue:
     public static boolean pollTo()
     public static long tryStealFrom()
 net.eximpoglobal.app.GoogleSignInBridge$1
+net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$a2a1708c0dd729f634daa4e655df85cfb9f2a092e0c5ed2bec556eccfc20a74b$0
 net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$1
-net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$a2a1708c0dd729f634daa4e655df85cfb9f2a092e0c5ed2bec556eccfc20a74b$0
 net.eximpoglobal.app.MainActivity$2
 net.eximpoglobal.app.MainActivity:
     public static void handleSignInResult()
     public final void hideNoNetwork()
-    public static boolean isNetworkAvailable()
     public static synthetic void lambda$hideNoNetwork$3()
     public static synthetic void lambda$onCreate$0()
     public static void lambda$onCreate$1()
     public static synthetic void lambda$showNoNetwork$2()
+    public final void loadWebsite()
     public final void showNoNetwork()
     public static void startNativeGoogleSignIn()
 net.eximpoglobal.app.R$id

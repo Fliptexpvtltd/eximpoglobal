@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-32:12
-INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-32:12
-INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-32:12
-INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-32:12
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-45:12
+INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-45:12
+INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-45:12
+INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:2:1-45:12
 MERGED from [androidx.appcompat:appcompat-resources:1.6.1] C:\Users\tech\.gradle\caches\8.14.3\transforms\b05366c70cb9a8ebbd50b2f5755d6935\transformed\jetified-appcompat-resources-1.6.1\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.appcompat:appcompat:1.6.1] C:\Users\tech\.gradle\caches\8.14.3\transforms\9581d3a64f024668ce612bc76a75cc13\transformed\appcompat-1.6.1\AndroidManifest.xml:17:1-22:12
 MERGED from [com.google.android.gms:play-services-auth:20.7.0] C:\Users\tech\.gradle\caches\8.14.3\transforms\e3d99b7711010cfeeaf538974990bf20\transformed\jetified-play-services-auth-20.7.0\AndroidManifest.xml:17:1-40:12
@@ -56,8 +56,8 @@ ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xm
 	android:name
 		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:5:22-76
 application
-ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:7:5-30:19
-INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:7:5-30:19
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:7:5-43:19
+INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:7:5-43:19
 MERGED from [com.google.android.gms:play-services-auth:20.7.0] C:\Users\tech\.gradle\caches\8.14.3\transforms\e3d99b7711010cfeeaf538974990bf20\transformed\jetified-play-services-auth-20.7.0\AndroidManifest.xml:22:5-38:19
 MERGED from [com.google.android.gms:play-services-auth:20.7.0] C:\Users\tech\.gradle\caches\8.14.3\transforms\e3d99b7711010cfeeaf538974990bf20\transformed\jetified-play-services-auth-20.7.0\AndroidManifest.xml:22:5-38:19
 MERGED from [com.google.android.gms:play-services-fido:20.0.1] C:\Users\tech\.gradle\caches\8.14.3\transforms\46331b4fa9c8b4ba4329a2788370dd00\transformed\jetified-play-services-fido-20.0.1\AndroidManifest.xml:7:5-8:19
@@ -115,13 +115,37 @@ ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xm
 	android:name
 		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:22:27-74
 activity#net.eximpoglobal.app.MainActivity
-ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:26:9-29:77
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:26:9-42:20
+	android:launchMode
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:30:13-44
 	android:exported
-		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:28:13-37
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:28:13-36
 	android:configChanges
 		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:29:13-74
 	android:name
 		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:27:13-41
+intent-filter#action:name:android.intent.action.VIEW+category:name:android.intent.category.BROWSABLE+category:name:android.intent.category.DEFAULT+data:host:app.eximpoglobal.net+data:scheme:https
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:33:13-40:29
+	android:autoVerify
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:33:28-53
+action#android.intent.action.VIEW
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:34:17-69
+	android:name
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:34:25-66
+category#android.intent.category.DEFAULT
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:35:17-76
+	android:name
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:35:27-73
+category#android.intent.category.BROWSABLE
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:36:17-78
+	android:name
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:36:27-75
+data
+ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:37:17-39:59
+	android:host
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:39:21-56
+	android:scheme
+		ADDED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml:38:21-43
 uses-sdk
 INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from E:\projects\eximpo\simple-webview-app\app\src\main\AndroidManifest.xml

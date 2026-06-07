@@ -1,0 +1,212 @@
+===============================================================
+iOS DEEP LINK SETUP - EXIMPO APP
+===============================================================
+
+---------------------------------------------------------------
+FILE 1: AppDelegate.swift (replace entire file)
+---------------------------------------------------------------
+
+import UIKit
+
+@main
+class AppDelegate: UIResponder, UIApplicationDelegate {
+
+    var pendingDeepLink: URL?
+
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        return true
+    }
+
+    // Handle Universal Links
+    func application(_ application: UIApplication,
+                     continue userActivity: NSUserActivity,
+                     restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb,
+           let url = userActivity.webpageURL {
+            NotificationCenter.default.post(name: .deepLinkReceived, object: url)
+        }
+        return true
+    }
+}
+
+
+---------------------------------------------------------------
+FILE 2: ViewController.swift (replace entire file)
+---------------------------------------------------------------
+
+import UIKit
+import WebKit
+import LocalAuthentication
+
+extension Notification.Name {
+    static let deepLinkReceived = Notification.Name("deepLinkReceived")
+}
+
+class ViewController: UIViewController, WKNavigationDelegate {
+
+    var webView: WKWebView!
+    var overlayView: UIView!          // covers screen when app is backgrounded
+    let baseURL = "https://app.eximpoglobal.net"
+    var isAuthenticated = false
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
+        // Inject flag so React app knows it's inside the native iOS WKWebView
+        let config = WKWebViewConfiguration()
+        let script = WKUserScript(
+            source: "window.isNativeIOSApp = true;",
+            injectionTime: .atDocumentStart,
+            forMainFrameOnly: false
+        )
+        config.userContentController.addUserScript(script)
+
+        webView = WKWebView(frame: view.bounds, configuration: config)
+        webView.navigationDelegate = self
+        webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        view.addSubview(webView)
+
+        // Overlay to hide content when app is backgrounded
+        overlayView = UIView(frame: view.bounds)
+        overlayView.backgroundColor = .systemBackground
+        overlayView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        overlayView.isHidden = true
+        let logo = UIImageView(image: UIImage(named: "AppIcon"))
+        logo.contentMode = .scaleAspectFit
+        logo.frame = CGRect(x: 0, y: 0, width: 100, height: 100)
+        logo.center = overlayView.center
+        overlayView.addSubview(logo)
+        view.addSubview(overlayView)
+
+        // Observe app lifecycle
+        NotificationCenter.default.addObserver(self,
+            selector: #selector(appDidEnterBackground),
+            name: UIApplication.didEnterBackgroundNotification,
+            object: nil)
+        NotificationCenter.default.addObserver(self,
+            selector: #selector(appWillEnterForeground),
+            name: UIApplication.willEnterForegroundNotification,
+            object: nil)
+        NotificationCenter.default.addObserver(self,
+            selector: #selector(handleDeepLink(_:)),
+            name: .deepLinkReceived,
+            object: nil)
+
+        // Authenticate on first launch
+        authenticateWithBiometrics { [weak self] success in
+            guard let self = self else { return }
+            if success {
+                self.isAuthenticated = true
+                self.overlayView.isHidden = true
+                if let url = (UIApplication.shared.delegate as? AppDelegate)?.pendingDeepLink {
+                    self.webView.load(URLRequest(url: url))
+                } else {
+                    self.loadWebsite()
+                }
+            }
+        }
+    }
+
+    func loadWebsite() {
+        webView.load(URLRequest(url: URL(string: baseURL)!))
+    }
+
+    @objc func appDidEnterBackground() {
+        // Show overlay to hide sensitive content in app switcher
+        overlayView.isHidden = false
+        isAuthenticated = false
+    }
+
+    @objc func appWillEnterForeground() {
+        // Require Face ID / Touch ID when returning to app
+        authenticateWithBiometrics { [weak self] success in
+            guard let self = self else { return }
+            if success {
+                self.isAuthenticated = true
+                self.overlayView.isHidden = true
+            }
+            // If failed, overlay stays — user must try again (system handles retries)
+        }
+    }
+
+    func authenticateWithBiometrics(completion: @escaping (Bool) -> Void) {
+        let context = LAContext()
+        var error: NSError?
+
+        if context.canEvaluatePolicy(.deviceOwnerAuthenticationWithBiometrics, error: &error) {
+            context.evaluatePolicy(
+                .deviceOwnerAuthenticationWithBiometrics,
+                localizedReason: "Unlock Eximpo"
+            ) { success, _ in
+                DispatchQueue.main.async {
+                    completion(success)
+                }
+            }
+        } else {
+            // No biometrics available — fall back to device passcode
+            context.evaluatePolicy(
+                .deviceOwnerAuthentication,
+                localizedReason: "Unlock Eximpo"
+            ) { success, _ in
+                DispatchQueue.main.async {
+                    completion(success)
+                }
+            }
+        }
+    }
+
+    @objc func handleDeepLink(_ notification: Notification) {
+        if let url = notification.object as? URL {
+            webView.load(URLRequest(url: url))
+        }
+    }
+
+    deinit {
+        NotificationCenter.default.removeObserver(self)
+    }
+}
+
+
+---------------------------------------------------------------
+XCODE SETUP STEPS
+---------------------------------------------------------------
+
+1. Open your project in Xcode
+2. Click your app Target (top left)
+3. Go to "Signing & Capabilities" tab
+4. Click "+ Capability" -> search "Associated Domains" -> Add it
+5. In Associated Domains, add these two entries:
+   applinks:app.eximpoglobal.net
+   applinks:app.eximpoglobal.net?mode=developer
+
+6. REQUIRED for Face ID: Add to Info.plist
+   Key:   NSFaceIDUsageDescription
+   Value: Eximpo uses Face ID to keep your account secure.
+
+NOTE: "?mode=developer" is for local testing only.
+      It bypasses Apple CDN verification.
+
+
+---------------------------------------------------------------
+TESTING ON PHYSICAL DEVICE (Mac Terminal)
+---------------------------------------------------------------
+
+After running app on device via Xcode USB, open Mac Terminal and run:
+
+xcrun devicectl device process launch --device <YOUR_DEVICE_UDID> \
+  --url "https://app.eximpoglobal.net/products/black-pepper/cf1c23d2-0278-4321-b1ec-980ba043c71f"
+
+OR simpler: Open Notes app on iPhone -> type the URL -> tap it.
+
+
+---------------------------------------------------------------
+FOR PRODUCTION (share these with backend developer)
+---------------------------------------------------------------
+
+Team ID   : found at developer.apple.com -> Account -> Membership
+Bundle ID : the Bundle Identifier set in Xcode (e.g. net.eximpoglobal.app)
+
+These are needed to add the apple-app-site-association endpoint to backend.
+
+===============================================================

@@ -3,8 +3,8 @@
 # min_api: 24
 # common_typos_disable
 # {"id":"com.android.tools.r8.mapping","version":"2.2"}
-# pg_map_id: 5775180
-# pg_map_hash: SHA-256 577518000a2aed30424898f9ccedf4c63a81292bc6e2be5f8c8ffa050b9406f2
+# pg_map_id: f2a8ef2
+# pg_map_hash: SHA-256 f2a8ef24fb18c6b8b859dd5cd214ab22bdafe73e28790a26bca627aa4f932a31
 android.app.AppComponentFactory -> android.app.AppComponentFactory:
 # {"id":"com.android.tools.r8.synthesized"}
 android.support.v4.app.RemoteActionCompatParcelizer -> android.support.v4.app.RemoteActionCompatParcelizer:
@@ -306,120 +306,120 @@ androidx.activity.ComponentActivity$1 -> androidx.activity.e:
     1:8:void $r8$init$synthetic(java.lang.Object,int):0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
       # {"id":"com.android.tools.r8.residualsignature","signature":"(ILjava/lang/Object;)V"}
-    9:30:void net.eximpoglobal.app.SplashActivity$1.run():0:0 -> run
-    9:30:void run$bridge():0 -> run
+    1:1:void net.eximpoglobal.app.SplashActivity$1.run():0:0 -> run
+    1:1:void run$bridge():0 -> run
       # {"id":"com.android.tools.r8.synthesized"}
-    31:34:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0:0 -> run
-    31:34:void run$bridge():0 -> run
-    35:36:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0:0 -> run
-    35:36:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    2:2:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0:0 -> run
+    2:2:void run$bridge():0 -> run
+    3:3:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0:0 -> run
+    3:3:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    35:36:void run$bridge():0 -> run
-    37:44:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    37:44:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    3:3:void run$bridge():0 -> run
+    4:4:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
+    4:4:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    37:44:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    37:44:void run$bridge():0 -> run
-    45:58:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    45:58:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
-    45:58:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    45:58:void run$bridge():0 -> run
-    59:75:android.content.Intent com.google.android.gms.auth.api.signin.internal.zbm.zbb(android.content.Context,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> run
-    59:75:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0 -> run
-    59:75:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
-    59:75:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    59:75:void run$bridge():0 -> run
-    76:86:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    76:86:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
-    76:86:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    76:86:void run$bridge():0 -> run
-    87:102:android.content.Intent com.google.android.gms.auth.api.signin.internal.zbm.zba(android.content.Context,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> run
-    87:102:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0 -> run
-    87:102:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
-    87:102:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    87:102:void run$bridge():0 -> run
-    103:104:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0:0 -> run
-    103:104:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    103:104:void run$bridge():0 -> run
-    105:108:void androidx.activity.result.ActivityResultLauncher.launch(java.lang.Object):0:0 -> run
-    105:108:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    4:4:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    4:4:void run$bridge():0 -> run
+    5:5:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
+    5:5:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    5:5:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    5:5:void run$bridge():0 -> run
+    6:6:android.content.Intent com.google.android.gms.auth.api.signin.internal.zbm.zbb(android.content.Context,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> run
+    6:6:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0 -> run
+    6:6:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    6:6:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    6:6:void run$bridge():0 -> run
+    7:7:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
+    7:7:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    7:7:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    7:7:void run$bridge():0 -> run
+    8:8:android.content.Intent com.google.android.gms.auth.api.signin.internal.zbm.zba(android.content.Context,com.google.android.gms.auth.api.signin.GoogleSignInOptions):0:0 -> run
+    8:8:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0 -> run
+    8:8:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    8:8:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    8:8:void run$bridge():0 -> run
+    9:9:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0:0 -> run
+    9:9:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    9:9:void run$bridge():0 -> run
+    10:10:void androidx.activity.result.ActivityResultLauncher.launch(java.lang.Object):0:0 -> run
+    10:10:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    105:108:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    105:108:void run$bridge():0 -> run
-    109:113:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
-    109:113:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
-    109:113:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
-    109:113:void run$bridge():0 -> run
-    114:117:void androidx.lifecycle.ProcessLifecycleOwner.dispatchPauseIfNeeded():0:0 -> run
-    114:117:void androidx.lifecycle.ProcessLifecycleOwner$1.run():0 -> run
+    10:10:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    10:10:void run$bridge():0 -> run
+    11:11:android.content.Intent com.google.android.gms.auth.api.signin.GoogleSignInClient.getSignInIntent():0:0 -> run
+    11:11:void net.eximpoglobal.app.MainActivity.startNativeGoogleSignIn():0 -> run
+    11:11:void net.eximpoglobal.app.GoogleSignInBridge$1.run():0 -> run
+    11:11:void run$bridge():0 -> run
+    12:12:void androidx.lifecycle.ProcessLifecycleOwner.dispatchPauseIfNeeded():0:0 -> run
+    12:12:void androidx.lifecycle.ProcessLifecycleOwner$1.run():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    114:117:void run$bridge():0 -> run
-    118:126:void androidx.lifecycle.ProcessLifecycleOwner.dispatchPauseIfNeeded():0:0 -> run
-    118:126:void androidx.lifecycle.ProcessLifecycleOwner$1.run():0 -> run
-    118:126:void run$bridge():0 -> run
-    127:148:void androidx.lifecycle.ProcessLifecycleOwner.dispatchStopIfNeeded():0:0 -> run
-    127:148:void androidx.lifecycle.ProcessLifecycleOwner$1.run():0 -> run
-    127:148:void run$bridge():0 -> run
-    149:181:void androidx.lifecycle.LiveData$1.run():0:0 -> run
-    149:181:void run$bridge():0 -> run
-    182:198:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
-    182:198:void run$bridge():0 -> run
-    199:214:void androidx.core.widget.AutoScrollHelper$ClampedScroller.start():0:0 -> run
-    199:214:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
-    199:214:void run$bridge():0 -> run
-    215:216:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
-    215:216:void run$bridge():0 -> run
-    217:224:boolean androidx.core.widget.AutoScrollHelper$ClampedScroller.isFinished():0:0 -> run
-    217:224:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    12:12:void run$bridge():0 -> run
+    13:13:void androidx.lifecycle.ProcessLifecycleOwner.dispatchPauseIfNeeded():0:0 -> run
+    13:13:void androidx.lifecycle.ProcessLifecycleOwner$1.run():0 -> run
+    13:13:void run$bridge():0 -> run
+    14:14:void androidx.lifecycle.ProcessLifecycleOwner.dispatchStopIfNeeded():0:0 -> run
+    14:14:void androidx.lifecycle.ProcessLifecycleOwner$1.run():0 -> run
+    14:14:void run$bridge():0 -> run
+    15:15:void androidx.lifecycle.LiveData$1.run():0:0 -> run
+    15:15:void run$bridge():0 -> run
+    16:16:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
+    16:16:void run$bridge():0 -> run
+    17:17:void androidx.core.widget.AutoScrollHelper$ClampedScroller.start():0:0 -> run
+    17:17:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    17:17:void run$bridge():0 -> run
+    18:18:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
+    18:18:void run$bridge():0 -> run
+    19:19:boolean androidx.core.widget.AutoScrollHelper$ClampedScroller.isFinished():0:0 -> run
+    19:19:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    217:224:void run$bridge():0 -> run
-    225:239:boolean androidx.core.widget.AutoScrollHelper$ClampedScroller.isFinished():0:0 -> run
-    225:239:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
-    225:239:void run$bridge():0 -> run
-    240:254:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
-    240:254:void run$bridge():0 -> run
-    255:275:void androidx.core.widget.AutoScrollHelper.cancelTargetTouch():0:0 -> run
-    255:275:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
-    255:275:void run$bridge():0 -> run
-    276:309:void androidx.core.widget.AutoScrollHelper$ClampedScroller.computeScrollDelta():0:0 -> run
-    276:309:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
-    276:309:void run$bridge():0 -> run
-    310:311:void androidx.core.widget.ListViewCompat.scrollListBy(android.widget.ListView,int):0:0 -> run
-    310:311:void androidx.core.widget.ListViewAutoScrollHelper.scrollTargetBy(int,int):0 -> run
-    310:311:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    19:19:void run$bridge():0 -> run
+    20:20:boolean androidx.core.widget.AutoScrollHelper$ClampedScroller.isFinished():0:0 -> run
+    20:20:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    20:20:void run$bridge():0 -> run
+    21:21:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
+    21:21:void run$bridge():0 -> run
+    22:22:void androidx.core.widget.AutoScrollHelper.cancelTargetTouch():0:0 -> run
+    22:22:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    22:22:void run$bridge():0 -> run
+    23:24:void androidx.core.widget.AutoScrollHelper$ClampedScroller.computeScrollDelta():0:0 -> run
+    23:24:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    23:24:void run$bridge():0 -> run
+    25:25:void androidx.core.widget.ListViewCompat.scrollListBy(android.widget.ListView,int):0:0 -> run
+    25:25:void androidx.core.widget.ListViewAutoScrollHelper.scrollTargetBy(int,int):0 -> run
+    25:25:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(2)"]}
-    310:311:void run$bridge():0 -> run
-    312:314:void androidx.core.widget.ListViewCompat.scrollListBy(android.widget.ListView,int):0:0 -> run
-    312:314:void androidx.core.widget.ListViewAutoScrollHelper.scrollTargetBy(int,int):0 -> run
-    312:314:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
-    312:314:void run$bridge():0 -> run
-    315:318:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
-    315:318:void run$bridge():0 -> run
-    319:322:void androidx.core.view.ViewCompat.postOnAnimation(android.view.View,java.lang.Runnable):0:0 -> run
-    319:322:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
-    319:322:void run$bridge():0 -> run
-    323:334:void androidx.core.widget.AutoScrollHelper$ClampedScroller.computeScrollDelta():0:0 -> run
-    323:334:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
-    323:334:void run$bridge():0 -> run
-    335:338:boolean androidx.appcompat.widget.Toolbar.showOverflowMenu():0:0 -> run
-    335:338:void androidx.appcompat.widget.Toolbar$2.run():0 -> run
-    335:338:void run$bridge():0 -> run
+    25:25:void run$bridge():0 -> run
+    26:26:void androidx.core.widget.ListViewCompat.scrollListBy(android.widget.ListView,int):0:0 -> run
+    26:26:void androidx.core.widget.ListViewAutoScrollHelper.scrollTargetBy(int,int):0 -> run
+    26:26:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    26:26:void run$bridge():0 -> run
+    27:27:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0:0 -> run
+    27:27:void run$bridge():0 -> run
+    28:28:void androidx.core.view.ViewCompat.postOnAnimation(android.view.View,java.lang.Runnable):0:0 -> run
+    28:28:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    28:28:void run$bridge():0 -> run
+    29:29:void androidx.core.widget.AutoScrollHelper$ClampedScroller.computeScrollDelta():0:0 -> run
+    29:29:void androidx.core.widget.AutoScrollHelper$ScrollAnimationRunnable.run():0 -> run
+    29:29:void run$bridge():0 -> run
+    30:30:boolean androidx.appcompat.widget.Toolbar.showOverflowMenu():0:0 -> run
+    30:30:void androidx.appcompat.widget.Toolbar$2.run():0 -> run
+    30:30:void run$bridge():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(2)"]}
-    339:342:boolean androidx.appcompat.widget.ActionMenuView.showOverflowMenu():0:0 -> run
-    339:342:boolean androidx.appcompat.widget.Toolbar.showOverflowMenu():0 -> run
+    31:31:boolean androidx.appcompat.widget.ActionMenuView.showOverflowMenu():0:0 -> run
+    31:31:boolean androidx.appcompat.widget.Toolbar.showOverflowMenu():0 -> run
       # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(1)"]}
-    339:342:void androidx.appcompat.widget.Toolbar$2.run():0 -> run
-    339:342:void run$bridge():0 -> run
-    343:350:boolean androidx.appcompat.widget.ActionMenuView.showOverflowMenu():0:0 -> run
-    343:350:boolean androidx.appcompat.widget.Toolbar.showOverflowMenu():0 -> run
-    343:350:void androidx.appcompat.widget.Toolbar$2.run():0 -> run
-    343:350:void run$bridge():0 -> run
-    351:360:void androidx.appcompat.widget.DropDownListView$ResolveHoverRunnable.run():0:0 -> run
-    351:360:void run$bridge():0 -> run
-    361:371:void androidx.appcompat.graphics.drawable.DrawableContainerCompat$1.run():0:0 -> run
-    361:371:void run$bridge():0 -> run
-    372:390:void run():0:0 -> run
-    372:390:void run$bridge():0 -> run
+    31:31:void androidx.appcompat.widget.Toolbar$2.run():0 -> run
+    31:31:void run$bridge():0 -> run
+    32:32:boolean androidx.appcompat.widget.ActionMenuView.showOverflowMenu():0:0 -> run
+    32:32:boolean androidx.appcompat.widget.Toolbar.showOverflowMenu():0 -> run
+    32:32:void androidx.appcompat.widget.Toolbar$2.run():0 -> run
+    32:32:void run$bridge():0 -> run
+    33:33:void androidx.appcompat.widget.DropDownListView$ResolveHoverRunnable.run():0:0 -> run
+    33:33:void run$bridge():0 -> run
+    34:34:void androidx.appcompat.graphics.drawable.DrawableContainerCompat$1.run():0:0 -> run
+    34:34:void run$bridge():0 -> run
+    35:35:void run():0:0 -> run
+    35:35:void run$bridge():0 -> run
 androidx.activity.ComponentActivity$2 -> androidx.activity.g:
 # {"id":"sourceFile","fileName":"ComponentActivity.java"}
     androidx.activity.ComponentActivity this$0 -> i
@@ -28943,42 +28943,64 @@ net.eximpoglobal.app.MainActivity -> net.eximpoglobal.app.MainActivity:
     22:22:void net.eximpoglobal.app.GoogleSignInBridge.<init>(android.app.Activity):0:0 -> onCreate
     22:22:void onCreate(android.os.Bundle):0 -> onCreate
     23:23:void onCreate(android.os.Bundle):0:0 -> onCreate
-    24:24:void com.google.android.gms.common.internal.Preconditions.checkArgument(boolean,java.lang.Object):0:0 -> onCreate
-    24:24:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.zaa(java.lang.String):0 -> onCreate
-    24:24:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestIdToken(java.lang.String):0 -> onCreate
+    24:24:void loadWebsite():0:0 -> onCreate
     24:24:void onCreate(android.os.Bundle):0 -> onCreate
-    3:44:boolean isNetworkAvailable():0:0 -> p
-    3:44:void loadWebsite():0 -> p
-    45:56:void hideNoNetwork():0:0 -> p
-    45:56:void loadWebsite():0 -> p
-    57:60:void loadWebsite():0:0 -> p
-    61:69:void showNoNetwork():0:0 -> p
-    61:69:void loadWebsite():0 -> p
+    25:25:void showNoNetwork():0:0 -> onCreate
+    25:25:void loadWebsite():0 -> onCreate
+    25:25:void onCreate(android.os.Bundle):0 -> onCreate
+    26:26:void hideNoNetwork():0:0 -> onCreate
+    26:26:void loadWebsite():0 -> onCreate
+    26:26:void onCreate(android.os.Bundle):0 -> onCreate
+    27:27:void loadWebsite():0:0 -> onCreate
+    27:27:void onCreate(android.os.Bundle):0 -> onCreate
+    28:28:void com.google.android.gms.common.internal.Preconditions.checkArgument(boolean,java.lang.Object):0:0 -> onCreate
+    28:28:java.lang.String com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.zaa(java.lang.String):0 -> onCreate
+    28:28:com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder com.google.android.gms.auth.api.signin.GoogleSignInOptions$Builder.requestIdToken(java.lang.String):0 -> onCreate
+    28:28:void onCreate(android.os.Bundle):0 -> onCreate
+    1:1:boolean isNetworkAvailable():0:0 -> p
+    7:16:void showNoNetwork():0:0 -> q
+    7:16:void loadDeepLink(android.net.Uri):0 -> q
+    17:25:void hideNoNetwork():0:0 -> q
+    17:25:void loadDeepLink(android.net.Uri):0 -> q
+    26:54:void loadDeepLink(android.net.Uri):0:0 -> q
 net.eximpoglobal.app.MainActivity$$ExternalSyntheticLambda0 -> z1.b:
+# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
+# {"id":"com.android.tools.r8.synthesized"}
+    int net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.$r8$classId -> a
+      # {"id":"com.android.tools.r8.synthesized"}
+    net.eximpoglobal.app.MainActivity net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.f$0 -> b
+      # {"id":"com.android.tools.r8.synthesized"}
+    1:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.<init>(net.eximpoglobal.app.MainActivity):0:0 -> <init>
+    1:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.$r8$init$synthetic(net.eximpoglobal.app.MainActivity,int):0 -> <init>
+      # {"id":"com.android.tools.r8.synthesized"}
+    11:21:void net.eximpoglobal.app.MainActivity.lambda$showNoNetwork$2():0:0 -> run
+    11:21:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.run$bridge():0 -> run
+      # {"id":"com.android.tools.r8.synthesized"}
+    22:32:void net.eximpoglobal.app.MainActivity.lambda$hideNoNetwork$3():0:0 -> run
+    22:32:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.run$bridge():0 -> run
+net.eximpoglobal.app.MainActivity$$ExternalSyntheticLambda1 -> z1.c:
 # {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
 # {"id":"com.android.tools.r8.synthesized"}
     net.eximpoglobal.app.MainActivity net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.f$0 -> a
       # {"id":"com.android.tools.r8.synthesized"}
     1:1:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.<init>(net.eximpoglobal.app.MainActivity):0:0 -> <init>
       # {"id":"com.android.tools.r8.synthesized"}
-    5:8:void net.eximpoglobal.app.MainActivity.lambda$onCreate$0(android.view.View):0:0 -> onClick
-    5:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.onClick(android.view.View):0 -> onClick
+    5:10:void net.eximpoglobal.app.MainActivity.loadWebsite():0:0 -> onClick
+    5:10:void net.eximpoglobal.app.MainActivity.lambda$onCreate$0(android.view.View):0 -> onClick
+    5:10:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.onClick(android.view.View):0 -> onClick
+      # {"id":"com.android.tools.r8.rewriteFrame","conditions":["throws(Ljava/lang/NullPointerException;)"],"actions":["removeInnerFrames(2)"]}
       # {"id":"com.android.tools.r8.synthesized"}
-net.eximpoglobal.app.MainActivity$$ExternalSyntheticLambda1 -> z1.c:
-# {"id":"sourceFile","fileName":"R8$$SyntheticClass"}
-# {"id":"com.android.tools.r8.synthesized"}
-    int net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.$r8$classId -> a
-      # {"id":"com.android.tools.r8.synthesized"}
-    net.eximpoglobal.app.MainActivity net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.f$0 -> b
-      # {"id":"com.android.tools.r8.synthesized"}
-    1:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.<init>(net.eximpoglobal.app.MainActivity):0:0 -> <init>
-    1:8:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.$r8$init$synthetic(net.eximpoglobal.app.MainActivity,int):0 -> <init>
-      # {"id":"com.android.tools.r8.synthesized"}
-    11:21:void net.eximpoglobal.app.MainActivity.lambda$showNoNetwork$2():0:0 -> run
-    11:21:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.run$bridge():0 -> run
-      # {"id":"com.android.tools.r8.synthesized"}
-    22:32:void net.eximpoglobal.app.MainActivity.lambda$hideNoNetwork$3():0:0 -> run
-    22:32:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$2$0fcb296a0b4c3173456528d07bf1e77af4363a4ab33c5421d7666610bbd36a9a$0.run$bridge():0 -> run
+    11:20:void net.eximpoglobal.app.MainActivity.showNoNetwork():0:0 -> onClick
+    11:20:void net.eximpoglobal.app.MainActivity.loadWebsite():0 -> onClick
+    11:20:void net.eximpoglobal.app.MainActivity.lambda$onCreate$0(android.view.View):0 -> onClick
+    11:20:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.onClick(android.view.View):0 -> onClick
+    21:29:void net.eximpoglobal.app.MainActivity.hideNoNetwork():0:0 -> onClick
+    21:29:void net.eximpoglobal.app.MainActivity.loadWebsite():0 -> onClick
+    21:29:void net.eximpoglobal.app.MainActivity.lambda$onCreate$0(android.view.View):0 -> onClick
+    21:29:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.onClick(android.view.View):0 -> onClick
+    30:37:void net.eximpoglobal.app.MainActivity.loadWebsite():0:0 -> onClick
+    30:37:void net.eximpoglobal.app.MainActivity.lambda$onCreate$0(android.view.View):0 -> onClick
+    30:37:void net.eximpoglobal.app.MainActivity$$InternalSyntheticLambda$1$db76302b8225e45e6a628b8e217cd68968ab42c2c93b7761f93a7dfa536433de$0.onClick(android.view.View):0 -> onClick
 net.eximpoglobal.app.MainActivity$1 -> z1.d:
 # {"id":"sourceFile","fileName":"MainActivity.java"}
     net.eximpoglobal.app.MainActivity this$0 -> a
