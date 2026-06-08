@@ -14,24 +14,19 @@ export const getUserStats = async (req, res) => {
         `SELECT 
           COUNT(*) FILTER (WHERE status IN ('pending', 'confirmed', 'processing')) as active_orders,
           COUNT(*) as total_orders,
-          COALESCE(SUM(total_amount), 0) as total_spent,
-          COUNT(*) FILTER (WHERE delivery_status = 'delivered' AND delivery_date <= estimated_delivery) as on_time_deliveries,
-          COUNT(*) FILTER (WHERE delivery_status = 'delivered') as total_deliveries
+          COALESCE(SUM(total_amount), 0) as total_spent
         FROM orders 
         WHERE buyer_id = $1`,
         [userId]
       );
 
       const orderData = orderStats.rows[0];
-      const onTimeRate = orderData.total_deliveries > 0 
-        ? Math.round((orderData.on_time_deliveries / orderData.total_deliveries) * 100) 
-        : 100;
 
       stats = {
         activeOrders: parseInt(orderData.active_orders) || 0,
         totalOrders: parseInt(orderData.total_orders) || 0,
         totalSpent: parseFloat(orderData.total_spent) || 0,
-        onTimeRate: onTimeRate
+        onTimeRate: 100
       };
     } else if (role === 'seller') {
       // Get seller stats
@@ -39,9 +34,7 @@ export const getUserStats = async (req, res) => {
         `SELECT 
           COUNT(*) FILTER (WHERE status IN ('pending', 'confirmed', 'processing')) as active_orders,
           COUNT(*) as total_orders,
-          COALESCE(SUM(total_amount), 0) as total_revenue,
-          COUNT(*) FILTER (WHERE delivery_status = 'delivered' AND delivery_date <= estimated_delivery) as on_time_deliveries,
-          COUNT(*) FILTER (WHERE delivery_status = 'delivered') as total_deliveries
+          COALESCE(SUM(total_amount), 0) as total_revenue
         FROM orders 
         WHERE seller_id = $1`,
         [userId]
@@ -53,16 +46,13 @@ export const getUserStats = async (req, res) => {
       );
 
       const sellerData = sellerStats.rows[0];
-      const onTimeRate = sellerData.total_deliveries > 0 
-        ? Math.round((sellerData.on_time_deliveries / sellerData.total_deliveries) * 100) 
-        : 100;
 
       stats = {
         activeOrders: parseInt(sellerData.active_orders) || 0,
         totalOrders: parseInt(sellerData.total_orders) || 0,
         totalRevenue: parseFloat(sellerData.total_revenue) || 0,
         totalProducts: parseInt(productCount.rows[0].count) || 0,
-        onTimeRate: onTimeRate
+        onTimeRate: 100
       };
     }
 
