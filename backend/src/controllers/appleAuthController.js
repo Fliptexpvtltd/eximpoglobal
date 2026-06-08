@@ -88,24 +88,66 @@ export const appleSignIn = async (req, res) => {
       });
     }
 
-    // New user — needs role selection
-    const tempToken = jwt.sign(
-      {
-        appleUserId: stableAppleId,
-        email: verifiedEmail,
-        name: fullName || null,
-        tempAuth: true,
-        provider: 'apple'
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '15m' }
+    // New user — auto-register immediately with default role 'buyer'
+    // User can update role/company from profile settings after login
+    console.log('🍎 New Apple user — auto-registering:', verifiedEmail || stableAppleId);
+
+    const userName = fullName || 'Apple User';
+    const emailToUse = verifiedEmail || `apple_${stableAppleId}@privaterelay.appleid.com`;
+    const randomPassword = bcrypt.hashSync(Math.random().toString(36), 10);
+
+    const newUserResult = await query(
+      `INSERT INTO users (email, password_hash, full_name, role, company_name, verified, email_verified, auth_provider, apple_user_id)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+       RETURNING id, email, full_name, role, company_name, verified`,
+      [
+        emailToUse,
+        randomPassword,
+        userName,
+        'buyer',           // default role — can be changed in profile
+        userName,          // default company name = their name
+        false,             // KYC still required
+        true,              // email verified by Apple
+        'apple',
+        stableAppleId
+      ]
     );
 
-    return res.json({
+    const newUser = newUserResult.rows[0];
+    console.log('✅ New Apple user registered:', newUser.email);
+
+    // Send welcome email asynchronously (non-blocking)
+    if (verifiedEmail) {
+      sendEmail(newUser.email, 'welcome', {
+        email: newUser.email,
+        fullName: newUser.full_name,
+        companyName: newUser.company_name,
+        role: newUser.role
+      }).catch(emailError => {
+        console.error('⚠️ Failed to queue welcome email:', emailError.message);
+      });
+    }
+
+    const token = jwt.sign(
+      { userId: newUser.id, email: newUser.email, role: newUser.role },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN }
+    );
+
+    return res.status(201).json({
       success: true,
       isNewUser: true,
-      tempToken,
-      user: { email: verifiedEmail, name: fullName || null }
+      data: {
+        token,
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          fullName: newUser.full_name,
+          role: newUser.role,
+          companyName: newUser.company_name,
+          verified: newUser.verified
+        }
+      }
     });
 
   } catch (error) {
