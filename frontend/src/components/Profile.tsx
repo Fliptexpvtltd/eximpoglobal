@@ -92,16 +92,19 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
     try {
       setLoading(true);
       const response = await api.delete('/auth/account');
-      if (response.success) {
+      console.log('Delete account response:', response);
+      if (response && response.success) {
         toast.success('Account deleted successfully');
         // Clear auth and logout
         setTimeout(() => {
           onLogout();
         }, 1000);
+      } else {
+        toast.error(response?.message || 'Failed to delete account');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to delete account:', error);
-      toast.error('Failed to delete account. Please try again.');
+      toast.error(error?.message || 'Failed to delete account. Please try again.');
     } finally {
       setLoading(false);
       setShowDeleteConfirm(false);
@@ -947,7 +950,8 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
         
         <button 
           onClick={() => setShowDeleteConfirm(true)}
-          className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          style={{ backgroundColor: '#dc2626', borderColor: '#991b1b' }}
+          className="w-full flex items-center justify-center gap-2 px-6 py-3 text-white font-semibold rounded-lg hover:opacity-90 transition-opacity border shadow-md"
         >
           <Trash2 className="w-5 h-5" />
           Delete Account
@@ -984,7 +988,8 @@ export function Profile({ user, activeMode = 'buyer', onLogout }: ProfileProps) 
               <button
                 onClick={handleDeleteAccount}
                 disabled={loading}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                style={{ backgroundColor: '#dc2626' }}
+                className="flex-1 px-4 py-2 text-white rounded-lg hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {loading ? 'Deleting...' : 'Delete Account'}
               </button>

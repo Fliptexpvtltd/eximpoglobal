@@ -38,19 +38,11 @@ export const appleSignIn = async (req, res) => {
     const stableAppleId = payload.sub;
     const verifiedEmail = payload.email || email || null;
 
-    // Check if user exists by Apple user ID or email
-    let userResult;
-    if (verifiedEmail) {
-      userResult = await query(
-        'SELECT * FROM users WHERE apple_user_id = $1 OR email = $2',
-        [stableAppleId, verifiedEmail]
-      );
-    } else {
-      userResult = await query(
-        'SELECT * FROM users WHERE apple_user_id = $1',
-        [stableAppleId]
-      );
-    }
+    // Check if user exists by Apple user ID (most reliable identifier)
+    let userResult = await query(
+      'SELECT * FROM users WHERE apple_user_id = $1',
+      [stableAppleId]
+    );
 
     if (userResult.rows.length > 0) {
       // Existing user — login
@@ -153,16 +145,16 @@ export const completeAppleRegistration = async (req, res) => {
       });
     }
 
-    // Check if user already exists
+    // Check if user with this Apple ID already exists
     const existingUser = await query(
-      'SELECT id FROM users WHERE email = $1 OR apple_user_id = $2',
-      [decoded.email || '', decoded.appleUserId]
+      'SELECT id FROM users WHERE apple_user_id = $1',
+      [decoded.appleUserId]
     );
 
     if (existingUser.rows.length > 0) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists'
+        message: 'User already exists with this Apple account'
       });
     }
 

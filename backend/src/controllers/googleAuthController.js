@@ -45,7 +45,7 @@ export const googleSignIn = async (req, res) => {
     // Verify the Google token
     const googleUser = await verifyGoogleToken(credential);
     
-    // Check if user exists
+    // Check if user exists (including deleted accounts)
     const userResult = await query(
       'SELECT * FROM users WHERE email = $1',
       [googleUser.email]
@@ -165,7 +165,7 @@ export const completeGoogleRegistration = async (req, res) => {
       });
     }
     
-    // Check if user already exists (shouldn't happen but safety check)
+    // Check if user already exists
     const existingUser = await query(
       'SELECT id FROM users WHERE email = $1',
       [decoded.email]

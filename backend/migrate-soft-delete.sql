@@ -1,0 +1,5 @@
+-- Hard delete migration for account deletion
+-- This migration is NOT NEEDED for hard delete
+-- When a user deletes their account, the record is completely removed from the database
+-- The CASCADE constraints on orders, products, etc. will automatically remove related data
+-- No migration required - using hard delete removes records immediately

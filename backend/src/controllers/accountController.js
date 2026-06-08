@@ -3,7 +3,7 @@ import { query } from '../config/database.js';
 // Delete user account (requires authentication)
 export const deleteAccount = async (req, res) => {
   try {
-    const userId = req.user.userId;
+    const userId = req.user.id;
 
     if (!userId) {
       return res.status(401).json({
@@ -12,32 +12,12 @@ export const deleteAccount = async (req, res) => {
       });
     }
 
-    // Delete user and all related data
-    await query('BEGIN');
-
+    // Hard delete user account and all related data (cascade delete)
     try {
-      // Delete user's chat messages
-      await query('DELETE FROM chat_messages WHERE sender_id = $1 OR receiver_id = $1', [userId]);
-
-      // Delete user's notifications
-      await query('DELETE FROM notifications WHERE user_id = $1', [userId]);
-
-      // Delete user's orders (if buyer)
-      await query('DELETE FROM orders WHERE buyer_id = $1', [userId]);
-
-      // Delete user's products (if seller)
-      await query('DELETE FROM products WHERE supplier_id = $1', [userId]);
-
-      // Delete user's supplier profile
-      await query('DELETE FROM supplier_profiles WHERE user_id = $1', [userId]);
-
-      // Delete user's company profile
-      await query('DELETE FROM company_profiles WHERE user_id = $1', [userId]);
-
-      // Delete the user account
-      const result = await query('DELETE FROM users WHERE id = $1 RETURNING email', [userId]);
-
-      await query('COMMIT');
+      const result = await query(
+        'DELETE FROM users WHERE id = $1 RETURNING email, id',
+        [userId]
+      );
 
       if (result.rows.length === 0) {
         return res.status(404).json({
@@ -46,14 +26,17 @@ export const deleteAccount = async (req, res) => {
         });
       }
 
+      const deletedUser = result.rows[0];
+      console.log(`Account permanently deleted: ${deletedUser.email} (ID: ${deletedUser.id})`);
+
       res.json({
         success: true,
         message: 'Account successfully deleted',
-        email: result.rows[0].email
+        email: deletedUser.email
       });
 
     } catch (innerError) {
-      await query('ROLLBACK');
+      console.error('Database error during account deletion:', innerError.message);
       throw innerError;
     }
 

@@ -89,7 +89,7 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Find user
+    // Find user (including deleted ones)
     const result = await query(
       'SELECT * FROM users WHERE email = $1',
       [email]
