@@ -188,18 +188,17 @@ export const completeAppleRegistration = async (req, res) => {
 
     const user = result.rows[0];
 
-    // Send welcome email (only if real email available)
+    // Send welcome email asynchronously (non-blocking) - don't wait for it
     if (decoded.email) {
-      try {
-        await sendEmail(user.email, 'welcome', {
-          email: user.email,
-          fullName: user.full_name,
-          companyName: user.company_name,
-          role: user.role
-        });
-      } catch (emailError) {
-        console.error('Failed to send welcome email:', emailError);
-      }
+      sendEmail(user.email, 'welcome', {
+        email: user.email,
+        fullName: user.full_name,
+        companyName: user.company_name,
+        role: user.role
+      }).catch(emailError => {
+        console.error('⚠️ Failed to queue welcome email (user registered successfully):', emailError.message);
+        // Email failure does NOT block registration
+      });
     }
 
     const token = jwt.sign(
