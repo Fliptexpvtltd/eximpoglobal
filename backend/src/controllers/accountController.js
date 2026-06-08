@@ -12,6 +12,14 @@ export const deleteAccount = async (req, res) => {
       });
     }
 
+    // Prevent admin accounts from deleting themselves
+    if (req.user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Admin accounts cannot be deleted through this endpoint'
+      });
+    }
+
     // Hard delete user account and all related data (cascade delete)
     try {
       const result = await query(
