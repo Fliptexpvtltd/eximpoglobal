@@ -69,10 +69,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             phone: data.data.phone || '',
           };
           setUser(loadedUser);
-          console.log('✅ User loaded from token:', loadedUser.email);
         } else {
           // Token invalid or expired, clear it
-          console.log('❌ Token invalid, clearing storage');
           localStorage.removeItem('token');
           sessionStorage.removeItem('token');
         }
@@ -90,7 +88,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string, rememberMe: boolean = true) => {
-    console.log('🔑 Login function called:', { email, rememberMe });
     try {
       const response = await fetch(`${API_BASE_URL}/auth/login`, {
         method: 'POST',
@@ -101,7 +98,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       const data = await response.json();
-      console.log('📡 Login response:', data);
 
       if (response.ok && data.success) {
         // Store token based on rememberMe choice

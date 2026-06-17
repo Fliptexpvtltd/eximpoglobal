@@ -82,11 +82,8 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
-    console.log('📸 File selected:', files);
-    
     if (files && files.length > 0) {
       const file = files[0];
-      console.log('📸 File details:', { name: file.name, size: file.size, type: file.type });
       
       // Validate file type
       if (!file.type.startsWith('image/')) {
@@ -105,7 +102,6 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
 
       try {
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-        console.log('🔑 Token exists:', !!token);
         
         if (!token) {
           toast.error('Authentication required. Please login again.', { id: uploadingToast });
@@ -117,7 +113,6 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
         formData.append('image', file);
 
         const uploadUrl = `${API_BASE_URL}/uploads/products/image`;
-        console.log('📤 Uploading to:', uploadUrl);
 
         // Upload to backend
         const response = await fetch(uploadUrl, {
@@ -128,12 +123,9 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
           body: formData,
         });
 
-        console.log('📥 Response status:', response.status);
         const data = await response.json();
-        console.log('📥 Response data:', data);
 
         if (data.success && data.file) {
-          console.log('✅ Upload successful, URL:', data.file.url);
           setImages([...images, data.file.url]);
           toast.success('Image uploaded successfully', { id: uploadingToast });
         } else {
@@ -507,8 +499,6 @@ export function AddProduct({ user, activeMode, onBack, onSuccess }: AddProductPr
                     src={image} 
                     alt={`Product ${index + 1}`} 
                     className="w-full h-full object-cover"
-                    onError={() => console.error('❌ Image load error:', image)}
-                    onLoad={() => console.log('✅ Image loaded:', image)}
                   />
                   <button
                     type="button"
