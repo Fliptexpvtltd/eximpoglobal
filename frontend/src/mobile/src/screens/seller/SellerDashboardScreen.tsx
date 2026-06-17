@@ -14,6 +14,13 @@ export default function SellerDashboardScreen() {
     po.status === 'in_production' || po.status === 'pending_payment'
   );
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good Morning';
+    else if (hour < 18) return 'Good Afternoon';
+    else return 'Good Evening';
+  };
+
   const stats = [
     { label: 'Incoming RFQs', value: incomingRFQs.length, icon: 'inbox', color: '#2563eb' },
     { label: 'Active Orders', value: activeOrders.length, icon: 'package', color: '#10b981' },
@@ -25,7 +32,7 @@ export default function SellerDashboardScreen() {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <View>
-          <Text h4>Seller Dashboard</Text>
+          <Text h4>{getGreeting()},</Text>
           <Text h3>{user?.companyName}</Text>
         </View>
         <Badge

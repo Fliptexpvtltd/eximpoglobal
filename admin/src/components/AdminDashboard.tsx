@@ -67,9 +67,15 @@ export function AdminDashboard({ user, onNavigate }: AdminDashboardProps) {
   const [users, setUsers] = useState<UserData[]>([]);
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [greeting, setGreeting] = useState('');
 
   useEffect(() => {
     fetchDashboardData();
+    // Set greeting based on time of day
+    const hour = new Date().getHours();
+    if (hour < 12) setGreeting('Good Morning');
+    else if (hour < 18) setGreeting('Good Afternoon');
+    else setGreeting('Good Evening');
   }, []);
 
   const fetchDashboardData = async () => {
@@ -229,7 +235,7 @@ export function AdminDashboard({ user, onNavigate }: AdminDashboardProps) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-gray-900">{greeting}, {user.fullName}</h1>
           <p className="text-gray-600 mt-1">Platform overview and management</p>
         </div>
         <Badge variant="outline" className="flex items-center gap-2">
